@@ -220,3 +220,7 @@ $lang["sales_work_order_number"] = "Work Order Number";
 $lang["sales_work_order_number_duplicate"] = "Work Order Number must be unique.";
 $lang["sales_work_order_sent"] = "Work Order sent to";
 $lang["sales_work_order_unsent"] = "Work Order failed to be sent to";
+$lang["sales_order_total"] = "Total Order";
+$lang["sales_order_delivery_date"] = "Delivery Date";
+$lang["sales_order_status"] = "Status";
+$lang["sales_order_no_sales_order_to_display"] = "No Sales Order to display.";
