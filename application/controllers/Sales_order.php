@@ -27,12 +27,46 @@ class Sales_order extends Secure_Controller
     public function manage()
     {
         $data['table_headers'] = get_sales_order_manage_table_headers();
-        $this->load->view('sales/manage', $data);
+        $this->load->view('sales_order/manage', $data);
+    }
+
+    public function detailso($sale_order_id){
+        $data['table_headers'] = get_sales_order_detail_table_headers();
+        $data['so_id'] = $sale_order_id;
+        $data['so_number'] = 'SO0000'.$sale_order_id;
+        $so_info = $this->Salesorder->get_sales_order_info_by_id($sale_order_id);
+        $data['so_info_customer'] = $so_info->company_name;
+        $data['so_info_comment'] = $so_info->comment;
+        $data['so_info_date'] = substr($so_info->sale_time,0,10);
+        $this->load->view('sales_order/view_detail_so', $data);
+    }
+
+    public function get_detail_so($sale_order_id){
+        $search = $this->input->get('search');
+        $limit = $this->input->get('limit');
+        $offset = $this->input->get('offset');
+        $sort = $this->input->get('sort');
+        $order = $this->input->get('order');
+        $filters = [];
+        $sales_order_items = $this->Salesorder->search_detail($sale_order_id,$search, $filters, $limit, $offset, $sort, $order);
+        $total_rows = $this->Salesorder->get_detail_found_rows($sale_order_id, $search, $filters);
+        $data_rows = array();
+        foreach($sales_order_items->result() as $so_item)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_items_data_row($so_item));
+        }
+
+        if($total_rows > 0)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_items_data_last_row($sales_order_items));
+        }
+        $payment_summary = '';
+        echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
 
     public function get_row($row_id)
     {
-        $sale_info = $this->Sale->get_info($row_id)->row();
+        $sale_info = $this->Sales_order->get_info($row_id)->row();
         $data_row = $this->xss_clean(get_sale_order_data_row($sale_info));
 
         echo json_encode($data_row);

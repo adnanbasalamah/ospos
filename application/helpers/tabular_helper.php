@@ -95,11 +95,25 @@ function get_sales_order_manage_table_headers()
 		array('employee_name' => $CI->lang->line('common_sales')),
 		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
 		array('order_status' => $CI->lang->line('sales_order_status')),
-		array('total_order' => $CI->lang->line('sales_order_total'))
+		array('total_order' => $CI->lang->line('sales_order_total')),
+		array('view_detail' => 'Detail', 'escape' => FALSE)
 	);
 	return transform_headers($headers);
 }
 
+function get_sales_order_detail_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_barcode' => $CI->lang->line('items_item_number')),
+		array('item_name' => $CI->lang->line('items_item')),
+		array('items_quantity' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal_order' => $CI->lang->line('sales_sub_total')),
+	);
+	return transform_headers($headers);
+}
 /*
 Get the html data row for the sales
 */
@@ -123,7 +137,7 @@ function get_sale_data_row($sale)
 	{
 		$row['invoice_number'] = $sale->invoice_number;
 		$row['invoice'] = empty($sale->invoice_number) ? '' : anchor($controller_name."/invoice/$sale->sale_id", '<span class="glyphicon glyphicon-list-alt"></span>',
-			array('title'=>$CI->lang->line('sales_show_invoice'))
+			array('title'=>$CI->lang->line('sales_show_sales_order_detail'))
 		);
 	}
 
@@ -152,9 +166,13 @@ function get_sale_order_data_row($sale)
 		'employee_name' => $sale->employee_name,
 		'delivery_date' => $sale->delivery_date,
 		'order_status' => $sales_order_status[$sale->sale_status],
-		'total_order' => to_currency($sale->total_order)
+		'total_order' => to_currency($sale->total_order),
 	);
-
+	$row['view_detail'] = anchor(
+		$controller_name."/detailso/$sale->sale_order_id",
+		'<span class="glyphicon glyphicon-list-alt"></span>',
+		array('title'=>$CI->lang->line('sales_show_invoice'))
+	);
 	if($CI->config->item('invoice_enable'))
 	{
 		$row['invoice_number'] = $sale->invoice_number;
@@ -170,6 +188,21 @@ function get_sale_order_data_row($sale)
 		array('class' => 'modal-dlg print_hide', 'data-btn-delete' => $CI->lang->line('common_delete'), 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
 	);
 
+	return $row;
+}
+
+function get_sale_order_items_data_row($so_item)
+{
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array(
+		'item_id' => $so_item->item_id,
+		'item_barcode' => $so_item->item_number,
+		'item_name' => $so_item->name,
+		'items_quantity' => $so_item->quantity_purchased,
+		'items_unit_price' => to_currency($so_item->item_unit_price),
+		'subtotal_order' => to_currency($so_item->item_unit_price * $so_item->quantity_purchased),
+	);
 	return $row;
 }
 
@@ -215,6 +248,22 @@ function get_sale_order_data_last_row($sales)
 		'sale_id' => '-',
 		'sale_time' => $CI->lang->line('sales_total'),
 		'total_order' => to_currency($sum_total_order),
+	);
+}
+
+function get_sale_order_items_data_last_row($so_items){
+	$CI =& get_instance();
+
+	$sum_total_order = 0;
+	foreach($so_items->result() as $key => $so_item)
+	{
+		$sum_total_order += $so_item->quantity_purchased * $so_item->item_unit_price;
+	}
+
+	return array(
+		'item_id' => '-',
+		'items_unit_price' => $CI->lang->line('sales_total'),
+		'subtotal_order' => to_currency($sum_total_order),
 	);
 }
 
@@ -304,6 +353,7 @@ function get_customer_manage_table_headers()
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
 		array('sales' => $CI->lang->line('common_sales')),
+		array('company_name' => $CI->lang->line('sales_company_name')),
 		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
 	);
 
@@ -332,6 +382,7 @@ function get_customer_data_row($person, $stats, $employee_name = '')
 		'phone_number' => $person->phone_number,
 		'employee_category' => $person->employee_category,
 		'sales' => $employee_name,
+		'company_name' => $person->company_name,
 		'total' => to_currency($stats->total),
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
