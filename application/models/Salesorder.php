@@ -139,7 +139,34 @@ class Salesorder extends CI_Model
         $this->db->trans_start();
 
         $sale_status = $this->get_sale_status($sale_order_id);
+        if($update_inventory && ((int)$sale_status == COMPLETED || (int)$sale_status == PARTIALLY_DELIVERED))
+        {
+            // defect, not all item deletions will be undone??
+            // get array with all the items involved in the sale to update the inventory tracking
+            $items = $this->get_sale_order_items($sale_order_id)->result_array();
+            foreach($items as $item)
+            {
+                $cur_item_info = $this->Item->get_info($item['item_id']);
 
+                if($cur_item_info->stock_type == HAS_STOCK)
+                {
+                    // create query to update inventory tracking
+                    $inv_data = array(
+                        'trans_date' => date('Y-m-d H:i:s'),
+                        'trans_items' => $item['item_id'],
+                        'trans_user' => $employee_id,
+                        'trans_comment' => 'Deleting sale ' . $sale_order_id,
+                        'trans_location' => $item['item_location'],
+                        'trans_inventory' => $item['quantity_purchased']
+                    );
+                    // update inventory
+                    $this->Inventory->insert($inv_data);
+
+                    // update quantities
+                    $this->Item_quantity->change_quantity($item['item_id'], $item['item_location'], $item['quantity_purchased']);
+                }
+            }
+        }
         $this->update_sale_status($sale_order_id, CANCELED);
 
         // execute transaction
@@ -151,7 +178,7 @@ class Salesorder extends CI_Model
     /**
      * Gets sale item
      */
-    public function get_sale_items($sale_order_id)
+    public function get_sale_order_items($sale_order_id)
     {
         $this->db->from('sales_order_items');
         $this->db->where('sale_order_id', $sale_order_id);

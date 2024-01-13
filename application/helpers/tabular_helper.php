@@ -106,8 +106,8 @@ function get_sales_order_detail_table_headers(){
 
 	$headers = array(
 		array('item_id' => $CI->lang->line('common_id')),
-		array('item_barcode' => $CI->lang->line('items_item_number')),
-		array('item_name' => $CI->lang->line('items_item')),
+		array('item_number' => $CI->lang->line('items_item_number')),
+		array('name' => $CI->lang->line('items_item')),
 		array('items_quantity' => $CI->lang->line('items_quantity')),
 		array('items_unit_price' => $CI->lang->line('items_unit_price')),
 		array('subtotal_order' => $CI->lang->line('sales_sub_total')),
@@ -197,8 +197,8 @@ function get_sale_order_items_data_row($so_item)
 	$controller_name = $CI->uri->segment(1);
 	$row = array(
 		'item_id' => $so_item->item_id,
-		'item_barcode' => $so_item->item_number,
-		'item_name' => $so_item->name,
+		'item_number' => $so_item->item_number,
+		'name' => $so_item->name,
 		'items_quantity' => $so_item->quantity_purchased,
 		'items_unit_price' => to_currency($so_item->item_unit_price),
 		'subtotal_order' => to_currency($so_item->item_unit_price * $so_item->quantity_purchased),

@@ -132,10 +132,12 @@ define('NAME_SEPARATOR', ' | ');
 /*
  | Sale Related Constants.
  */
-define('COMPLETED', 0);
-define('SUSPENDED', 1);
-define('CANCELED', 2);
-
+define('COMPLETED', 4);
+define('SUSPENDED', 6);
+define('CANCELED', 5);
+define('NEW', 0);
+define('APPROVED', 1);
+define('PARTIALLY_DELIVERED', 2);
 
 define('SALE_TYPE_POS', 0);
 define('SALE_TYPE_INVOICE', 1);

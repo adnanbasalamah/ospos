@@ -31,12 +31,14 @@ class Sales_order extends Secure_Controller
     }
 
     public function detailso($sale_order_id){
+        $arr_order_status = arr_sales_order_status();
         $data['table_headers'] = get_sales_order_detail_table_headers();
         $data['so_id'] = $sale_order_id;
         $data['so_number'] = 'SO0000'.$sale_order_id;
         $so_info = $this->Salesorder->get_sales_order_info_by_id($sale_order_id);
         $data['so_info_customer'] = $so_info->company_name;
         $data['so_info_comment'] = $so_info->comment;
+        $data['so_info_status'] = strtoupper($arr_order_status[$so_info->sale_status]);
         $data['so_info_date'] = substr($so_info->sale_time,0,10);
         $this->load->view('sales_order/view_detail_so', $data);
     }
@@ -106,5 +108,29 @@ class Sales_order extends Secure_Controller
         }
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
+    }
+
+    public function delete($sale_order_id = -1, $update_inventory = TRUE)
+    {
+        $employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+        $has_grant = $this->Employee->has_grant('sales_delete', $employee_id);
+        if(!$has_grant)
+        {
+            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_not_authorized')));
+        }
+        else
+        {
+            $sale_order_ids = $sale_order_id == -1 ? $this->input->post('ids') : array($sale_order_id);
+
+            if($this->Salesorder->delete_list($sale_order_ids, $employee_id))
+            {
+                echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_successfully_deleted') . ' ' .
+                    count($sale_order_ids) . ' ' . $this->lang->line('sales_one_or_multiple'), 'ids' => $sale_order_ids));
+            }
+            else
+            {
+                echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_deleted')));
+            }
+        }
     }
 }
