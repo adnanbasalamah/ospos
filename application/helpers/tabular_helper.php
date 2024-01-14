@@ -92,7 +92,7 @@ function get_sales_order_manage_table_headers()
 		array('sale_id' => $CI->lang->line('common_id')),
 		array('sale_time' => $CI->lang->line('sales_sale_time')),
 		array('customer_name' => $CI->lang->line('customers_customer')),
-		array('company_name' => $CI->lang->line('customers_customer')),
+		array('company_name' => $CI->lang->line('sales_company_name')),
 		array('employee_name' => $CI->lang->line('common_sales')),
 		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
 		array('order_status' => $CI->lang->line('sales_order_status')),
