@@ -939,4 +939,148 @@ function arr_employee_category()
 function arr_sales_order_status(){
 	return [0 => 'New', 1 => 'Approved', 2 => 'Shipping', 3 => 'Partially Delivered', 4 => 'Complete', 5 => 'Cancel'];
 }
+
+function arr_purchase_order_status(){
+	return [0 => 'New', 1 => 'Approved', 2 => 'Shipping', 3 => 'Partially Delivered', 4 => 'Complete', 5 => 'Cancel'];
+}
+
+/*
+Get the header for the sales purchase order tabular view
+*/
+function get_po_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('po_id' => $CI->lang->line('common_id')),
+		array('po_time' => $CI->lang->line('po_time')),
+		array('supplier_name' => $CI->lang->line('supplier_name')),
+		array('employee_name' => $CI->lang->line('common_sales')),
+		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
+		array('po_status' => $CI->lang->line('sales_order_status')),
+		array('total_order' => $CI->lang->line('sales_order_total')),
+		array('view_detail' => 'Detail', 'escape' => FALSE)
+	);
+	return transform_headers($headers);
+}
+
+function get_po_detail_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_barcode' => $CI->lang->line('items_item_number')),
+		array('item_name' => $CI->lang->line('items_item')),
+		array('items_quantity' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal_order' => $CI->lang->line('sales_sub_total')),
+	);
+
+
+	return transform_headers($headers);
+}
+
+function get_purchase_order_detail_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_barcode' => $CI->lang->line('items_item_number')),
+		array('item_name' => $CI->lang->line('items_item')),
+		array('items_quantity' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal_order' => $CI->lang->line('sales_sub_total')),
+	);
+	return transform_headers($headers);
+}
+
+function get_purchase_order_data_row($po)
+{
+	$CI =& get_instance();
+
+	$controller_name = $CI->uri->segment(1);
+
+	$purchase_order_status = arr_purchase_order_status();
+
+	$row = array (
+		'po_id' => $po->po_id,
+		'po_time' => to_datetime(strtotime($po->po_time)),
+		'supplier_name' => $po->supplier_name,
+		'employee_name' => $po->employee_name,
+		'delivery_date' => $po->delivery_date,
+		'po_status' => $purchase_order_status[$po->po_status],
+		'total_order' => to_currency($po->total_order),
+	);
+	$row['view_detail'] = anchor(
+		$controller_name."/detailpo/$po->po_id",
+		'<span class="glyphicon glyphicon-list-alt"></span>',
+		array('title'=>$CI->lang->line('sales_show_invoice'))
+	);
+	/*
+	if($CI->config->item('invoice_enable'))
+	{
+		$row['invoice_number'] = $po->invoice_number;
+		$row['invoice'] = empty($po->invoice_number) ? '' : anchor($controller_name."/invoice/$po->po_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+			array('title'=>$CI->lang->line('sales_show_invoice'))
+		);
+	}
+	*/
+	$row['receipt'] = anchor($controller_name."/receipt/$po->po_id", '<span class="glyphicon glyphicon-usd"></span>',
+		array('title' => $CI->lang->line('sales_show_receipt'))
+	);
+	$row['edit'] = anchor($controller_name."/edit/$po->po_id", '<span class="glyphicon glyphicon-edit"></span>',
+		array('class' => 'modal-dlg print_hide', 'data-btn-delete' => $CI->lang->line('common_delete'), 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
+	);
+
+	return $row;
+}
+
+function get_purchase_order_items_data_row($po_item)
+{
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array(
+		'item_id' => $po_item->item_id,
+		'item_barcode' => $po_item->item_number,
+		'item_name' => $po_item->name,
+		'items_quantity' => $po_item->quantity_purchased,
+		'items_unit_price' => to_currency($po_item->item_unit_price),
+		'subtotal_order' => to_currency($po_item->item_unit_price * $po_item->quantity_purchased),
+	);
+	return $row;
+}
+
+function get_purchase_order_data_last_row($pos)
+{
+	$CI =& get_instance();
+
+	$sum_total_order = 0;
+
+	foreach($pos->result() as $key=>$po)
+	{
+		$sum_total_order += $po->total_order;
+	}
+
+	return array(
+		'po_id' => '-',
+		'po_time' => $CI->lang->line('total_order'),
+		'total_order' => to_currency($sum_total_order),
+	);
+}
+
+function get_purchase_order_items_data_last_row($po_items){
+	$CI =& get_instance();
+
+	$sum_total_order = 0;
+	foreach($po_items->result() as $key => $po_item)
+	{
+		$sum_total_order += $po_item->quantity_purchased * $po_item->item_unit_price;
+	}
+
+	return array(
+		'item_id' => '-',
+		'items_unit_price' => $CI->lang->line('sales_total'),
+		'subtotal_order' => to_currency($sum_total_order),
+	);
+}
 ?>
