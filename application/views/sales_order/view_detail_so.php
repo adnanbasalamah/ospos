@@ -23,6 +23,7 @@
             }
         });
     });
+    $('#add-item').removeAttr('disabled');
 </script>
 <div id="title_bar" class="print_hide btn-toolbar">
     <button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
@@ -37,8 +38,21 @@
 <div class="row">
     <div class="col-md-2 so-info">Customer</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_customer; ?></div>
     <div class="col-md-2 so-info">Order Date</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_date; ?></div>
-    <div class="col-md-2 so-info">Order Notes</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_comment;?></div><div class="col-md-2 so-info">&nbsp;</div><div class="col-md-4 so-info so-info-value">&nbsp;</div>
+    <div class="col-md-2 so-info">Order Notes</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_comment;?></div>
+    <div class="col-md-2 so-info">Order Status</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_status;?></div>
 </div>
+<?php if ($so_info_status == CANCELED || $so_info_status == COMPLETED){ ?>
+<div id="title_bar" class="print_hide btn-toolbar">
+    <?php echo anchor("sales_order/add-item", '<span class="glyphicon glyphicon-plus-sign">&nbsp</span>' . $this->lang->line('sales_new_item'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
+</div>
+<div id="toolbar">
+    <div class="pull-left form-inline" role="toolbar">
+        <button id="delete" class="btn btn-default btn-sm print_hide">
+            <span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
+        </button>
+    </div>
+</div>
+<?php } ?>
 <div id="table_holder">
     <table id="table"></table>
 </div>
