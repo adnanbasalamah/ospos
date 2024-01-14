@@ -41,6 +41,7 @@ class Salesorder extends CI_Model
             'dinner_table_id','work_order_number','sale_type','total_order','delivery_date',
             'CONCAT(CONCAT(people_cust.first_name," "), people_cust.last_name) AS customer_name',
             'CONCAT(CONCAT(people_emp.first_name," "), people_emp.last_name) AS employee_name',
+            '(SELECT company_name FROM ospos_customers WHERE ospos_customers.person_id = so.customer_id) AS company_name'
         ];
         $this->db->select(implode(',',$FieldArr))->from('sales_order AS so');
         $this->db->join('people AS people_emp','so.employee_id = people_emp.person_id','LEFT');
