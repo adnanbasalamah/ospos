@@ -55,3 +55,9 @@ $lang["receivings_transaction_failed"] = "Receivings transaction(s) failed.";
 $lang["receivings_unable_to_add_item"] = "Item add to Receiving failed.";
 $lang["receivings_unsuccessfully_updated"] = "Receiving update failed.";
 $lang["receivings_update"] = "Update";
+
+$lang["purchase_order"] = "Purchase Order";
+$lang["po_mode"] = "PO Mode";
+$lang["po_receipt"] = "Purchase Order";
+$lang["receivings_id"] = "PO ID";
+
