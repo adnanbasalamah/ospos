@@ -41,7 +41,7 @@
     <div class="col-md-2 so-info">Order Notes</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_comment;?></div>
     <div class="col-md-2 so-info">Order Status</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_status;?></div>
 </div>
-<?php if ($so_info_status == CANCELED || $so_info_status == COMPLETED){ ?>
+<?php if ($so_info_status != CANCELED && $so_info_status != COMPLETED){ ?>
 <div id="title_bar" class="print_hide btn-toolbar">
     <?php echo anchor("sales_order/add-item", '<span class="glyphicon glyphicon-plus-sign">&nbsp</span>' . $this->lang->line('sales_new_item'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
 </div>
