@@ -49,10 +49,6 @@ class Employees extends Persons
 		echo json_encode($suggestions);
 	}
 
-	public function employee_category()
-	{
-		return ['sales' => 'Sales','inventory' => 'Inventory','admin' => 'Admin'];
-	}
 	/*
 	Loads the employee edit form
 	*/
@@ -65,7 +61,7 @@ class Employees extends Persons
 		}
 		$data['person_info'] = $person_info;
 		$data['employee_id'] = $employee_id;
-		$data['employee_category'] = $this->employee_category();
+
 		$modules = array();
 		foreach($this->Module->get_all_modules()->result() as $module)
 		{
@@ -117,7 +113,6 @@ class Employees extends Persons
 			'zip' => $this->input->post('zip'),
 			'country' => $this->input->post('country'),
 			'comments' => $this->input->post('comments'),
-			'employee_category' => $this->input->post('employee_category'),
 		);
 
 		$grants_array = array();

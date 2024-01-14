@@ -63,11 +63,7 @@ class Customers extends Persons
 
 		$customers = $this->Customer->search($search, $limit, $offset, $sort, $order);
 		$total_rows = $this->Customer->get_found_rows($search);
-		$EmpArr = $this->Employee->get_all_employee_data();
-		$EmpOption = [];
-		foreach($EmpArr as $EmpData){
-			$EmpOption[$EmpData->person_id] = $EmpData->first_name.' '.$EmpData->last_name;
-		}
+
 		$data_rows = array();
 		foreach($customers->result() as $person)
 		{
@@ -85,7 +81,7 @@ class Customers extends Persons
 				$stats->quantity = 0;
 			}
 
-			$data_rows[] = $this->xss_clean(get_customer_data_row($person, $stats, $EmpOption[$person->employee_id]));
+			$data_rows[] = $this->xss_clean(get_customer_data_row($person, $stats));
 		}
 
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
@@ -125,15 +121,10 @@ class Customers extends Persons
 			$data['person_info']->date = date('Y-m-d H:i:s');
 			$data['person_info']->employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
 		}
-		$EmpArray = $this->Employee->get_all_employee_data();
-		$EmpOption = [];
-		foreach($EmpArray as $EmpData){
-		  $EmpOption[$EmpData->person_id] = $EmpData->first_name.' '.$EmpData->last_name;
-		}
-		$data['employee_list'] = $EmpArray;
-		$data['employee_option'] = $EmpOption;
+
 		$employee_info = $this->Employee->get_info($info->employee_id);
 		$data['employee'] = $this->xss_clean($employee_info->first_name . ' ' . $employee_info->last_name);
+
 		$tax_code_info = $this->Tax_code->get_info($info->sales_tax_code_id);
 		$tax_code_id = $tax_code_info->tax_code_id;
 

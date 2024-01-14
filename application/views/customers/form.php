@@ -185,30 +185,19 @@
 				</div>
 
 				<div class="form-group form-group-sm">
-					<?php echo form_label($this->lang->line('customers_employee'), 'employee_id', array('class'=>'control-label col-xs-3')); ?>
+					<?php echo form_label($this->lang->line('customers_employee'), 'employee', array('class'=>'control-label col-xs-3')); ?>
 					<div class='col-xs-8'>
-						<?php /*echo form_input(array(
+						<?php echo form_input(array(
 								'name'=>'employee',
 								'id'=>'employee',
 								'class'=>'form-control input-sm',
 								'value'=>$employee,
 								'readonly'=>'true')
-								);*/
-                        echo form_dropdown(
-                            array(
-                                'name'=>'employee_id',
-                                'id'=>'employee_id'
-                            ),
-                            $employee_option,
-                            $person_info->employee_id,
-                            array('class' => 'form-control input-sm')
-                        );
-
-                        ?>
+								); ?>
 					</div>
 				</div>
 
-				<?php /*echo form_hidden('employee_id', $person_info->employee_id);*/ ?>
+				<?php echo form_hidden('employee_id', $person_info->employee_id); ?>
 			</fieldset>
 		</div>
 
