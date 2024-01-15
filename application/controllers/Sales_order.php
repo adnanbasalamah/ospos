@@ -81,13 +81,14 @@ class Sales_order extends Secure_Controller
         $offset = $this->input->get('offset');
         $sort = $this->input->get('sort');
         $order = $this->input->get('order');
-
         $filters = array('sale_type' => 'all',
             'location_id' => 'all',
             'start_date' => $this->input->get('start_date'),
             'end_date' => $this->input->get('end_date'),
-            'customer_id' => $this->input->get('customer_id'),
         );
+        if (!empty($this->input->get('customer_id'))){
+           $filters['customer_id'] = $this->input->get('customer_id');
+        }
 
         // check if any filter is set in the multiselect dropdown
         //$filledup = array_fill_keys($this->input->get('filters'), TRUE);

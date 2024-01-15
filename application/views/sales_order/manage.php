@@ -25,8 +25,10 @@
                 console.log(ui.item.label);
                 event.preventDefault();
                 $('#filters').val(ui.item.label);
-                $('input[name="customer_id"]').val(ui.item.value);
-                table_support.refresh();
+                if (parseInt(ui.item.value) > 0){
+                    $('input[name="customer_id"]').val(ui.item.value);
+                    table_support.refresh();
+                }
                 return ui.item.label;
             }
         });
@@ -38,8 +40,8 @@
             return {
                 start_date: start_date,
                 end_date: end_date,
-                customer_id: $('input[name="customer_id"]').val() || [""],
-                filters: $("#filters").val() || [""]
+                customer_id: $('input[name="customer_id"]').val() || '',
+                filters: $("#filters").val() || ''
             }
         };
 
