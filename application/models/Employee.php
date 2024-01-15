@@ -49,8 +49,16 @@ class Employee extends Person
 		$this->db->order_by('last_name', 'asc');
 		$this->db->limit($limit);
 		$this->db->offset($offset);
-
 		return $this->db->get();
+	}
+
+	/*
+	Return all employee data
+	*/
+	public function get_all_employee_data($limit = 10000, $offset = 0)
+	{
+		$query = $this->get_all($limit, $offset);
+		return $query->result();
 	}
 
 	/*

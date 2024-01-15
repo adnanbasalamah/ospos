@@ -133,4 +133,59 @@ class Sales_order extends Secure_Controller
             }
         }
     }
+
+    public function edit($sale_order_id)
+    {
+        $data = array();
+        $sale_info = $this->xss_clean($this->Salesorder->get_info($sale_order_id)->row_array());
+        $data['selected_customer_id'] = $sale_info['customer_id'];
+        $data['selected_customer_name'] = $sale_info['customer_name'];
+        $employee_info = $this->Employee->get_info($sale_info['employee_id']);
+        $data['selected_employee_id'] = $sale_info['employee_id'];
+        $data['selected_employee_name'] = $this->xss_clean($employee_info->first_name . ' ' . $employee_info->last_name);
+        $EmpArray = $this->Employee->get_all_employee_data();
+        $EmpOption = [];
+        foreach($EmpArray as $EmpData){
+            $EmpOption[$EmpData->person_id] = $EmpData->first_name.' '.$EmpData->last_name;
+        }
+        $data['employee_list'] = $EmpArray;
+        $data['employee_option'] = $EmpOption;
+        $employee_info = $this->Employee->get_info($sale_info['employee_id']);
+        $CustArray = $this->Customer->get_all()->result();
+        $CustOption = [];
+        foreach($CustArray as $CustData){
+            $CustOption[$CustData->person_id] = $CustData->company_name;
+        }
+        $data['customer_list'] = $CustArray;
+        $data['customer_option'] = $CustOption;
+        $data['sale_info'] = $sale_info;
+        $SOStatusOption = arr_sales_order_status();
+        $data['status_option'] = $SOStatusOption;
+        $this->load->view('sales_order/form', $data);
+    }
+
+    public function save($sale_order_id = -1)
+    {
+        $newdate = $this->input->post('date');
+        $date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
+        $sale_time = $date_formatter->format('Y-m-d H:i:s');
+
+        $sale_data = array(
+            'sale_time' => $sale_time,
+            'customer_id' => $this->input->post('customer_id') != '' ? $this->input->post('customer_id') : NULL,
+            'employee_id' => $this->input->post('employee_id') != '' ? $this->input->post('employee_id') : NULL,
+            'comment' => $this->input->post('comment'),
+            'sale_status' => $this->input->post('sale_status') != '' ? $this->input->post('sale_status') : NULL
+        );
+
+        $this->Inventory->update('POS '.$sale_order_id, ['trans_date' => $sale_time]);
+        if($this->Sale->update($sale_order_id, $sale_data))
+        {
+            echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_successfully_updated'), 'id' => $sale_id));
+        }
+        else
+        {
+            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_id));
+        }
+    }
 }

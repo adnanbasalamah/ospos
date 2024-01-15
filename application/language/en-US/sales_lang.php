@@ -226,3 +226,4 @@ $lang["sales_order_status"] = "Status";
 $lang["sales_order_no_sales_order_to_display"] = "No Sales Order to display.";
 $lang["sales_show_sales_order_detail"] = "Show Sales Order Detail";
 $lang["sales_order_list"] = "Sales Order List";
+$lang["sales_order_update"] = "Update Sales Order";

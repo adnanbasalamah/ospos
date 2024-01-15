@@ -994,6 +994,7 @@ function get_purchase_order_detail_table_headers(){
 	return transform_headers($headers);
 }
 
+
 function get_purchase_order_data_row($po)
 {
 	$CI =& get_instance();

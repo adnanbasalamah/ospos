@@ -67,7 +67,7 @@ class Purchaseorder extends CI_Model
 		}
 
 		$receivings_data = array(
-			'receiving_time' => date('Y-m-d H:i:s'),
+			'po_time' => date('Y-m-d H:i:s'),
 			'supplier_id' => $this->Supplier->exists($supplier_id) ? $supplier_id : NULL,
 			'employee_id' => $employee_id,
 			'payment_type' => $payment_type,
@@ -86,7 +86,7 @@ class Purchaseorder extends CI_Model
 			$cur_item_info = $this->Item->get_info($item['item_id']);
 
 			$receivings_items_data = array(
-				'receiving_id' => $receiving_id,
+				'po_id' => $receiving_id,
 				'item_id' => $item['item_id'],
 				'line' => $item['line'],
 				'description' => $item['description'],
@@ -109,23 +109,6 @@ class Purchaseorder extends CI_Model
 			{
 				$this->Item->change_cost_price($item['item_id'], $items_received, $item['price'], $cur_item_info->cost_price);
 			}
-
-			//Update stock quantity
-			//$item_quantity = $this->Item_quantity->get_item_quantity($item['item_id'], $item['item_location']);
-			//$this->Item_quantity->save(array('quantity' => $item_quantity->quantity + $items_received, 'item_id' => $item['item_id'],
-			//								  'location_id' => $item['item_location']), $item['item_id'], $item['item_location']);
-
-			$recv_remarks = 'RECV ' . $receiving_id;
-			$inv_data = array(
-				'trans_date' => date('Y-m-d H:i:s'),
-				'trans_items' => $item['item_id'],
-				'trans_user' => $employee_id,
-				'trans_location' => $item['item_location'],
-				'trans_comment' => $recv_remarks,
-				'trans_inventory' => $items_received
-			);
-
-			//$this->Inventory->insert($inv_data);
 
 			$this->Attribute->copy_attribute_links($item['item_id'], 'receiving_id', $receiving_id);
 

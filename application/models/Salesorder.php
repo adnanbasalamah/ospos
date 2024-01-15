@@ -4,7 +4,23 @@
  */
 class Salesorder extends CI_Model
 {
+    public function get_info($sale_order_id)
+    {
+        $FieldArr = [
+            'sale_time','customer_id','employee_id','comment',
+            'invoice_number','quote_number','sale_order_id','sale_status',
+            'dinner_table_id','work_order_number','sale_type','total_order','delivery_date',
+            'CONCAT(CONCAT(people_cust.first_name," "), people_cust.last_name) AS customer_name',
+            'CONCAT(CONCAT(people_emp.first_name," "), people_emp.last_name) AS employee_name',
+            '(SELECT company_name FROM ospos_customers WHERE ospos_customers.person_id = so.customer_id) AS company_name'
+        ];
+        $this->db->select(implode(',',$FieldArr))->from('sales_order AS so');
+        $this->db->join('people AS people_emp','so.employee_id = people_emp.person_id','LEFT');
+        $this->db->join('people AS people_cust','so.customer_id = people_cust.person_id','LEFT');
+        $this->db->where('sale_order_id',$sale_order_id);
 
+        return $this->db->get();
+    }
     /**
      * Get number of rows for the takings (sales_order/manage) view
      */
@@ -223,6 +239,25 @@ class Salesorder extends CI_Model
     {
         $this->db->where('sale_order_id', $sale_order_id);
         $this->db->update('sales_order', array('sale_status'=>$sale_status));
+    }
+
+    public function update($sale_order_id, $sale_data)
+    {
+        $this->db->where('sale_order_id', $sale_order_id);
+        $success = $this->db->update('sales_order', $sale_data);
+
+        // touch payment only if update sale is successful and there is a payments object otherwise the result would be to delete all the payments associated to the sale
+        if($success)
+        {
+            //Run these queries as a transaction, we want to make sure we do all or nothing
+            $this->db->trans_start();
+            if ($sale_data['sale_status'] == 2){
+
+            }
+            $this->db->trans_complete();
+            $success &= $this->db->trans_status();
+        }
+        return $success;
     }
 
     /**

@@ -16,7 +16,7 @@ class purchase_order extends Secure_Controller
 
 	public function index()
 	{
-		$this->_reload();
+		$this->list(); //_reload();
 	}
 
 	public function item_search()
