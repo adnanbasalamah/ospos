@@ -151,12 +151,12 @@ class Sales_order extends Secure_Controller
         $data['employee_list'] = $EmpArray;
         $data['employee_option'] = $EmpOption;
         $employee_info = $this->Employee->get_info($sale_info['employee_id']);
-        $CustArray = $this->Customer->get_all()->result();
+        $CustList = $this->Customer->get_all()->result();
         $CustOption = [];
-        foreach($CustArray as $CustData){
+        foreach($CustList as $CustData){
             $CustOption[$CustData->person_id] = $CustData->company_name;
         }
-        $data['customer_list'] = $CustArray;
+        $data['customer_list'] = $CustList;
         $data['customer_option'] = $CustOption;
         $data['sale_info'] = $sale_info;
         $SOStatusOption = arr_sales_order_status();
