@@ -75,6 +75,7 @@ $(document).ready(function()
 </div>
 
 <div id="payment_summary">
+    Test
 </div>
 
 <?php $this->load->view("partial/footer"); ?>
