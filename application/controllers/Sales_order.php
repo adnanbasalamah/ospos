@@ -86,6 +86,7 @@ class Sales_order extends Secure_Controller
             'location_id' => 'all',
             'start_date' => $this->input->get('start_date'),
             'end_date' => $this->input->get('end_date'),
+            'customer_id' => $this->input->get('customer_id'),
         );
 
         // check if any filter is set in the multiselect dropdown
@@ -177,7 +178,7 @@ class Sales_order extends Secure_Controller
             'comment' => $this->input->post('comment'),
             'sale_status' => $this->input->post('sale_status') != '' ? $this->input->post('sale_status') : NULL
         );
-
+        $InventoryData =
         $this->Inventory->update('POS '.$sale_order_id, ['trans_date' => $sale_time]);
         if($this->Sale->update($sale_order_id, $sale_data))
         {

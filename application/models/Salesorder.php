@@ -63,13 +63,15 @@ class Salesorder extends CI_Model
         $this->db->join('people AS people_emp','so.employee_id = people_emp.person_id','LEFT');
         $this->db->join('people AS people_cust','so.customer_id = people_cust.person_id','LEFT');
         $this->db->where($where);
-
+        if (isset($filters['customer_id']) && !empty($filters['customer_id'])){
+            $this->db->where('so.customer_id', $filters['customer_id']);
+        }
         if(!empty($search))
         {
             if($filters['is_valid_receipt'] != FALSE)
             {
                 $pieces = explode(' ', $search);
-                $this->db->where('sales_order.sale_order_id', $pieces[1]);
+                $this->db->where('so.sale_order_id', $pieces[1]);
             }
             else
             {
