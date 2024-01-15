@@ -3,8 +3,11 @@
     $(document).ready(function()
     {
         // when any filter is clicked and the dropdown window is closed
-        $('#filters').on('change', function(e) {
-            table_support.refresh();
+        $('#filters').on('keyup', function(e) {
+            if ($(this).val() == '') {
+                $('input[name="customer_id"]').val('');
+                table_support.refresh();
+            }
         });
 
         // load the preset datarange picker
@@ -21,8 +24,6 @@
             cacheLength: 1,
             appendTo: '.modal-content',
             select: function( event, ui ) {
-                console.dir(ui);
-                console.log(ui.item.label);
                 event.preventDefault();
                 $('#filters').val(ui.item.label);
                 if (parseInt(ui.item.value) > 0){
