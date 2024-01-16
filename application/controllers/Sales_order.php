@@ -163,6 +163,7 @@ class Sales_order extends Secure_Controller
         $data['sale_info'] = $sale_info;
         $SOStatusOption = arr_sales_order_status();
         $data['status_option'] = $SOStatusOption;
+        $data['detail_order'] = get_detail_so($sale_order_id);
         $this->load->view('sales_order/form', $data);
     }
 
