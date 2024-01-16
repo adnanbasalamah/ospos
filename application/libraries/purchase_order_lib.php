@@ -274,7 +274,7 @@ class purchase_order_lib
 		return TRUE;
 	}
 
-	public function edit_item($line, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $receiving_quantity)
+	public function edit_item($line, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $po_quantity)
 	{
 		$items = $this->get_cart();
 		if(isset($items[$line]))
@@ -283,14 +283,14 @@ class purchase_order_lib
 			$line['description'] = $description;
 			$line['serialnumber'] = $serialnumber;
 			$line['quantity'] = $quantity;
-			$line['receiving_quantity'] = $receiving_quantity;
+			$line['po_quantity'] = $po_quantity;
 			$line['discount'] = $discount;
 			if(!is_null($discount_type))
 			{
 				$line['discount_type'] = $discount_type;
 			}
 			$line['price'] = $price;
-			$line['total'] = $this->get_item_total($quantity, $price, $discount, $discount_type, $receiving_quantity);
+			$line['total'] = $this->get_item_total($quantity, $price, $discount, $discount_type, $po_quantity);
 			$this->set_cart($items);
 		}
 

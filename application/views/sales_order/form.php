@@ -72,6 +72,13 @@
             <?php echo form_textarea(array('name'=>'comment', 'value'=>$sale_info['comment'], 'id'=>'comment', 'class'=>'form-control input-sm', 'rows' => 4));?>
         </div>
     </div>
+    <?php
+    if (count($detail_order)){
+        foreach ($detail_order as $item_order){
+
+        }
+    }
+    ?>
 </fieldset>
 <?php echo form_close(); ?>
 
