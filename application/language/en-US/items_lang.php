@@ -117,3 +117,5 @@ $lang["items_unit_price_required"] = "Retail Price is a required field.";
 $lang["items_upc_database"] = "Barcode Database";
 $lang["items_update"] = "Update Item";
 $lang["items_use_inventory_menu"] = "Use Inventory Menu";
+$lang["items_shipped"] = "Qty Shipped";
+$lang["items_ordered"] = "Qty Ordered";

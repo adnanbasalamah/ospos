@@ -11,3 +11,13 @@
 .so-info-value{
     border-left: 1px solid #999;
 }
+.small-input{
+    width: 80px !important;
+    height : 28px !important
+}
+.align-right{
+    text-align : right !important;
+}
+#detail-table-so td.fix-align{
+    padding-top: 13px !important;
+}

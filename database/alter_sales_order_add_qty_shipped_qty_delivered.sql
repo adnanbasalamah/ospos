@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_sales_order_items` ADD `qty_shipped` DOUBLE NULL AFTER `delivery_status`, ADD `qty_delivered` DOUBLE NULL AFTER `qty_shipped`;

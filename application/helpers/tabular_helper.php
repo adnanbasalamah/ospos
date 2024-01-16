@@ -1084,4 +1084,16 @@ function get_purchase_order_items_data_last_row($po_items){
 		'subtotal_order' => to_currency($sum_total_order),
 	);
 }
+
+function get_sales_order_detail_form_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('name' => $CI->lang->line('items_item')),
+		array('items_ordered' => $CI->lang->line('items_ordered')),
+		array('items_shipped' => $CI->lang->line('items_shipped')),
+	);
+	return transform_headers($headers);
+}
 ?>
