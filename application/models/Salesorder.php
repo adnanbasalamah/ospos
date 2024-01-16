@@ -199,7 +199,8 @@ class Salesorder extends CI_Model
      */
     public function get_sale_order_items($sale_order_id)
     {
-        $this->db->from('sales_order_items');
+        $this->db->from('sales_order_items as so_items');
+        $this->db->join('items AS items','so_items.item_id = items.item_id','LEFT');
         $this->db->where('sale_order_id', $sale_order_id);
 
         return $this->db->get();

@@ -59,7 +59,8 @@
                 ),
                 $status_option,
                 $sale_info['sale_status'],
-                array('class' => 'form-control input-sm')
+                array('class' => 'form-control input-sm'),
+                $disabled_status
             );
             ?>
             <?php //echo form_hidden('employee_id', $selected_employee_id); ?>
@@ -73,21 +74,51 @@
         </div>
     </div>
     <?php
-    if (count($detail_order)){
-        foreach ($detail_order as $item_order){
+    $detail_table = '';
+    if (count($details_order)){
+        $detail_table = '<table id="detail-table-so" class="table-striped table-bordered table table-hover">';
+        $detail_table .= '<thead><tr>';
+        $detail_table .= '<th>'.$this->lang->line('common_id').'</th>';
+        $detail_table .= '<th>'.$this->lang->line('items_item').'</th>';
+        $detail_table .= '<th>'.$this->lang->line('items_ordered').'</th>';
+        $detail_table .= '<th>'.$this->lang->line('items_shipped').'</th>';
+        $detail_table .= '</tr></thead>';
+        $detail_table .= '<tbody>';
+        foreach ($details_order as $row_detail){
+            $detail_table .= '<tr>';
+            $detail_table .= '<td class="fix-align">'.$row_detail[0].'</td>';
+            $detail_table .= '<td class="fix-align">'.$row_detail[1].'</td>';
+            $detail_table .= '<td class="fix-align"><div class="align-right">'.($row_detail[2]*1).'</div></td>';
+            $input_qty_shipped = form_input(
+                array(
+                    'name'=>'qty_shipped',
+                    'id' => 'qty_shipped-'.$row_detail->item_id,
+                    'value'=> ($row_detail[3]*1),
+                    'class'=>'form-control input-sm small-input'
+                )
+            );
+            $detail_table .= '<td>'.$input_qty_shipped.'</td>';
+            $detail_table .= '</tr>';
 
         }
+        $detail_table .= '</tbody></table>';
     }
     ?>
+    <div id="table_wrapper" class="wrapper" style="display: none;">
+        <?php echo $detail_table; ?>
+    </div>
 </fieldset>
 <?php echo form_close(); ?>
 
 <script type="text/javascript">
     $(document).ready(function() {
         <?php $this->load->view('partial/datepicker_locale'); ?>
+        var detail_table_so = '';
         $('#sale_status').on('change', function(e){
            if ($(this).val() == 2){
-               alert('Shipping');
+               $('#table_wrapper').css('display','inline');
+           }else{
+               $('#table_wrapper').css('display','none');
            }
         });
     });

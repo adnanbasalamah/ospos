@@ -163,7 +163,25 @@ class Sales_order extends Secure_Controller
         $data['sale_info'] = $sale_info;
         $SOStatusOption = arr_sales_order_status();
         $data['status_option'] = $SOStatusOption;
-        $data['detail_order'] = $this->Salesorder->get_sale_order_items($sale_order_id)->result();
+        $DisabledOption = [];
+        if ((int)$sale_info['sale_status'] >= 2){
+            foreach ($SOStatusOption as $Idx => $OptValue){
+                if ((int)$Idx < $sale_info['sale_status']) {
+                    $DisabledOption[$Idx] = 'disabled';
+                }elseif ((int)$Idx == 5 && $sale_info['sale_status'] != 5){
+                    $DisabledOption[$Idx] = 'disabled';
+                }
+            }
+        }
+        $data['disabled_status'] = $DisabledOption;
+        $details_data = $this->Salesorder->get_sale_order_items($sale_order_id)->result();
+        $row_details = [];
+        foreach ($details_data as $detail_data){
+            $row_details[] = [$detail_data->item_id, $detail_data->name, $detail_data->quantity_purchased, $detail_data->quantity_purchased];
+        }
+        $data['details_order'] = $row_details;
+        $table_headers = get_sales_order_detail_form_table_headers();
+
         $this->load->view('sales_order/form', $data);
     }
 
