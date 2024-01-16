@@ -69,7 +69,7 @@
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('sales_comment'), 'comment', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
-            <?php echo form_textarea(array('name'=>'comment', 'value'=>$sale_info['comment'], 'id'=>'comment', 'class'=>'form-control input-sm'));?>
+            <?php echo form_textarea(array('name'=>'comment', 'value'=>$sale_info['comment'], 'id'=>'comment', 'class'=>'form-control input-sm', 'rows' => 4));?>
         </div>
     </div>
 </fieldset>
@@ -78,5 +78,10 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <?php $this->load->view('partial/datepicker_locale'); ?>
+        $('#sale_status').on('change', function(e){
+           if ($(this).val() == 2){
+               alert('Shipping');
+           }
+        });
     });
 </script>

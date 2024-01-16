@@ -81,12 +81,14 @@ class Sales_order extends Secure_Controller
         $offset = $this->input->get('offset');
         $sort = $this->input->get('sort');
         $order = $this->input->get('order');
-
         $filters = array('sale_type' => 'all',
             'location_id' => 'all',
             'start_date' => $this->input->get('start_date'),
             'end_date' => $this->input->get('end_date'),
         );
+        if (!empty($this->input->get('customer_id'))){
+           $filters['customer_id'] = $this->input->get('customer_id');
+        }
 
         // check if any filter is set in the multiselect dropdown
         //$filledup = array_fill_keys($this->input->get('filters'), TRUE);
@@ -161,6 +163,7 @@ class Sales_order extends Secure_Controller
         $data['sale_info'] = $sale_info;
         $SOStatusOption = arr_sales_order_status();
         $data['status_option'] = $SOStatusOption;
+        $data['detail_order'] = get_detail_so($sale_order_id);
         $this->load->view('sales_order/form', $data);
     }
 
@@ -177,7 +180,7 @@ class Sales_order extends Secure_Controller
             'comment' => $this->input->post('comment'),
             'sale_status' => $this->input->post('sale_status') != '' ? $this->input->post('sale_status') : NULL
         );
-
+        $InventoryData =
         $this->Inventory->update('POS '.$sale_order_id, ['trans_date' => $sale_time]);
         if($this->Sale->update($sale_order_id, $sale_data))
         {
