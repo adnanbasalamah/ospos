@@ -87,8 +87,10 @@ class purchase_order extends Secure_Controller
 	}
 
 	public function new_po(){
-		$this->load->view('purchase_order/po');
+		$this->load->view('purchase_order/po') ; 
+		
 	}
+	
 	public function detailpo($po_id){
         $data['table_headers'] = get_purchase_order_detail_table_headers();
         $data['po_id'] = $po_id;
