@@ -223,11 +223,11 @@ class purchase_order extends Secure_Controller
 		$discount_type = $this->input->post('discount_type');
 		$discount = $discount_type ? parse_quantity($this->input->post('discount')) : parse_decimals($this->input->post('discount'));
 
-		$receiving_quantity = $this->input->post('receiving_quantity');
+		$po_quantity = $this->input->post('po_quantity');
 
 		if($this->form_validation->run() != FALSE)
 		{
-			$this->purchase_order_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $receiving_quantity);
+			$this->purchase_order_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $po_quantity);
 		}
 		else
 		{
