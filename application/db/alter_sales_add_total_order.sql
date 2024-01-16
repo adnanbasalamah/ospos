@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_sales` ADD `total_order` DOUBLE NULL AFTER `sale_type`;
