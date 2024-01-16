@@ -61,4 +61,5 @@ $lang["po_mode"] = "PO Mode";
 $lang["po_receipt"] = "Purchase Order";
 $lang["receivings_id"] = "PO ID";
 $lang["po_register"] = "New Purchase Order";
+$lang["po_time"] = "PO Date";
 

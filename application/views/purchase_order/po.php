@@ -21,44 +21,6 @@ if (isset($success))
 
 <!-- Top register controls -->
 
-	<?php echo form_open($controller_name."/change_mode", array('id'=>'mode_form', 'class'=>'form-horizontal panel panel-default')); ?>
-		<div class="panel-body form-group">
-			<ul>
-				<li class="pull-left first_li">
-					<label class="control-label"><?php echo $this->lang->line('receivings_mode'); ?></label>
-				</li>
-				<li class="pull-left">
-					<?php echo form_dropdown('mode', $modes, $mode, array('onchange'=>"$('#mode_form').submit();", 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
-				</li>
-
-				<?php 
-				if ($show_stock_locations)
-				{
-				?>
-					<li class="pull-left">
-						<label class="control-label"><?php echo $this->lang->line('receivings_stock_source'); ?></label>
-					</li>
-					<li class="pull-left">
-						<?php echo form_dropdown('stock_source', $stock_locations, $stock_source, array('onchange'=>"$('#mode_form').submit();", 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
-					</li>
-					
-					<?php
-					if($mode=='requisition')
-					{
-					?>
-						<li class="pull-left">
-							<label class="control-label"><?php echo $this->lang->line('receivings_stock_destination'); ?></label>
-						</li>
-						<li class="pull-left">
-							<?php echo form_dropdown('stock_destination', $stock_locations, $stock_destination, array('onchange'=>"$('#mode_form').submit();", 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
-						</li>
-				<?php
-					}
-				}
-				?>
-			</ul>
-		</div>
-	<?php echo form_close(); ?>
 
 	<?php echo form_open($controller_name."/add", array('id'=>'add_item_form', 'class'=>'form-horizontal panel panel-default')); ?>
 		<div class="panel-body form-group">
