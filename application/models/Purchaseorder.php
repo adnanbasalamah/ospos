@@ -52,25 +52,26 @@ class Purchaseorder extends CI_Model
 		return ($this->db->get()->num_rows() == 1);
 	}
 
-	public function update($receiving_data, $receiving_id)
+	public function update($po_data, $po_id)
 	{
-		$this->db->where('receiving_id', $receiving_id);
+		$this->db->where('po_id', $po_id);
 
-		return $this->db->update('receivings', $receiving_data);
+		return $this->db->update('po', $po_data);
 	}
 
-	public function save($items, $supplier_id, $employee_id, $comment, $reference, $payment_type, $receiving_id = FALSE)
+	public function save($items, $supplier_id, $employee_id, $comment, $total, $reference, $payment_type, $receiving_id = FALSE)
 	{
 		if(count($items) == 0)
 		{
 			return -1;
 		}
 
-		$receivings_data = array(
+		$po_data = array(
 			'po_time' => date('Y-m-d H:i:s'),
 			'supplier_id' => $this->Supplier->exists($supplier_id) ? $supplier_id : NULL,
 			'employee_id' => $employee_id,
 			'payment_type' => $payment_type,
+			'total_order' => &$total,
 			'comment' => $comment,
 			'reference' => $reference
 		);
@@ -78,7 +79,7 @@ class Purchaseorder extends CI_Model
 		//Run these queries as a transaction, we want to make sure we do all or nothing
 		$this->db->trans_start();
 
-		$this->db->insert('po', $receivings_data);
+		$this->db->insert('po', $po_data);
 		$receiving_id = $this->db->insert_id();
 
 		foreach($items as $line=>$item)

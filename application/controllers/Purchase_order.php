@@ -338,17 +338,17 @@ class purchase_order extends Secure_Controller
 		//SAVE receiving to database
 		//print_r($data);		
 		
-		$data['receiving_id'] = 'RECV ' . $this->Purchaseorder->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['reference'], $data['payment_type'], $data['stock_location']);
+		$data['po_id'] = 'PO ' . $this->Purchaseorder->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['total'], $data['reference'], $data['payment_type'], $data['stock_location']);
 
 		$data = $this->xss_clean($data);
 
-		if($data['receiving_id'] == 'RECV -1')
+		if($data['po_id'] == 'RECV -1')
 		{
 			$data['error_message'] = $this->lang->line('receivings_transaction_failed');
 		}
 		else
 		{
-			$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['receiving_id']);				
+			$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['po_id']);				
 		}
 
 		$data['print_after_sale'] = $this->purchase_order_lib->is_print_after_sale();
@@ -469,29 +469,32 @@ class purchase_order extends Secure_Controller
 		$this->load->view("purchase_order/po", $data);
 	}
 	
-	public function save($receiving_id = -1)
+	public function save($po_id = -1)
 	{
 		$newdate = $this->input->post('date');
 		
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
-		$receiving_time = $date_formatter->format('Y-m-d H:i:s');
+		$po_time = $date_formatter->format('Y-m-d H:i:s');
 
-		$receiving_data = array(
-			'receiving_time' => $receiving_time,
+		$po_data = array(
+			'receiving_time' => $po_time,
 			'supplier_id' => $this->input->post('supplier_id') ? $this->input->post('supplier_id') : NULL,
 			'employee_id' => $this->input->post('employee_id'),
+			'total_order' => $this->purchase_order_lib->get_total(),
 			'comment' => $this->input->post('comment'),
 			'reference' => $this->input->post('reference') != '' ? $this->input->post('reference') : NULL
 		);
+		print_r($po_data);
+		die;
 
-		//$this->Inventory->update('RECV '.$receiving_id, ['trans_date' => $receiving_time]);
-		if($this->Receiving->update($receiving_data, $receiving_id))
+		//$this->Inventory->update('RECV '.$receiving_id, ['trans_date' => $po_time]);
+		if($this->Purchaseorder->update($po_data, $po_id))
 		{
-			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('receivings_successfully_updated'), 'id' => $receiving_id));
+			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('receivings_successfully_updated'), 'id' => $po_id));
 		}
 		else
 		{
-			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('receivings_unsuccessfully_updated'), 'id' => $receiving_id));
+			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('receivings_unsuccessfully_updated'), 'id' => $po_id));
 		}
 	}
 
