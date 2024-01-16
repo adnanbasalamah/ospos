@@ -3,8 +3,11 @@
     $(document).ready(function()
     {
         // when any filter is clicked and the dropdown window is closed
-        $('#filters').on('hidden.bs.select', function(e) {
-            table_support.refresh();
+        $('#filters').on('keyup', function(e) {
+            if ($(this).val() == '') {
+                $('input[name="customer_id"]').val('');
+                table_support.refresh();
+            }
         });
 
         // load the preset datarange picker
@@ -14,6 +17,23 @@
             table_support.refresh();
         });
 
+        $('#filters').autocomplete( {
+            source: "<?php echo site_url('customers/suggest'); ?>",
+            minChars: 0,
+            delay: 15,
+            cacheLength: 1,
+            appendTo: '.modal-content',
+            select: function( event, ui ) {
+                event.preventDefault();
+                $('#filters').val(ui.item.label);
+                if (parseInt(ui.item.value) > 0){
+                    $('input[name="customer_id"]').val(ui.item.value);
+                    table_support.refresh();
+                }
+                return ui.item.label;
+            }
+        });
+
         <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 
         table_support.query_params = function()
@@ -21,6 +41,8 @@
             return {
                 start_date: start_date,
                 end_date: end_date,
+                customer_id: $('input[name="customer_id"]').val() || '',
+                filters: $("#filters").val() || ''
             }
         };
 
@@ -60,6 +82,8 @@
         </button>
 
         <?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm', 'id'=>'daterangepicker')); ?>
+        <?php echo form_input(array('name'=>'filters', 'class'=>'form-control input-sm', 'id'=>'filters')); ?>
+        <?php echo form_hidden('customer_id', ''); ?>
     </div>
 </div>
 
