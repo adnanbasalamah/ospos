@@ -65,4 +65,7 @@ $lang["po_time"] = "Created";
 $lang["supplier_name"] = "Supplier";
 $lang["total_order"] = "Total Purchase Order";
 $lang["purchase_order_no_purchase_order_to_display"] = "No Purchase Order to display.";
+$lang["receivings_confirm_delete"] = "Are you sure you want to delete this PO? This action cannot be undone.";
+$lang["po_list"] = "Purchase Order List";
+
 
