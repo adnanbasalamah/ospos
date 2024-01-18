@@ -206,6 +206,16 @@ class Salesorder extends CI_Model
         return $this->db->get();
     }
 
+    public function get_sale_order_item_info($sale_order_id, $item_id)
+    {
+        $this->db->from('sales_order_items as so_items');
+        $this->db->join('items AS items','so_items.item_id = items.item_id','LEFT');
+        $this->db->where('sale_order_id', $sale_order_id);
+        $this->db->where('so_items.item_id', $item_id);
+
+        return $this->db->get();
+    }
+
     /**
 
     /**
@@ -248,18 +258,14 @@ class Salesorder extends CI_Model
     {
         $this->db->where('sale_order_id', $sale_order_id);
         $success = $this->db->update('sales_order', $sale_data);
+        return $success;
+    }
 
-        // touch payment only if update sale is successful and there is a payments object otherwise the result would be to delete all the payments associated to the sale
-        if($success)
-        {
-            //Run these queries as a transaction, we want to make sure we do all or nothing
-            $this->db->trans_start();
-            if ($sale_data['sale_status'] == 2){
-
-            }
-            $this->db->trans_complete();
-            $success &= $this->db->trans_status();
-        }
+    public function update_detail($sale_order_id, $item_id, $sale_detail_data)
+    {
+        $this->db->where('sale_order_id', $sale_order_id);
+        $this->db->where('item_id', $item_id);
+        $success = $this->db->update('sales_order_items', $sale_detail_data);
         return $success;
     }
 

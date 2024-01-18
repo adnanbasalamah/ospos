@@ -95,7 +95,7 @@ function get_sales_order_manage_table_headers()
 		array('company_name' => $CI->lang->line('sales_company_name')),
 		array('employee_name' => $CI->lang->line('common_sales')),
 		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
-		array('order_status' => $CI->lang->line('sales_order_status')),
+		array('order_status' => $CI->lang->line('sales_order_status'), 'escape' => FALSE),
 		array('total_order' => $CI->lang->line('sales_order_total')),
 		array('view_detail' => 'Detail', 'escape' => FALSE)
 	);
@@ -159,6 +159,7 @@ function get_sale_order_data_row($sale)
 	$controller_name = $CI->uri->segment(1);
 
 	$sales_order_status = arr_sales_order_status();
+	$so_status_color = array_status_color();
 
 	$row = array (
 		'sale_id' => $sale->sale_order_id,
@@ -167,7 +168,7 @@ function get_sale_order_data_row($sale)
 		'company_name' => $sale->company_name,
 		'employee_name' => $sale->employee_name,
 		'delivery_date' => $sale->delivery_date,
-		'order_status' => $sales_order_status[$sale->sale_status],
+		'order_status' => '<div class="btn btn-xs btn-block '.$so_status_color[$sale->sale_status].'">'.$sales_order_status[$sale->sale_status].'</div>',
 		'total_order' => to_currency($sale->total_order),
 	);
 	$row['view_detail'] = anchor(
@@ -1095,5 +1096,9 @@ function get_sales_order_detail_form_table_headers(){
 		array('items_shipped' => $CI->lang->line('items_shipped')),
 	);
 	return transform_headers($headers);
+}
+
+function array_status_color(){
+	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-danger' ];
 }
 ?>

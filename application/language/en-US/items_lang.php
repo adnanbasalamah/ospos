@@ -119,3 +119,4 @@ $lang["items_update"] = "Update Item";
 $lang["items_use_inventory_menu"] = "Use Inventory Menu";
 $lang["items_shipped"] = "Qty Shipped";
 $lang["items_ordered"] = "Qty Ordered";
+$lang["items_delivered"] = "Delivered";

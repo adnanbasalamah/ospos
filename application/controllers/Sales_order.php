@@ -68,7 +68,7 @@ class Sales_order extends Secure_Controller
 
     public function get_row($row_id)
     {
-        $sale_info = $this->Sales_order->get_info($row_id)->row();
+        $sale_info = $this->Salesorder->get_info($row_id)->row();
         $data_row = $this->xss_clean(get_sale_order_data_row($sale_info));
 
         echo json_encode($data_row);
@@ -177,7 +177,11 @@ class Sales_order extends Secure_Controller
         $details_data = $this->Salesorder->get_sale_order_items($sale_order_id)->result();
         $row_details = [];
         foreach ($details_data as $detail_data){
-            $row_details[] = [$detail_data->item_id, $detail_data->name, $detail_data->quantity_purchased, $detail_data->quantity_purchased];
+            if ((int)$sale_info['sale_status'] < 2) {
+                $row_details[] = [$detail_data->item_id, $detail_data->name, $detail_data->quantity_purchased, $detail_data->quantity_purchased];
+            }elseif ((int)$sale_info['sale_status'] >= 2){
+                $row_details[] = [$detail_data->item_id, $detail_data->name, $detail_data->qty_shipped, $detail_data->qty_shipped];
+            }
         }
         $data['details_order'] = $row_details;
         $table_headers = get_sales_order_detail_form_table_headers();
@@ -198,15 +202,104 @@ class Sales_order extends Secure_Controller
             'comment' => $this->input->post('comment'),
             'sale_status' => $this->input->post('sale_status') != '' ? $this->input->post('sale_status') : NULL
         );
-        $InventoryData =
-        $this->Inventory->update('POS '.$sale_order_id, ['trans_date' => $sale_time]);
-        if($this->Sale->update($sale_order_id, $sale_data))
-        {
-            echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_successfully_updated'), 'id' => $sale_id));
+        $sale_order_data = $this->Salesorder->get_info($sale_order_id)->result();
+        $old_status = $sale_order_data[0]->sale_status;
+        $status_changed = false;
+        if ((int)$sale_order_data[0]->sale_status != (int)$this->input->post('sale_status') && !is_null($this->input->post('sale_status'))
+            && !is_null($sale_order_data[0]->sale_status)){
+            $status_changed = true;
         }
-        else
-        {
-            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_id));
+        $status_so = 'Tidak Berubah';
+        if ((int)$this->input->post('sale_status') == 2 && $status_changed) {
+            $status_so = 'Berubah';
+            $items = $this->input->post('item_id');
+            $qty_items = $this->input->post('qty_shipped');
+            $data_items = [];
+            for ($i = 0;$i < count($items);$i++){
+                $so_item_detail = $this->Salesorder->get_sale_order_item_info($sale_order_id,$items[$i])->result();
+                $data_items[$items[$i]]['info'] = $this->Item->get_info($items[$i]);
+                $data_items[$items[$i]]['info']->item_location = $so_item_detail[0]->item_location;
+                $data_items[$items[$i]]['qty'] = $qty_items[$i];
+            }
+            foreach($data_items as $Item_id => $ItemData){
+                $kalkulasistok = 'Kalkulasi Tidak Terjadi';
+                if($ItemData['info']->stock_type == HAS_STOCK && (double)$ItemData['qty'] > 0){
+                    $kalkulasistok = 'Kalkulasi Terjadi';
+                    $item_quantity = $this->Item_quantity->get_item_quantity($Item_id, $ItemData['info']->item_location);
+                    $this->Item_quantity->save(array('quantity'	=> $item_quantity->quantity - $ItemData['qty'],
+                        'item_id'		=> $Item_id,
+                        'location_id'	=> $ItemData['info']->item_location), $Item_id, $ItemData['info']->item_location);
+                    // if an items was deleted but later returned it's restored with this rule
+
+                    if($ItemData['qty'] < 0)
+                    {
+                        $this->Item->undelete($Item_id);
+                    }
+
+                    // Inventory Count Details
+                    $sale_remarks = 'SO Number : '.$sale_order_id.' Shipped';
+                    $inv_data = array(
+                        'trans_date'		=> date('Y-m-d H:i:s'),
+                        'trans_items'		=> $Item_id,
+                        'trans_user'		=> $sale_data['employee_id'],
+                        'trans_location'	=> $ItemData['info']->item_location,
+                        'trans_comment'		=> $sale_remarks,
+                        'trans_inventory'	=> -$ItemData['qty']
+                    );
+                    $this->Inventory->insert($inv_data);
+                    $SODetailData = ['sale_order_id' => $sale_order_id, 'item_id' => $Item_id, 'qty_shipped' => $ItemData['qty']];
+                    $this->Salesorder->update_detail($sale_order_id, $Item_id, $SODetailData);
+                }
+            }
+        }elseif (((int)$this->input->post('sale_status') == 3 || (int)$this->input->post('sale_status') == 4) && $status_changed){
+            $status_so = 'Berubah';
+            $items = $this->input->post('item_id');
+            $qty_items = $this->input->post('qty_shipped');
+            $data_items = [];
+            for ($i = 0;$i < count($items);$i++){
+                $so_item_detail = $this->Salesorder->get_sale_order_item_info($sale_order_id,$items[$i])->result();
+                $data_items[$items[$i]]['info'] = $this->Item->get_info($items[$i]);
+                $data_items[$items[$i]]['info']->item_location = $so_item_detail[0]->item_location;
+                $data_items[$items[$i]]['qty'] = $qty_items[$i];
+            }
+            foreach($data_items as $Item_id => $ItemData){
+                $kalkulasistok = 'Kalkulasi Tidak Terjadi';
+                if($ItemData['info']->stock_type == HAS_STOCK && (double)$ItemData['qty'] > 0){
+                    $kalkulasistok = 'Kalkulasi Terjadi';
+                    $item_quantity = $this->Item_quantity->get_item_quantity_outlet($Item_id, $sale_data['customer_id']);
+                    $this->Item_quantity->save_outlet(array('quantity'	=> $item_quantity->quantity + $ItemData['qty'],
+                        'item_id'		=> $Item_id,
+                        'location_id'	=> $sale_data['customer_id']), $Item_id, $sale_data['customer_id']);
+                    // if an items was deleted but later returned it's restored with this rule
+
+                    if($ItemData['qty'] < 0)
+                    {
+                        $this->Item->undelete($Item_id);
+                    }
+
+                    // Inventory Count Details
+                    $sale_remarks = 'SO Number : '.$sale_order_id.' Delivered';
+                    $inv_data = array(
+                        'trans_date'		=> date('Y-m-d H:i:s'),
+                        'trans_items'		=> $Item_id,
+                        'trans_user'		=> $sale_data['employee_id'],
+                        'trans_location'	=> 0,
+                        'trans_comment'		=> $sale_remarks,
+                        'trans_inventory'	=> -$ItemData['qty'],
+                        'customer_id'       => $sale_data['customer_id']
+                    );
+                    $this->Inventory->insert_outlet($inv_data);
+                    $SODetailData = ['sale_order_id' => $sale_order_id, 'item_id' => $Item_id, 'qty_delivered' => $ItemData['qty']];
+                    $this->Salesorder->update_detail($sale_order_id, $Item_id, $SODetailData);
+                }
+            }
+        }
+        if ($this->Salesorder->update($sale_order_id, $sale_data)) {
+            echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_order_successfully_updated'), 'id' => $sale_order_id,
+                'old-status' => $old_status, 'new-status' => $this->input->post('sale_status'),
+                'status so' => $status_so, 'kalkulasi' => $kalkulasistok));
+        } else {
+            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_order_id));
         }
     }
 }

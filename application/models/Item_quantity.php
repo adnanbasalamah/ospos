@@ -84,5 +84,50 @@ class Item_quantity extends CI_Model
 
         return $this->db->update('item_quantities', array('quantity' => 0));
 	}
+
+    public function get_item_quantity_outlet($item_id, $customer_id)
+    {
+        $this->db->from('item_quantities_outlet');
+        $this->db->where('item_id', $item_id);
+        $this->db->where('customer_id', $customer_id);
+        $result = $this->db->get()->row();
+        if(empty($result) == TRUE)
+        {
+            //Get empty base parent object, as $item_id is NOT an item
+            $result = new stdClass();
+
+            //Get all the fields from items table (TODO to be reviewed)
+            foreach($this->db->list_fields('item_quantities_outlet') as $field)
+            {
+                $result->$field = '';
+            }
+
+            $result->quantity = 0;
+        }
+
+        return $result;
+    }
+
+    public function save_outlet($location_detail, $item_id, $customer_id)
+    {
+        if(!$this->exists_outlet($item_id, $customer_id))
+        {
+            return $this->db->insert('item_quantities_outlet', $location_detail);
+        }
+
+        $this->db->where('item_id', $item_id);
+        $this->db->where('customer_id', $customer_id);
+
+        return $this->db->update('item_quantities_outlet', $location_detail);
+    }
+
+    public function exists_outlet($item_id, $customer_id)
+    {
+        $this->db->from('item_quantities_outlet');
+        $this->db->where('item_id', $item_id);
+        $this->db->where('customer_id', $customer_id);
+
+        return ($this->db->get()->num_rows() == 1);
+    }
 }
 ?>

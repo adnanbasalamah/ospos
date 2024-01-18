@@ -59,5 +59,29 @@ class Inventory extends CI_Model
 
 		return $this->db->get()->result_array();
 	}
+
+	public function insert_outlet($inventory_data)
+	{
+		return $this->db->insert('inventory_outlet', $inventory_data);
+	}
+
+	public function update_outlet($comment, $inventory_data)
+	{
+		$this->db->where('trans_comment', $comment);
+		return $this->db->update('inventory_outlet', $inventory_data);
+	}
+
+	public function get_inventory_outlet_data_for_item($item_id, $customer_id = FALSE)
+	{
+		$this->db->from('inventory_outlet');
+		$this->db->where('trans_items', $item_id);
+		if($customer_id != FALSE)
+		{
+			$this->db->where('customer_id', $customer_id);
+		}
+		$this->db->order_by('trans_date', 'desc');
+
+		return $this->db->get();
+	}
 }
 ?>
