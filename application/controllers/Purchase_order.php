@@ -47,14 +47,20 @@ class purchase_order extends Secure_Controller
         //$filledup = array_fill_keys($this->input->get('filters'), TRUE);
         //$filters = array_merge($filters, $filledup);
 
-
+	
         $sales = $this->Purchaseorder->search($search, $filters, $limit, $offset, $sort, $order);
         $total_rows = $this->Purchaseorder->get_total_rows($search, $filters);
 
         $data_rows = array();
+		$no=1;
+		$i=0;
         foreach($sales->result() as $sale)
         {
-            $data_rows[] = $this->xss_clean(get_purchase_order_data_row($sale));
+			
+            $data_rows[$i] = $this->xss_clean(get_purchase_order_data_row($sale));
+			$data_rows[$i]['no']=$no;
+			$i++;
+			$no++;
         }
 
         if($total_rows > 0)
@@ -99,10 +105,11 @@ class purchase_order extends Secure_Controller
         $data['po_info_suplier'] = $po_info->supplier_name;
         $data['po_info_comment'] = $po_info->comment;
         $data['po_info_date'] = substr($po_info->po_time,0,10);
-		
+
         $this->load->view('purchase_order/view_detail_po', $data);
     }
 	public function get_detail_po($po_id){
+		
         $search = $this->input->get('search');
         $limit = $this->input->get('limit');
         $offset = $this->input->get('offset');
@@ -112,15 +119,24 @@ class purchase_order extends Secure_Controller
         $purchase_order_items = $this->Purchaseorder->search_detail($po_id,$search, $filters, $limit, $offset, $sort, $order);
         $total_rows = $this->Purchaseorder->get_detail_found_rows($po_id, $search, $filters);
         $data_rows = array();
+
+		$no=1;
+		$i=0;
         foreach($purchase_order_items->result() as $po_item)
         {
-            $data_rows[] = $this->xss_clean(get_purchase_order_items_data_row($po_item));
-        }
+			
+			$data_rows[$i] = $this->xss_clean(get_purchase_order_items_data_row($po_item));
+			$data_rows[$i]['no']=$no;
+			$i++;
+			$no++;
+
+		}
 
         if($total_rows > 0)
         {
             $data_rows[] = $this->xss_clean(get_purchase_order_items_data_last_row($purchase_order_items));
         }
+
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
@@ -268,10 +284,10 @@ class purchase_order extends Secure_Controller
 		$this->_reload();
 	}
 	
-	public function delete($receiving_id = -1, $update_inventory = TRUE) 
+	public function delete($po_id = -1, $update_inventory = TRUE) 
 	{
 		$employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
-		$receiving_ids = $receiving_id == -1 ? $this->input->post('ids') : array($receiving_id);
+		$po_ids = $po_id == -1 ? $this->input->post('ids') : array($po_id);
 	
 		if($this->Receiving->delete_list($receiving_ids, $employee_id, $update_inventory))
 		{

@@ -953,6 +953,7 @@ function get_po_manage_table_headers()
 	$CI =& get_instance();
 
 	$headers = array(
+		array('no' => $CI->lang->line('no')),
 		array('po_id' => $CI->lang->line('common_id')),
 		array('po_time' => $CI->lang->line('po_time')),
 		array('supplier_name' => $CI->lang->line('supplier_name')),
@@ -985,6 +986,7 @@ function get_purchase_order_detail_table_headers(){
 	$CI =& get_instance();
 
 	$headers = array(
+		array('no' => $CI->lang->line('common_no')),
 		array('item_id' => $CI->lang->line('common_id')),
 		array('item_barcode' => $CI->lang->line('items_item_number')),
 		array('item_name' => $CI->lang->line('items_item')),
@@ -1004,6 +1006,7 @@ function get_purchase_order_data_row($po)
 
 	$purchase_order_status = arr_purchase_order_status();
 
+	
 	$row = array (
 		'po_id' => $po->po_id,
 		'po_time' => to_datetime(strtotime($po->po_time)),

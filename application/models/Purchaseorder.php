@@ -71,7 +71,7 @@ class Purchaseorder extends CI_Model
 			'supplier_id' => $this->Supplier->exists($supplier_id) ? $supplier_id : NULL,
 			'employee_id' => $employee_id,
 			'payment_type' => $payment_type,
-			'total_order' => &$total,
+			'total_order' => $total,
 			'comment' => $comment,
 			'reference' => $reference
 		);
@@ -80,14 +80,14 @@ class Purchaseorder extends CI_Model
 		$this->db->trans_start();
 
 		$this->db->insert('po', $po_data);
-		$receiving_id = $this->db->insert_id();
+		$po_id = $this->db->insert_id();
 
 		foreach($items as $line=>$item)
 		{
 			$cur_item_info = $this->Item->get_info($item['item_id']);
 
 			$receivings_items_data = array(
-				'po_id' => $receiving_id,
+				'po_id' => $po_id,
 				'item_id' => $item['item_id'],
 				'line' => $item['line'],
 				'description' => $item['description'],
@@ -111,7 +111,7 @@ class Purchaseorder extends CI_Model
 				$this->Item->change_cost_price($item['item_id'], $items_received, $item['price'], $cur_item_info->cost_price);
 			}
 
-			$this->Attribute->copy_attribute_links($item['item_id'], 'receiving_id', $receiving_id);
+			$this->Attribute->copy_attribute_links($item['item_id'], 'receiving_id', $po_id);
 
 			$supplier = $this->Supplier->get_info($supplier_id);
 		}
@@ -123,7 +123,7 @@ class Purchaseorder extends CI_Model
 			return -1;
 		}
 
-		return $receiving_id;
+		return $po_id;
 	}
 
 	public function delete_list($receiving_ids, $employee_id, $update_inventory = TRUE)
@@ -232,8 +232,8 @@ class Purchaseorder extends CI_Model
             $where .= 'po_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
         }
         $FieldArr = [
-            'po_id','po_time','supplier_id','employee_id','comment',
-            'company_name','po_status',
+            'po_id','po_time','supplier_id','employee_id','comment','total_order',
+            'company_name','po_status','delivery_date',
 			'CONCAT(CONCAT(people_sup.first_name," "), people_sup.last_name) AS supplier_name',
             'CONCAT(CONCAT(people_emp.first_name," "), people_emp.last_name) AS employee_name',
         ];

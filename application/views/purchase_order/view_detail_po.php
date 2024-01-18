@@ -28,7 +28,7 @@
     <button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
         <span class="glyphicon glyphicon-print">&nbsp</span><?php echo $this->lang->line('common_print'); ?>
     </button>
-    <?php echo anchor("purchase_order", '<span class="glyphicon glyphicon-shopping-cart">&nbsp</span>' . $this->lang->line('sales_order_list'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
+    <?php echo anchor("purchase_order", '<span class="glyphicon glyphicon-shopping-cart">&nbsp</span>' . $this->lang->line('po_list'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
 </div>
 <div id="page_title">PURCHASE ORDER</div>
 <div class="so-number"><?php echo $po_number; ?></div>
