@@ -282,7 +282,8 @@ class Sales_order extends Secure_Controller
                     $item_quantity = $this->Item_quantity->get_item_quantity_outlet($Item_id, $sale_data['customer_id']);
                     $this->Item_quantity->save_outlet(array('quantity'	=> $item_quantity->quantity + $ItemData['qty'],
                         'item_id'		=> $Item_id,
-                        'location_id'	=> $sale_data['customer_id']), $Item_id, $sale_data['customer_id']);
+                        'customer_id'	=> $sale_data['customer_id'],
+                        'location_id' => 0), $Item_id, $sale_data['customer_id']);
                     // if an items was deleted but later returned it's restored with this rule
 
                     if($ItemData['qty'] < 0)
