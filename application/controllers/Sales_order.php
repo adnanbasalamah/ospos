@@ -299,7 +299,7 @@ class Sales_order extends Secure_Controller
                         'trans_user'		=> $sale_data['employee_id'],
                         'trans_location'	=> 0,
                         'trans_comment'		=> $sale_remarks,
-                        'trans_inventory'	=> -$ItemData['qty'],
+                        'trans_inventory'	=> +$ItemData['qty'],
                         'customer_id'       => $sale_data['customer_id']
                     );
                     $this->Inventory->insert_outlet($inv_data);
