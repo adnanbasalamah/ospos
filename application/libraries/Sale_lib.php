@@ -1070,26 +1070,6 @@ class Sale_lib
 		$this->CI->session->set_userdata('cash_mode', CASH_MODE_FALSE);
 
 		// Establish cash_mode for this sale by inspecting the payments
-		if($this->CI->session->userdata('cash_rounding'))
-		{
-			$cash_types_only = true;
-			foreach($this->CI->Sale->get_sale_payments($sale_id)->result() as $row)
-			{
-				if($row->payment_type != $this->CI->lang->line('sales_cash') && $row->payment_type != $this->CI->lang->line('sales_cash_adjustment'))
-				{
-					$cash_types_only = FALSE;
-				}
-
-			}
-			if($cash_types_only)
-			{
-				$this->CI->session->set_userdata('cash_mode', CASH_MODE_TRUE);
-			}
-			else
-			{
-				$this->CI->session->set_userdata('cash_mode', CASH_MODE_FALSE);
-			}
-		}
 
 		// Now load payments
 		foreach($this->CI->Sale->get_sale_payments($sale_id)->result() as $row)

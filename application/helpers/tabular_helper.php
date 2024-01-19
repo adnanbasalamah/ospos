@@ -97,7 +97,8 @@ function get_sales_order_manage_table_headers()
 		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
 		array('order_status' => $CI->lang->line('sales_order_status'), 'escape' => FALSE),
 		array('total_order' => $CI->lang->line('sales_order_total')),
-		array('view_detail' => 'Detail', 'escape' => FALSE)
+		array('view_detail' => 'Detail', 'escape' => FALSE),
+		array('print_so' => 'Print', 'escape' => FALSE)
 	);
 	return transform_headers($headers);
 }
@@ -176,6 +177,19 @@ function get_sale_order_data_row($sale)
 		'<span class="glyphicon glyphicon-list-alt"></span>',
 		array('title'=>$CI->lang->line('sales_show_invoice'))
 	);
+	if ($sale->sale_status == 2){
+		$row['print_so'] = anchor(
+			$controller_name . "/sales_order_print/$sale->sale_order_id",
+			'<span class="glyphicon glyphicon-print"></span>',
+			array('title' => $CI->lang->line('delivery_order_print'))
+		);
+	}else {
+		$row['print_so'] = anchor(
+			$controller_name . "/sales_order_print/$sale->sale_order_id",
+			'<span class="glyphicon glyphicon-print"></span>',
+			array('title' => $CI->lang->line('sales_order_print'))
+		);
+	}
 	if($CI->config->item('invoice_enable'))
 	{
 		$row['invoice_number'] = $sale->invoice_number;
