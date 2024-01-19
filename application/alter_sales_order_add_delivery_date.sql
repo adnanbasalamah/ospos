@@ -1,1 +1,0 @@
-ALTER TABLE `ospos_sales_order` ADD `delivery_date` DATE NULL DEFAULT NULL AFTER `total_order`;

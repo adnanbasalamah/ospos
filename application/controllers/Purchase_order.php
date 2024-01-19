@@ -100,7 +100,7 @@ class purchase_order extends Secure_Controller
 	public function detailpo($po_id){
         $data['table_headers'] = get_purchase_order_detail_table_headers();
         $data['po_id'] = $po_id;
-        $data['po_number'] = 'PO0000'.$po_id;
+        $data['po_number'] = 'PO'.str_pad($po_id,5,'0',STR_PAD_LEFT);
         $po_info = $this->Purchaseorder->get_purchase_order_info_by_id($po_id);
         $data['po_info_suplier'] = $po_info->supplier_name;
         $data['po_info_comment'] = $po_info->comment;
@@ -274,7 +274,7 @@ class purchase_order extends Secure_Controller
 		$data['selected_supplier_id'] = $po_info['supplier_id'];
 		$data['po_info'] = $po_info;
 	
-		$this->load->view('receivings/form', $data);
+		$this->load->view('purchase_order/form', $data);
 	}
 
 	public function delete_item($item_number)
