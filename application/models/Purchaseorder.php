@@ -9,9 +9,9 @@ class Purchaseorder extends CI_Model
 	public function get_info($po_id)
 	{
 		$this->db->from('po');
-		$this->db->join('people', 'people.person_id = receivings.supplier_id', 'LEFT');
-		$this->db->join('suppliers', 'suppliers.person_id = receivings.supplier_id', 'LEFT');
-		$this->db->where('receiving_id', $po_id);
+		$this->db->join('people', 'people.person_id = po.supplier_id', 'LEFT');
+		$this->db->join('suppliers', 'suppliers.person_id = po.supplier_id', 'LEFT');
+		$this->db->where('po_id', $po_id);
 
 		return $this->db->get();
 	}
@@ -86,7 +86,7 @@ class Purchaseorder extends CI_Model
 		{
 			$cur_item_info = $this->Item->get_info($item['item_id']);
 
-			$receivings_items_data = array(
+			$po_items_data = array(
 				'po_id' => $po_id,
 				'item_id' => $item['item_id'],
 				'line' => $item['line'],
@@ -101,7 +101,7 @@ class Purchaseorder extends CI_Model
 				'item_location' => $item['item_location']
 			);
 
-			$this->db->insert('po_items', $receivings_items_data);
+			$this->db->insert('po_items', $po_items_data);
 
 			$items_received = $item['receiving_quantity'] != 0 ? $item['quantity'] * $item['receiving_quantity'] : $item['quantity'];
 

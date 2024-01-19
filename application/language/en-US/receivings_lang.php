@@ -57,6 +57,7 @@ $lang["receivings_unsuccessfully_updated"] = "Receiving update failed.";
 $lang["receivings_update"] = "Update";
 
 $lang["purchase_order"] = "Purchase Order";
+$lang["module_purchase_order"] = "Purchase Order";
 $lang["po_mode"] = "PO Mode";
 $lang["po_receipt"] = "Purchase Order";
 $lang["receivings_id"] = "PO ID";
@@ -67,5 +68,8 @@ $lang["total_order"] = "Total Purchase Order";
 $lang["purchase_order_no_purchase_order_to_display"] = "No Purchase Order to display.";
 $lang["receivings_confirm_delete"] = "Are you sure you want to delete this PO? This action cannot be undone.";
 $lang["po_list"] = "Purchase Order List";
+$lang["po_receipt_number"] = "PO #";
+$lang["po_date"] = "PO Date";
+
 
 
