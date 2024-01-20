@@ -86,14 +86,17 @@ class purchase_order extends Secure_Controller
 
 
         $data['table_headers'] = get_po_manage_table_headers();
-		$filters = [];
+		$data['filters'] = [];
 		
         $this->load->view('purchase_order/manage', $data);
 		
 	}
 
 	public function new_po(){
-		$this->load->view('purchase_order/po') ; 
+		$data['total'] = $this->purchase_order_lib->get_total();
+		$data['cart'] = $this->purchase_order_lib->get_cart();
+		$data['mode']='po';
+		$this->load->view('purchase_order/po',$data) ; 
 		
 	}
 	
