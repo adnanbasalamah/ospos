@@ -942,7 +942,8 @@ function arr_sales_order_status(){
 }
 
 function arr_purchase_order_status(){
-	return [0 => 'New', 1 => 'Approved', 2 => 'Shipping', 3 => 'Partially Delivered', 4 => 'Complete', 5 => 'Cancel'];
+	return [0 => 'New', 1 => 'Received'];
+	//return [0 => 'New', 1 => 'Received', 2 => 'Shipping', 3 => 'Partially Delivered', 4 => 'Complete', 5 => 'Cancel'];
 }
 
 /*

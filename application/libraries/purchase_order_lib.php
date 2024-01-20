@@ -304,29 +304,29 @@ class purchase_order_lib
 		$this->set_cart($items);
 	}
 
-	public function return_entire_receiving($receipt_receiving_id)
+	public function return_entire_po($receipt_po_id)
 	{
 		//RECV #
-		$pieces = explode(' ', $receipt_receiving_id);
+		$pieces = explode(' ', $receipt_po_id);
 		if(preg_match("/(RECV|KIT)/", $pieces[0]))
 		{
-			$receiving_id = $pieces[1];
+			$po_id = $pieces[1];
 		} 
 		else 
 		{
-			$receiving_id = $this->CI->Receiving->get_receiving_by_reference($receipt_receiving_id)->row()->receiving_id;
+			$po_id = $this->CI->Purchaseorder->get_po_by_reference($receipt_po_id)->row()->po_id;
 		}
 
 		$this->empty_cart();
 		$this->remove_supplier();
 		$this->clear_comment();
 
-		foreach($this->CI->Receiving->get_receiving_items($receiving_id)->result() as $row)
+		foreach($this->CI->Purchaseorder->get_receiving_items($po_id)->result() as $row)
 		{
-			$this->add_item($row->item_id, -$row->quantity_purchased, $row->item_location, $row->discount, $row->discount_type, $row->item_unit_price, $row->description, $row->serialnumber, $row->receiving_quantity, $receiving_id, TRUE);
+			$this->add_item($row->item_id, -$row->quantity_purchased, $row->item_location, $row->discount, $row->discount_type, $row->item_unit_price, $row->description, $row->serialnumber, $row->receiving_quantity, $po_id, TRUE);
 		}
 
-		$this->set_supplier($this->CI->Receiving->get_supplier($receiving_id)->person_id);
+		$this->set_supplier($this->CI->Purchaseorder->get_supplier($po_id)->person_id);
 	}
 
 	public function add_item_kit($external_item_kit_id, $item_location, $discount, $discount_type)

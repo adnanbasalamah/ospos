@@ -51,7 +51,7 @@
 		<?php
 		}
 		?>
-		<div id="sale_id"><?php echo $this->lang->line('receivings_id').": ".$receiving_id; ?></div>
+		<div id="sale_id"><?php echo $this->lang->line('receivings_id').": ".$po_id; ?></div>
 		<?php 
 		if (!empty($reference))
 		{
@@ -150,7 +150,7 @@
 
 	<div id='barcode'>
 		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
-		<?php echo $receiving_id; ?>
+		<?php echo $po_id; ?>
 	</div>
 </div>
 <?php $this->load->view("partial/footer"); ?>

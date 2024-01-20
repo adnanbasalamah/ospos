@@ -70,6 +70,9 @@ $lang["receivings_confirm_delete"] = "Are you sure you want to delete this PO? T
 $lang["po_list"] = "Purchase Order List";
 $lang["po_receipt_number"] = "PO #";
 $lang["po_date"] = "PO Date";
+$lang["purchase_order_update"] = "Purchase Order Update";
+$lang["no"] = "No";
+
 
 
 

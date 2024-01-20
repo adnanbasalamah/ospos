@@ -16,9 +16,9 @@ class Purchaseorder extends CI_Model
 		return $this->db->get();
 	}
 
-	public function get_receiving_by_reference($reference)
+	public function get_po_by_reference($reference)
 	{
-		$this->db->from('receivings');
+		$this->db->from('po');
 		$this->db->where('reference', $reference);
 
 		return $this->db->get();
