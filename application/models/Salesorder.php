@@ -9,7 +9,7 @@ class Salesorder extends CI_Model
         $FieldArr = [
             'sale_time','customer_id','employee_id','comment',
             'invoice_number','quote_number','sale_order_id','sale_status',
-            'dinner_table_id','work_order_number','sale_type','total_order','delivery_date',
+            'dinner_table_id','work_order_number','sale_type','total_order','delivery_date', 'shipped_date',
             'CONCAT(CONCAT(people_cust.first_name," "), people_cust.last_name) AS customer_name',
             'CONCAT(CONCAT(people_emp.first_name," "), people_emp.last_name) AS employee_name',
             '(SELECT company_name FROM ospos_customers WHERE ospos_customers.person_id = so.customer_id) AS company_name'

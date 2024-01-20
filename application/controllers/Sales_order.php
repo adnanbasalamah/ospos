@@ -34,11 +34,23 @@ class Sales_order extends Secure_Controller
         $arr_order_status = arr_sales_order_status();
         $data['table_headers'] = get_sales_order_detail_table_headers();
         $data['so_id'] = $sale_order_id;
-        $data['so_number'] = 'SO0000'.$sale_order_id;
         $so_info = $this->Salesorder->get_sales_order_info_by_id($sale_order_id);
+        if ((int)$so_info->sale_status == 2){
+            $data['so_number'] = 'DO0000' . $sale_order_id;
+            $data['page_title'] = 'DELIVERY ORDER';
+        }else {
+            $data['so_number'] = 'SO0000' . $sale_order_id;
+            $data['page_title'] = 'SALES ORDER';
+            if ((int)$so_info->sale_status == 3 || (int)$so_info->sale_status == 4){
+                $data['page_title'] = 'SALES ORDER DELIVERED';
+            }elseif ((int)$so_info->sale_status == 5){
+                $data['page_title'] = 'SALES ORDER CANCELED';
+            }
+        }
         $data['so_info_customer'] = $so_info->company_name;
         $data['so_info_comment'] = $so_info->comment;
         $data['so_info_status'] = strtoupper($arr_order_status[$so_info->sale_status]);
+        $data['so_info_status_int'] = (int)$so_info->sale_status;
         $data['so_info_date'] = substr($so_info->sale_time,0,10);
         $this->load->view('sales_order/view_detail_so', $data);
     }
@@ -251,6 +263,7 @@ class Sales_order extends Secure_Controller
                     $this->Salesorder->update_detail($sale_order_id, $Item_id, $SODetailData);
                 }
             }
+            $sale_data['shipped_date'] = date('Y-m-d H:i:s');
         }elseif (((int)$this->input->post('sale_status') == 3 || (int)$this->input->post('sale_status') == 4) && $status_changed){
             $status_so = 'Berubah';
             $items = $this->input->post('item_id');
@@ -269,7 +282,8 @@ class Sales_order extends Secure_Controller
                     $item_quantity = $this->Item_quantity->get_item_quantity_outlet($Item_id, $sale_data['customer_id']);
                     $this->Item_quantity->save_outlet(array('quantity'	=> $item_quantity->quantity + $ItemData['qty'],
                         'item_id'		=> $Item_id,
-                        'location_id'	=> $sale_data['customer_id']), $Item_id, $sale_data['customer_id']);
+                        'customer_id'	=> $sale_data['customer_id'],
+                        'location_id' => 0), $Item_id, $sale_data['customer_id']);
                     // if an items was deleted but later returned it's restored with this rule
 
                     if($ItemData['qty'] < 0)
@@ -285,7 +299,7 @@ class Sales_order extends Secure_Controller
                         'trans_user'		=> $sale_data['employee_id'],
                         'trans_location'	=> 0,
                         'trans_comment'		=> $sale_remarks,
-                        'trans_inventory'	=> -$ItemData['qty'],
+                        'trans_inventory'	=> +$ItemData['qty'],
                         'customer_id'       => $sale_data['customer_id']
                     );
                     $this->Inventory->insert_outlet($inv_data);
@@ -293,6 +307,7 @@ class Sales_order extends Secure_Controller
                     $this->Salesorder->update_detail($sale_order_id, $Item_id, $SODetailData);
                 }
             }
+            $sale_data['delivery_date'] = date('Y-m-d H:i:s');
         }
         if ($this->Salesorder->update($sale_order_id, $sale_data)) {
             echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_order_successfully_updated'), 'id' => $sale_order_id,
@@ -301,5 +316,134 @@ class Sales_order extends Secure_Controller
         } else {
             echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_order_id));
         }
+    }
+    public function sales_order_print($sale_order_id)
+    {
+        $data = $this->_load_sale_order_data($sale_order_id);
+        $data['cart'] = $this->Salesorder->get_sale_order_items($sale_order_id)->result();
+        $this->load->view('sales_order/sales_order_print', $data);
+    }
+    public function _load_sale_order_data($sale_order_id)
+    {
+        $this->sale_lib->clear_all();
+        $cash_rounding = $this->sale_lib->reset_cash_rounding();
+        $data['cash_rounding'] = $cash_rounding;
+
+        $sale_info = $this->Salesorder->get_info($sale_order_id)->row_array();
+        $this->sale_lib->copy_entire_sale($sale_order_id);
+        $data = array();
+        $data['discount'] = $this->sale_lib->get_discount();
+        $data['transaction_time'] = to_datetime(strtotime($sale_info['sale_time']));
+        $data['show_stock_locations'] = $this->Stock_location->show_locations('sales');
+
+        // Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
+        $totals = 0;//$this->sale_lib->get_totals();
+        $data['subtotal'] = $totals['subtotal'];
+
+        $employee_info = $this->Employee->get_info($this->sale_lib->get_employee());
+        $data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
+        $this->_load_customer_data($this->sale_lib->get_customer(), $data);
+
+        $data['sale_order_id_num'] = $sale_order_id;
+        $data['sale_order_id'] = $sale_order_id;
+        $data['comments'] = $sale_info['comment'];
+        if ((int)$sale_info['sale_status'] == 2){
+            $data['so_number'] = 'DO ' . str_pad($sale_order_id,5,'0',STR_PAD_LEFT);
+            $data['page_title'] = $this->lang->line('delivery_order');
+            $data['transaction_date'] = to_date(strtotime($sale_info['shipped_date']));
+        }else {
+            $data['transaction_date'] = to_date(strtotime($sale_info['sale_time']));
+            if ((int)$sale_info['sale_status'] == 3 || (int)$sale_info['sale_status'] == 4){
+                $data['transaction_date'] = to_date(strtotime($sale_info['delivery_date']));
+            }
+            $data['so_number'] = 'SO ' . str_pad($sale_order_id,5,'0',STR_PAD_LEFT);
+            $data['page_title'] = $this->lang->line('sales_order');
+        }
+        $data['quote_number'] = $sale_info['quote_number'];
+        $data['sale_status'] = $sale_info['sale_status'];
+
+        $data['company_info'] = implode("\n", array(
+            $this->config->item('address'),
+            $this->config->item('phone')
+        ));
+        if($this->config->item('account_number'))
+        {
+            $data['company_info'] .= "\n" . $this->lang->line('sales_account_number') . ": " . $this->config->item('account_number');
+        }
+        if($this->config->item('tax_id') != '')
+        {
+            $data['company_info'] .= "\n" . $this->lang->line('sales_tax_id') . ": " . $this->config->item('tax_id');
+        }
+
+        $data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['so_number']);
+        $data['print_after_sale'] = FALSE;
+        $data['price_work_orders'] = FALSE;
+        return $this->xss_clean($data);
+    }
+    private function _load_customer_data($customer_id, &$data, $stats = FALSE)
+    {
+        $customer_info = '';
+
+        if($customer_id != -1)
+        {
+            $customer_info = $this->Customer->get_info($customer_id);
+            $data['customer_id'] = $customer_id;
+            if(!empty($customer_info->company_name))
+            {
+                $data['customer'] = $customer_info->company_name;
+            }
+            else
+            {
+                $data['customer'] = $customer_info->first_name . ' ' . $customer_info->last_name;
+            }
+            $data['first_name'] = $customer_info->first_name;
+            $data['last_name'] = $customer_info->last_name;
+            $data['customer_email'] = $customer_info->email;
+            $data['customer_address'] = $customer_info->address_1;
+            if(!empty($customer_info->zip) || !empty($customer_info->city))
+            {
+                $data['customer_location'] = $customer_info->zip . ' ' . $customer_info->city . "\n" . $customer_info->state;
+            }
+            else
+            {
+                $data['customer_location'] = '';
+            }
+            $data['customer_account_number'] = $customer_info->account_number;
+            $data['customer_discount'] = $customer_info->discount;
+            $data['customer_discount_type'] = $customer_info->discount_type;
+            $package_id = $this->Customer->get_info($customer_id)->package_id;
+            if($package_id != NULL)
+            {
+                $package_name = $this->Customer_rewards->get_name($package_id);
+                $points = $this->Customer->get_info($customer_id)->points;
+                $data['customer_rewards']['package_id'] = $package_id;
+                $data['customer_rewards']['points'] = empty($points) ? 0 : $points;
+                $data['customer_rewards']['package_name'] = $package_name;
+            }
+
+            if($stats)
+            {
+                $cust_stats = $this->Customer->get_stats($customer_id);
+                $data['customer_total'] = empty($cust_stats) ? 0 : $cust_stats->total;
+            }
+
+            $data['customer_info'] = implode("\n", array(
+                $data['customer'],
+                $data['customer_address'],
+                $data['customer_location']
+            ));
+
+            if($data['customer_account_number'])
+            {
+                $data['customer_info'] .= "\n" . $this->lang->line('sales_account_number') . ": " . $data['customer_account_number'];
+            }
+            if($customer_info->tax_id != '')
+            {
+                $data['customer_info'] .= "\n" . $this->lang->line('sales_tax_id') . ": " . $customer_info->tax_id;
+            }
+            $data['tax_id'] = $customer_info->tax_id;
+        }
+
+        return $customer_info;
     }
 }

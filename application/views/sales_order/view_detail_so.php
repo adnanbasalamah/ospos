@@ -25,13 +25,14 @@
     });
     $('#add-item').removeAttr('disabled');
 </script>
+<?php $this->load->view('partial/print_receipt', array('print_after_sale'=>false, 'selected_printer'=>'takings_printer')); ?>
 <div id="title_bar" class="print_hide btn-toolbar">
     <button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
         <span class="glyphicon glyphicon-print">&nbsp</span><?php echo $this->lang->line('common_print'); ?>
     </button>
     <?php echo anchor("sales_order", '<span class="glyphicon glyphicon-shopping-cart">&nbsp</span>' . $this->lang->line('sales_order_list'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
 </div>
-<div id="page_title">SALES ORDER</div>
+<div id="page_title"><?php echo $page_title; ?></div>
 <div class="so-number"><?php echo $so_number; ?></div>
 <div class="row">&nbsp;</div>
 <div class="row">&nbsp;</div>
@@ -41,7 +42,7 @@
     <div class="col-md-2 so-info">Order Notes</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_comment;?></div>
     <div class="col-md-2 so-info">Order Status</div><div class="col-md-4 so-info so-info-value"><?php echo $so_info_status;?></div>
 </div>
-<?php if ($so_info_status != CANCELED && $so_info_status != COMPLETED){ ?>
+<?php if ($so_info_status_int != CANCELED && $so_info_status_int != COMPLETED){ ?>
 <div id="title_bar" class="print_hide btn-toolbar">
     <?php echo anchor("sales_order/add-item", '<span class="glyphicon glyphicon-plus-sign">&nbsp</span>' . $this->lang->line('sales_new_item'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
 </div>
