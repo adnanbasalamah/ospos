@@ -59,7 +59,7 @@ class Purchaseorder extends CI_Model
 		return $this->db->update('po', $po_data);
 	}
 
-	public function save($items, $supplier_id, $employee_id, $comment, $total, $reference, $payment_type, $receiving_id = FALSE)
+	public function save($items, $supplier_id, $employee_id, $comment, $total, $reference, $payment_type, $receiving_id = FALSE,$po_status)
 	{
 		if(count($items) == 0)
 		{
@@ -72,6 +72,7 @@ class Purchaseorder extends CI_Model
 			'employee_id' => $employee_id,
 			'payment_type' => $payment_type,
 			'total_order' => $total,
+			'po_status' => $po_status,
 			'comment' => $comment,
 			'reference' => $reference
 		);
