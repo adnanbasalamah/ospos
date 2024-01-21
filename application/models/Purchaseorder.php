@@ -46,8 +46,8 @@ class Purchaseorder extends CI_Model
 
 	public function exists($receiving_id)
 	{
-		$this->db->from('receivings');
-		$this->db->where('receiving_id', $receiving_id);
+		$this->db->from('po');
+		$this->db->where('po_id', $receiving_id);
 
 		return ($this->db->get()->num_rows() == 1);
 	}
