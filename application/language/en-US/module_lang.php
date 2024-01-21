@@ -48,3 +48,5 @@ $lang["module_timeclocks_categories"] = "";
 $lang["module_timeclocks_categories_desc"] = "";
 $lang["module_timeclocks_desc"] = "";
 $lang["module_purchase_order"] = "Purchase Order";
+$lang["module_inventory_outlet"] = "Outlet Inventory";
+$lang["module_inventory_outlet_desc"] = "View and manage outlet inventory";

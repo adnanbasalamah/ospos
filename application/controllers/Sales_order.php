@@ -351,6 +351,7 @@ class Sales_order extends Secure_Controller
             $data['so_number'] = 'DO ' . str_pad($sale_order_id,5,'0',STR_PAD_LEFT);
             $data['page_title'] = $this->lang->line('delivery_order');
             $data['transaction_date'] = to_date(strtotime($sale_info['shipped_date']));
+            $data['total'] = '-';
         }else {
             $data['transaction_date'] = to_date(strtotime($sale_info['sale_time']));
             if ((int)$sale_info['sale_status'] == 3 || (int)$sale_info['sale_status'] == 4){
@@ -358,6 +359,7 @@ class Sales_order extends Secure_Controller
             }
             $data['so_number'] = 'SO ' . str_pad($sale_order_id,5,'0',STR_PAD_LEFT);
             $data['page_title'] = $this->lang->line('sales_order');
+            $data['total'] = to_currency($totals);
         }
         $data['quote_number'] = $sale_info['quote_number'];
         $data['sale_status'] = $sale_info['sale_status'];

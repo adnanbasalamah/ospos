@@ -114,7 +114,7 @@ if(isset($error_message))
             </tr>
             <tr>
                 <td class="meta-head"><?php echo $this->lang->line('sales_order_total'); ?></td>
-                <td><?php echo to_currency($total); ?></td>
+                <td><?php echo $total; ?></td>
             </tr>
         </table>
     </div>

@@ -21,3 +21,8 @@
 #detail-table-so td.fix-align{
     padding-top: 13px !important;
 }
+#customer-name{
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}

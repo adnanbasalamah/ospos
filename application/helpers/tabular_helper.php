@@ -1114,8 +1114,52 @@ function get_sales_order_detail_form_table_headers(){
 	);
 	return transform_headers($headers);
 }
-
 function array_status_color(){
 	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-danger' ];
 }
+
+function get_inventory_outlet_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_number' => $CI->lang->line('items_item_number')),
+		array('name' => $CI->lang->line('items_item')),
+		array('items_quantity' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal' => $CI->lang->line('sales_sub_total')),
+	);
+	return transform_headers($headers);
+}
+
+function get_inventory_outlet_data_row($item_qo)
+{
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array (
+		'item_id' => $item_qo->item_id,
+		'item_number' => $item_qo->item_number,
+		'name' => $item_qo->name,
+		'items_quantity' => $item_qo->quantity,
+		'items_unit_price' => to_currency($item_qo->unit_price),
+		'subtotal' => to_currency($item_qo->quantity*$item_qo->unit_price),
+	);
+	return $row;
+}
+
+function get_inventory_outlet_data_last_row($items_qo){
+	$CI =& get_instance();
+	$total_inventory = 0;
+	foreach($items_qo->result() as $key => $item_qo)
+	{
+		$total_inventory += $item_qo->quantity * $item_qo->unit_price;
+	}
+
+	return array(
+		'item_id' => '-',
+		'items_unit_price' => $CI->lang->line('sales_total'),
+		'subtotal_order' => to_currency($total_inventory),
+	);
+}
+
 ?>
