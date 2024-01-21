@@ -47,7 +47,7 @@
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('po_status'), 'purchaseorder', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
-				<?php echo form_dropdown('po_id', $po_status, $po_info['po_id'], 'id="po_id" class="form-control"');?>
+				<?php echo form_dropdown('po_status', $po_status, $po_info['po_id'], 'id="po_id" class="form-control"');?>
 			</div>
 		</div>
 

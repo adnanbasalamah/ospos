@@ -275,7 +275,8 @@ class purchase_order extends Secure_Controller
 		$po_info = $this->xss_clean($this->Purchaseorder->get_info($po_id)->row_array());
 		$data['selected_supplier_name'] = !empty($po_info['supplier_id']) ? $po_info['company_name'] : '';
 		$data['selected_supplier_id'] = $po_info['supplier_id'];
-		$data['po_status'] = $po_info['po_status'];
+		$POStatusOption = arr_purchase_order_status();
+		$data['po_status'] = $POStatusOption;
 		$data['po_info'] = $po_info;
 
 		
@@ -342,6 +343,7 @@ class purchase_order extends Secure_Controller
 		if($supplier_id != -1)
 		{
 			$supplier_info = $this->Supplier->get_info($supplier_id);
+			$data['po_status'] = '0';
 			$data['supplier'] = $supplier_info->company_name;
 			$data['first_name'] = $supplier_info->first_name;
 			$data['last_name'] = $supplier_info->last_name;
@@ -360,7 +362,7 @@ class purchase_order extends Secure_Controller
 		//SAVE receiving to database
 		//print_r($data);		
 		
-		$data['po_id'] = 'PO ' . $this->Purchaseorder->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['total'], $data['reference'], $data['payment_type'], $data['stock_location']);
+		$data['po_id'] = 'PO ' . $this->Purchaseorder->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['total'], $data['reference'], $data['payment_type'], $data['stock_location'], $data['po_status']);
 
 		$data = $this->xss_clean($data);
 
@@ -497,10 +499,10 @@ class purchase_order extends Secure_Controller
 		
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
 		$po_time = $date_formatter->format('Y-m-d H:i:s');
-		$po_status=0;
+		//$po_status=0;
 		$po_data = array(
 			'po_time' => $po_time,
-			'po_status' => $po_status,
+		//	'po_status' => $this->input->post('po_status'),
 			'supplier_id' => $this->input->post('supplier_id') ? $this->input->post('supplier_id') : NULL,
 			'employee_id' => $this->input->post('employee_id'),
 			'total_order' => $this->purchase_order_lib->get_total(),
