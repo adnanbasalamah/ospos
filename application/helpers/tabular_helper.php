@@ -956,9 +956,10 @@ function arr_sales_order_status(){
 }
 
 function arr_purchase_order_status(){
-	return [0 => 'New', 1 => 'Received'];
-	//return [0 => 'New', 1 => 'Received', 2 => 'Shipping', 3 => 'Partially Delivered', 4 => 'Complete', 5 => 'Cancel'];
+	return [0 => 'New', 1 => 'Receive', 2 => 'Partially Complete', 3 => 'Complete'];
 }
+
+
 
 /*
 Get the header for the sales purchase order tabular view

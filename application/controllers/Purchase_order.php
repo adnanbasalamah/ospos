@@ -275,6 +275,7 @@ class purchase_order extends Secure_Controller
 		$po_info = $this->xss_clean($this->Purchaseorder->get_info($po_id)->row_array());
 		$data['selected_supplier_name'] = !empty($po_info['supplier_id']) ? $po_info['company_name'] : '';
 		$data['selected_supplier_id'] = $po_info['supplier_id'];
+		$data['po_status'] = $po_info['po_status'];
 		$data['po_info'] = $po_info;
 
 		
