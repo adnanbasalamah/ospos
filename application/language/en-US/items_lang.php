@@ -120,3 +120,4 @@ $lang["items_use_inventory_menu"] = "Use Inventory Menu";
 $lang["items_shipped"] = "Qty Shipped";
 $lang["items_ordered"] = "Qty Ordered";
 $lang["items_delivered"] = "Delivered";
+$lang["inventory_outlet_no_inventory_outlet_to_display"] = "No Items to display.";
