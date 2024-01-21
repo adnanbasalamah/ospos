@@ -86,14 +86,17 @@ class purchase_order extends Secure_Controller
 
 
         $data['table_headers'] = get_po_manage_table_headers();
-		$filters = [];
+		$data['filters'] = [];
 		
         $this->load->view('purchase_order/manage', $data);
 		
 	}
 
 	public function new_po(){
-		$this->load->view('purchase_order/po') ; 
+		$data['total'] = $this->purchase_order_lib->get_total();
+		$data['cart'] = $this->purchase_order_lib->get_cart();
+		$data['mode']='po';
+		$this->load->view('purchase_order/po',$data) ; 
 		
 	}
 	
@@ -143,8 +146,8 @@ class purchase_order extends Secure_Controller
 
     public function get_row($row_id)
     {
-        //$sale_info = $this->Purchaseorder->get_info($row_id)->row();
-        $data_row = $this->xss_clean(get_purchase_order_data_row($sale_info));
+        $po_info = $this->Purchaseorder->get_info($row_id)->row();
+        $data_row = $this->xss_clean(get_purchase_order_data_row($po_info));
 
         echo json_encode($data_row);
     }
@@ -208,9 +211,9 @@ class purchase_order extends Secure_Controller
 		$discount = $this->config->item('default_receivings_discount');
 		$discount_type = $this->config->item('default_receivings_discount_type');
 
-		if($mode == 'return' && $this->Receiving->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
+		if($mode == 'return' && $this->Purchaseorder->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
 		{
-			$this->purchase_order_lib->return_entire_receiving($item_id_or_number_or_item_kit_or_receipt);
+			$this->purchase_order_lib->return_entire_po($item_id_or_number_or_item_kit_or_receipt);
 		}
 		elseif($this->Item_kit->is_valid_item_kit($item_id_or_number_or_item_kit_or_receipt))
 		{
@@ -272,8 +275,11 @@ class purchase_order extends Secure_Controller
 		$po_info = $this->xss_clean($this->Purchaseorder->get_info($po_id)->row_array());
 		$data['selected_supplier_name'] = !empty($po_info['supplier_id']) ? $po_info['company_name'] : '';
 		$data['selected_supplier_id'] = $po_info['supplier_id'];
+		$data['po_status'] = $po_info['po_status'];
 		$data['po_info'] = $po_info;
-	
+
+		
+
 		$this->load->view('purchase_order/form', $data);
 	}
 
@@ -289,7 +295,7 @@ class purchase_order extends Secure_Controller
 		$employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
 		$po_ids = $po_id == -1 ? $this->input->post('ids') : array($po_id);
 	
-		if($this->Receiving->delete_list($receiving_ids, $employee_id, $update_inventory))
+		if($this->Purchaseorder->delete_list($po_id, $employee_id, $update_inventory))
 		{
 			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('receivings_successfully_deleted') . ' ' .
 							count($receiving_ids) . ' ' . $this->lang->line('receivings_one_or_multiple'), 'ids' => $receiving_ids));
@@ -369,7 +375,7 @@ class purchase_order extends Secure_Controller
 
 		$data['print_after_sale'] = $this->purchase_order_lib->is_print_after_sale();
 
-		$this->load->view("receivings/receipt",$data);
+		$this->load->view("purchase_order/receipt",$data);
 
 		$this->purchase_order_lib->clear_all();
 	}
@@ -395,20 +401,20 @@ class purchase_order extends Secure_Controller
 		}
 	}
 	
-	public function receipt($receiving_id)
+	public function receipt($po_id)
 	{
-		$receiving_info = $this->Receiving->get_info($receiving_id)->row_array();
-		$this->purchase_order_lib->copy_entire_receiving($receiving_id);
+		$po_info = $this->purchase_order->get_info($po_id)->row_array();
+		$this->purchase_order_lib->copy_entire_receiving($po_id);
 		$data['cart'] = $this->purchase_order_lib->get_cart();
 		$data['total'] = $this->purchase_order_lib->get_total();
 		$data['mode'] = $this->purchase_order_lib->get_mode();
-		$data['transaction_time'] = to_datetime(strtotime($receiving_info['receiving_time']));
+		$data['transaction_time'] = to_datetime(strtotime($po_info['receiving_time']));
 		$data['show_stock_locations'] = $this->Stock_location->show_locations('receivings');
-		$data['payment_type'] = $receiving_info['payment_type'];
+		$data['payment_type'] = $po_info['payment_type'];
 		$data['reference'] = $this->purchase_order_lib->get_reference();
-		$data['receiving_id'] = 'RECV ' . $receiving_id;
-		$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['receiving_id']);
-		$employee_info = $this->Employee->get_info($receiving_info['employee_id']);
+		$data['po_id'] = 'PO ' . $po_id;
+		$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['po_id']);
+		$employee_info = $this->Employee->get_info($po_info['employee_id']);
 		$data['employee'] = $employee_info->first_name . ' ' . $employee_info->last_name;
 
 		$supplier_id = $this->purchase_order_lib->get_supplier();
@@ -434,7 +440,7 @@ class purchase_order extends Secure_Controller
 
 		$data = $this->xss_clean($data);
 		
-		$this->load->view("receivings/receipt", $data);
+		$this->load->view("purchase_order/receipt", $data);
 
 		$this->purchase_order_lib->clear_all();
 	}
@@ -491,17 +497,17 @@ class purchase_order extends Secure_Controller
 		
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
 		$po_time = $date_formatter->format('Y-m-d H:i:s');
-
+		$po_status=0;
 		$po_data = array(
-			'receiving_time' => $po_time,
+			'po_time' => $po_time,
+			'po_status' => $po_status,
 			'supplier_id' => $this->input->post('supplier_id') ? $this->input->post('supplier_id') : NULL,
 			'employee_id' => $this->input->post('employee_id'),
 			'total_order' => $this->purchase_order_lib->get_total(),
 			'comment' => $this->input->post('comment'),
 			'reference' => $this->input->post('reference') != '' ? $this->input->post('reference') : NULL
 		);
-		print_r($po_data);
-		die;
+
 
 		//$this->Inventory->update('RECV '.$receiving_id, ['trans_date' => $po_time]);
 		if($this->Purchaseorder->update($po_data, $po_id))
@@ -512,6 +518,8 @@ class purchase_order extends Secure_Controller
 		{
 			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('receivings_unsuccessfully_updated'), 'id' => $po_id));
 		}
+		$this->list();
+
 	}
 
 	public function cancel_receiving()
