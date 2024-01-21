@@ -94,7 +94,7 @@ class Purchaseorder extends CI_Model
 				'description' => $item['description'],
 				'serialnumber' => $item['serialnumber'],
 				'quantity_purchased' => $item['quantity'],
-				'receiving_quantity' => $item['receiving_quantity'],
+				'receiving_quantity' => 0, //$item['receiving_quantity'],
 				'discount' => $item['discount'],
 				'discount_type' => $item['discount_type'],
 				'item_cost_price' => $cur_item_info->cost_price,
