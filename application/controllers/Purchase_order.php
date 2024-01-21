@@ -256,31 +256,7 @@ class purchase_order extends Secure_Controller
 		$this->_reload($data);
 	}
 	
-	public function edit($po_id)
-	{
-		$data = array();
-
-		$data['suppliers'] = array('' => 'No Supplier');
-		foreach($this->Supplier->get_all()->result() as $supplier)
-		{
-			$data['suppliers'][$supplier->person_id] = $this->xss_clean($supplier->first_name . ' ' . $supplier->last_name);
-		}
 	
-		$data['employees'] = array();
-		foreach($this->Employee->get_all()->result() as $employee)
-		{
-			$data['employees'][$employee->person_id] = $this->xss_clean($employee->first_name . ' '. $employee->last_name);
-		}
-	
-		$po_info = $this->xss_clean($this->Purchaseorder->get_info($po_id)->row_array());
-		$data['selected_supplier_name'] = !empty($po_info['supplier_id']) ? $po_info['company_name'] : '';
-		$data['selected_supplier_id'] = $po_info['supplier_id'];
-		$data['po_info'] = $po_info;
-
-		
-
-		$this->load->view('purchase_order/form', $data);
-	}
 
 	public function delete_item($item_number)
 	{
