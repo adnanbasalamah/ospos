@@ -277,6 +277,7 @@ class purchase_order extends Secure_Controller
 		$data['selected_supplier_id'] = $po_info['supplier_id'];
 		$data['po_info'] = $po_info;
 
+		
 
 		$this->load->view('purchase_order/form', $data);
 	}
