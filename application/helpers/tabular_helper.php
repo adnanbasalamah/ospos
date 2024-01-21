@@ -1164,4 +1164,48 @@ function get_inventory_outlet_data_last_row($items_qo){
 	);
 }
 
+function get_sales_order_matrix_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_number' => $CI->lang->line('items_item_number')),
+		array('name' => $CI->lang->line('items_item')),
+		array('total_qty' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal' => $CI->lang->line('sales_sub_total')),
+		array('company_order' => $CI->lang->line('sales_company_name')),
+	);
+	return transform_headers($headers);
+}
+
+function get_sale_order_matrix_data_row($item_so){
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array (
+		'item_id' => $item_so->item_id,
+		'item_number' => $item_so->item_number,
+		'name' => $item_so->name,
+		'total_qty' => $item_so->total_qty,
+		'items_unit_price' => to_currency($item_so->item_unit_price),
+		'subtotal' => to_currency($item_so->subtotal),
+		'company_order' => $item_so->company_order,
+	);
+	return $row;
+}
+
+function get_sale_order_matrix_data_last_row($items_so){
+	$CI =& get_instance();
+	$total_order = 0;
+	foreach($items_so->result() as $key => $item_so)
+	{
+		$total_order += $item_so->subtotal;
+	}
+
+	return array(
+		'item_id' => '-',
+		'items_unit_price' => $CI->lang->line('sales_total'),
+		'subtotal' => to_currency($total_order),
+	);
+}
 ?>

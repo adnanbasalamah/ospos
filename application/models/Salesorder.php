@@ -351,5 +351,45 @@ class Salesorder extends CI_Model
         print $this->db->last_query();*/
         return $this->db->get();
     }
+    function search_detail_matrix($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_order_items.item_id', $order = 'asc', $count_only = FALSE){
+        $where = '';
+        if(empty($this->config->item('date_or_time_format')))
+        {
+            $where .= 'DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+        }
+        else
+        {
+            $where .= 'sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+        }
+        $FieldArr = [
+            'so_item.item_id', 'SUM(quantity_purchased) AS total_qty',
+            'GROUP_CONCAT(DISTINCT(customers.company_name) ORDER BY customers.company_name ASC SEPARATOR ", ") AS company_order',
+            'items.name','items.category','items.item_number',
+            'item_cost_price','item_unit_price',
+            'SUM(so_item.item_unit_price*so_item.quantity_purchased) AS subtotal'
+        ];
+        $this->db->select(implode(',',$FieldArr))->from('sales_order_items AS so_item');
+        $this->db->join('sales_order AS sales_order', 'so_item.sale_order_id = sales_order.sale_order_id', 'left');
+        $this->db->join('items AS items', 'so_item.item_id = items.item_id', 'left');
+        $this->db->join('customers AS customers', 'sales_order.customer_id = customers.person_id', 'left');
+        $this->db->where($where);
+        $this->db->group_by('so_item.item_id');
+        if($count_only == TRUE)
+        {
+            return $this->db->get()->num_rows();
+        }
+        // order by sale time by default
+        $this->db->order_by($sort, $order);
+        if($rows > 0)
+        {
+            $this->db->limit($rows, $limit_from);
+        }
+        $return_dt = $this->db->get();
+        //print $this->db->last_query();
+        return $return_dt;
+    }
+    function get_detail_found_rows_matrix($search, $filters){
+        return $this->search_detail_matrix($search, $filters, 0, 0, 'item_id', 'desc', TRUE);
+    }
 }
 ?>
