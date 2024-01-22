@@ -1128,8 +1128,9 @@ function get_inventory_outlet_table_headers(){
 		array('item_number' => $CI->lang->line('items_item_number')),
 		array('name' => $CI->lang->line('items_item')),
 		array('items_quantity' => $CI->lang->line('items_quantity')),
-		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('unit_price' => $CI->lang->line('items_unit_price')),
 		array('subtotal' => $CI->lang->line('sales_sub_total')),
+		array('view_detail' => 'Inventory', 'escape' => FALSE)
 	);
 	return transform_headers($headers);
 }
@@ -1143,8 +1144,13 @@ function get_inventory_outlet_data_row($item_qo)
 		'item_number' => $item_qo->item_number,
 		'name' => $item_qo->name,
 		'items_quantity' => $item_qo->quantity,
-		'items_unit_price' => to_currency($item_qo->unit_price),
+		'unit_price' => to_currency($item_qo->unit_price),
 		'subtotal' => to_currency($item_qo->quantity*$item_qo->unit_price),
+	);
+	$row['edit'] = anchor(
+		$controller_name."/inventory/$item_qo->item_id-$item_qo->customer_id",
+		'<span class="glyphicon glyphicon-list-alt"></span>',
+		array('class' => 'modal-dlg print_hide','title' => $CI->lang->line($controller_name.'_list'))
 	);
 	return $row;
 }
@@ -1154,13 +1160,14 @@ function get_inventory_outlet_data_last_row($items_qo){
 	$total_inventory = 0;
 	foreach($items_qo->result() as $key => $item_qo)
 	{
-		$total_inventory += $item_qo->quantity * $item_qo->unit_price;
+		//print_r($item_qo);
+		$total_inventory = $total_inventory + ($item_qo->quantity * $item_qo->unit_price);
 	}
 
 	return array(
 		'item_id' => '-',
-		'items_unit_price' => $CI->lang->line('sales_total'),
-		'subtotal_order' => to_currency($total_inventory),
+		'unit_price' => $CI->lang->line('sales_total'),
+		'subtotal' => to_currency($total_inventory),
 	);
 }
 

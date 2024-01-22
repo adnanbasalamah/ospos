@@ -66,6 +66,7 @@ class Inventoryoutlet extends CI_Model
             $this->db->limit($rows, $limit_from);
         }
         $return_query = $this->db->get();
+        //print_r($this->db->last_query());
         return $return_query;
     }
 

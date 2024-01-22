@@ -56,4 +56,28 @@ class Inventory_outlet extends Secure_Controller
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
+    public function count_details($item_id = NEW_ITEM, $customer_id = 0)
+    {
+        $item_info = $this->Item->get_info($item_id);
+
+        foreach(get_object_vars($item_info) as $property => $value)
+        {
+            $item_info->$property = $this->xss_clean($value);
+        }
+
+        $data['item_info'] = $item_info;
+        $data['stock_locations'] = [];
+        $stock_locations = $this->Stock_location->get_undeleted_all()->result_array();
+
+        foreach($stock_locations as $location)
+        {
+            $location = $this->xss_clean($location);
+            $quantity = $this->xss_clean($this->Item_quantity->get_item_quantity($item_id, $location['location_id'])->quantity);
+
+            $data['stock_locations'][$location['location_id']] = $location['location_name'];
+            $data['item_quantities'][$location['location_id']] = $quantity;
+        }
+
+        $this->load->view('items/form_count_details', $data);
+    }
 }
