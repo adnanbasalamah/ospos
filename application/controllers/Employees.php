@@ -62,7 +62,12 @@ class Employees extends Persons
 		$data['person_info'] = $person_info;
 		$data['employee_id'] = $employee_id;
 		$data['employee_category'] = $this->employee_category();
-
+		$supplier_array = $this->Supplier->get_all()->result();
+		$supplier_opt = [];
+		foreach($supplier_array as $idx => $supplier_data){
+			$supplier_opt[$supplier_data->person_id] = $supplier_data->company_name;
+		}
+		$data['supplier_option'] = $supplier_opt;
 		$modules = array();
 		foreach($this->Module->get_all_modules()->result() as $module)
 		{
@@ -114,6 +119,7 @@ class Employees extends Persons
 			'zip' => $this->input->post('zip'),
 			'country' => $this->input->post('country'),
 			'comments' => $this->input->post('comments'),
+			'employee_category' => $this->input->post('employee_category'),
 		);
 
 		$grants_array = array();
@@ -138,7 +144,8 @@ class Employees extends Persons
 				'password' 	=> password_hash($this->input->post('password'), PASSWORD_DEFAULT),
 				'hash_version' 	=> 2,
 				'language_code' => $exploded[0],
-				'language' 	=> $exploded[1]
+				'language' 	=> $exploded[1],
+				'supplier_id' => $this->input->post('supplier_id')
 			);
 		}
 		else //Password not changed
@@ -147,7 +154,8 @@ class Employees extends Persons
 			$employee_data = array(
 				'username' 	=> $this->input->post('username'),
 				'language_code'	=> $exploded[0],
-				'language' 	=> $exploded[1]
+				'language' 	=> $exploded[1],
+				'supplier_id' => $this->input->post('supplier_id')
 			);
 		}
 

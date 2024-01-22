@@ -166,6 +166,24 @@ if (!empty($employee_category)){
 <?php
 }
  ?>
+<?php
+if (!empty($supplier_option)){
+    ?>
+    <div class="form-group form-group-sm">
+        <?php echo form_label('Supplier', 'supplier_id', array('class'=>'control-label col-xs-3')); ?>
+        <div class='col-xs-8'>
+            <?php echo form_dropdown(
+                'supplier_id',
+                $supplier_option,
+                $person_info->supplier_id,
+                array('class' => 'form-control input-sm')
+            );
+            ?>
+        </div>
+    </div>
+    <?php
+}
+?>
 <div class="form-group form-group-sm">	
 	<?php echo form_label($this->lang->line('common_comments'), 'comments', array('class'=>'control-label col-xs-3')); ?>
 	<div class='col-xs-8'>

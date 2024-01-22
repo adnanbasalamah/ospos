@@ -320,7 +320,8 @@ function get_people_manage_table_headers()
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
-		array('employee_category' => $CI->lang->line('items_category'))
+		array('employee_category' => $CI->lang->line('items_category')),
+		array('supplier_id' => $CI->lang->line('suppliers_supplier')),
 	);
 
 	if($CI->Employee->has_grant('messages', $CI->session->userdata('person_id')))
@@ -347,6 +348,7 @@ function get_person_data_row($person)
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
 		'employee_category' => $emp_category[$person->employee_category],
+		'supplier_id' => $person->company_employee,
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',
