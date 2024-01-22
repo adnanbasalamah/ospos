@@ -61,6 +61,7 @@ class Employees extends Persons
 		}
 		$data['person_info'] = $person_info;
 		$data['employee_id'] = $employee_id;
+		$data['employee_category'] = $this->employee_category();
 
 		$modules = array();
 		foreach($this->Module->get_all_modules()->result() as $module)
@@ -196,6 +197,11 @@ class Employees extends Persons
 	{
 		$exists = $this->Employee->username_exists($employee_id, $this->input->get('username'));
 		echo !$exists ? 'true' : 'false';
+	}
+
+	public function employee_category()
+	{
+		return ['sales' => 'Sales','inventory' => 'Inventory','admin' => 'Admin'];
 	}
 }
 ?>

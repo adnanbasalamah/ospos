@@ -324,8 +324,9 @@ class Employee extends Person
 		{
 			$this->db->limit($rows, $limit_from);
 		}
-
-		return $this->db->get();
+		$ret_dt = $this->db->get();
+		//print $this->db->last_query();
+		return $ret_dt;
 	}
 
 	/*
