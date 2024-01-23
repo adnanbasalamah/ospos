@@ -237,4 +237,7 @@ $lang["sales_order_print"] = "Print SO";
 $lang["delivery_order_print"] = "Print DO";
 $lang["sales_order_matrix"] = "Sales Order Matrix";
 $lang["sales_payment_status"] = "Payment Status";
+$lang["sales_total_paid"] = "Total Paid";
+$lang["sales_total_unpaid"] = "Total Unpaid";
+
 

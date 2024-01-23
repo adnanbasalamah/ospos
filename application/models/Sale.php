@@ -169,7 +169,10 @@ class Sale extends CI_Model
 					(MAX(payments.sale_payment_amount)) - ($sale_total) AS change_due,
 					" . '
 					MAX(payments.payment_type) AS payment_type,
-					sales.payment_status
+					sales.payment_status, 
+					total_order,
+					(total_order - MAX(payments.sale_payment_amount)) AS total_unpaid,
+					MAX(payments.sale_payment_amount) AS total_paid
 			');
 		}
 

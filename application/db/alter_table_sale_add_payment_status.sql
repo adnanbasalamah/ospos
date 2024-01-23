@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_sales`  ADD `payment_status` INT NULL DEFAULT '0'  AFTER `total_order`;
