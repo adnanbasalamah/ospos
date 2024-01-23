@@ -78,17 +78,20 @@ class Sale extends CI_Model
 	/**
 	 * Get the sales data for the takings (sales/manage) view
 	 */
-	public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales.sale_time', $order = 'desc', $count_only = FALSE)
+	public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales.sale_time', $order = 'desc', $count_only = FALSE, $payment_status = null, $sale_type = SALE_TYPE_INVOICE)
 	{
 		// Pick up only non-suspended records
-		$where = 'sales.sale_status = 0 AND ';
+		$where = 'sales.sale_status = 0 AND sale_type = '.$sale_type.' AND ';
 
 		if (empty($this->config->item('date_or_time_format'))) {
 			$where .= 'DATE(sales.sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
 		} else {
 			$where .= 'sales.sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
 		}
-
+		if (!is_null($payment_status) && count($payment_status)){
+			$payment_status_value = implode(',',$payment_status);
+			$where .= ' AND (payment_status IN ('.$payment_status_value.'))';
+		}
 		// NOTE: temporary tables are created to speed up searches due to the fact that they are orthogonal to the main query
 		// create a temporary table to contain all the payments per sale item
 		$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('sales_payments_temp') .
@@ -239,8 +242,9 @@ class Sale extends CI_Model
 		if ($rows > 0) {
 			$this->db->limit($rows, $limit_from);
 		}
-
-		return $this->db->get();
+		$ret = $this->db->get();
+		//print $this->db->last_query();
+		return $ret;
 	}
 
 	/**
