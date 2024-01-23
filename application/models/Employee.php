@@ -43,7 +43,7 @@ class Employee extends Person
 	*/
 	public function get_all($limit = 10000, $offset = 0)
 	{
-		$this->db->select('employees.*, people.*, (SELECT company_name FROM suppliers WHERE person_id = employees.supplier_id) AS company_employee')->from('employees');
+		$this->db->select('employees.*, people.*, (SELECT company_name FROM ospos_suppliers WHERE person_id = ospos_employees.supplier_id) AS company_employee')->from('employees');
 		$this->db->where('deleted', 0);
 		$this->db->join('people', 'employees.person_id = people.person_id');
 		$this->db->order_by('last_name', 'asc');
