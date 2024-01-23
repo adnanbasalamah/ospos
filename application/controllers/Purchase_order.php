@@ -367,7 +367,9 @@ class purchase_order extends Secure_Controller
 	
 		//SAVE receiving to database
 		//print_r($data);		
-		
+		if (!isset($data['stock_location'])){
+			$data['stock_location'] = 0;
+		}
 		$data['po_id'] = 'PO ' . $this->Purchaseorder->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['total'], $data['reference'], $data['payment_type'], $data['stock_location'], $data['po_status']);
 
 		$data = $this->xss_clean($data);
