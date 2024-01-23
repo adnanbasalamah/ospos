@@ -123,7 +123,13 @@ class Sales_order extends Secure_Controller
         $limit = $this->input->get('limit');
         $offset = $this->input->get('offset');
         $sort = $this->input->get('sort');
+        if (empty($sort)){
+            $sort = 'sale_order_id';
+        }
         $order = $this->input->get('order');
+        if (empty($order)){
+            $order = 'DESC';
+        }
         $filters = array('sale_type' => 'all',
             'location_id' => 'all',
             'start_date' => $this->input->get('start_date'),

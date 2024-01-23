@@ -1155,7 +1155,7 @@ function get_inventory_outlet_data_row($item_qo)
 		'item_id' => $item_qo->item_id,
 		'item_number' => $item_qo->item_number,
 		'name' => $item_qo->name,
-		'items_quantity' => $item_qo->quantity,
+		'items_quantity' => to_quantity_decimals($item_qo->quantity),
 		'unit_price' => to_currency($item_qo->unit_price),
 		'subtotal' => to_currency($item_qo->quantity*$item_qo->unit_price),
 	);

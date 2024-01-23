@@ -36,7 +36,7 @@ class Salesorder extends CI_Model
     /**
      * Get the sales data for the takings (sales/manage) view
      */
-    public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_order.sale_time', $order = 'desc', $count_only = FALSE)
+    public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_order.sale_id', $order = 'desc', $count_only = FALSE)
     {
 
 
