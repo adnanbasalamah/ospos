@@ -67,7 +67,9 @@ function get_sales_manage_table_headers()
 		array('amount_due' => $CI->lang->line('sales_amount_due')),
 		array('amount_tendered' => $CI->lang->line('sales_amount_tendered')),
 		array('change_due' => $CI->lang->line('sales_change_due')),
-		array('payment_type' => $CI->lang->line('sales_payment_type'))
+		array('payment_type' => $CI->lang->line('sales_payment_type')),
+		array('payment_status' => $CI->lang->line('sales_payment_status'), 'escape' => FALSE )
+
 	);
 
 	if($CI->config->item('invoice_enable') == TRUE)
@@ -124,7 +126,8 @@ function get_sale_data_row($sale)
 	$CI =& get_instance();
 
 	$controller_name = $CI->uri->segment(1);
-
+	$arr_payment_status = arr_sale_payment_status();
+	$arr_status_color = array_payment_status_color();
 	$row = array (
 		'sale_id' => $sale->sale_id,
 		'sale_time' => to_datetime(strtotime($sale->sale_time)),
@@ -132,7 +135,8 @@ function get_sale_data_row($sale)
 		'total_order' => to_currency($sale->amount_due),
 		'amount_tendered' => to_currency($sale->amount_tendered),
 		'change_due' => to_currency($sale->change_due),
-		'payment_type' => $sale->payment_type
+		'payment_type' => $sale->payment_type,
+		'payment_status' => '<div class="btn btn-xs btn-block '.$arr_status_color[$sale->payment_status].'">'.$arr_payment_status[$sale->payment_status].'</div>'
 	);
 
 	if($CI->config->item('invoice_enable'))
@@ -961,7 +965,9 @@ function arr_purchase_order_status(){
 	return [0 => 'New', 1 => 'Receive', 2 => 'Partially Complete', 3 => 'Complete'];
 }
 
-
+function arr_sale_payment_status(){
+	return [0 => 'Unpaid', 1 => 'Partially Paid', 2 => 'Complete'];
+}
 
 /*
 Get the header for the sales purchase order tabular view
@@ -1120,6 +1126,10 @@ function get_sales_order_detail_form_table_headers(){
 }
 function array_status_color(){
 	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-default' ];
+}
+
+function array_payment_status_color(){
+	return [0 => 'btn-danger', 1 => 'btn-warning', 2 => 'btn-info'];
 }
 
 function get_inventory_outlet_table_headers(){
