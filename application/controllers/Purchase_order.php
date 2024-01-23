@@ -6,6 +6,7 @@ class purchase_order extends Secure_Controller
 {
 	public function __construct()
 	{
+		error_reporting(E_ERROR | E_WARNING | E_PARSE);
 		parent::__construct('purchase_order');
 
 		$this->load->library('purchase_order_lib');		
@@ -88,7 +89,7 @@ class purchase_order extends Secure_Controller
         $data['table_headers'] = get_po_manage_table_headers();
 		$data['filters'] = [];
 		
-        $this->load->view('purchase_order/manage', $data);
+       $this->load->view('purchase_order/manage', $data);
 		
 	}
 
@@ -500,12 +501,13 @@ class purchase_order extends Secure_Controller
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
 		$po_time = $date_formatter->format('Y-m-d H:i:s');
 		//$po_status=0;
+
 		$po_data = array(
 			'po_time' => $po_time,
-		//	'po_status' => $this->input->post('po_status'),
+			'po_status' => $this->input->post('po_status'),
 			'supplier_id' => $this->input->post('supplier_id') ? $this->input->post('supplier_id') : NULL,
 			'employee_id' => $this->input->post('employee_id'),
-			'total_order' => $this->purchase_order_lib->get_total(),
+		//	'total_order' => $this->purchase_order_lib->get_total(),
 			'comment' => $this->input->post('comment'),
 			'reference' => $this->input->post('reference') != '' ? $this->input->post('reference') : NULL
 		);
@@ -514,6 +516,7 @@ class purchase_order extends Secure_Controller
 		//$this->Inventory->update('RECV '.$receiving_id, ['trans_date' => $po_time]);
 		if($this->Purchaseorder->update($po_data, $po_id))
 		{
+
 			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('receivings_successfully_updated'), 'id' => $po_id));
 		}
 		else
@@ -530,5 +533,59 @@ class purchase_order extends Secure_Controller
 
 		$this->_reload();
 	}
+
+	public function saveToReceive()
+	{
+		/*
+		$data = array();
+		
+		$data['cart'] = $this->receiving_lib->get_cart();
+		$data['total'] = $this->receiving_lib->get_total();
+		$data['transaction_time'] = to_datetime(time());
+		$data['mode'] = $this->receiving_lib->get_mode();
+		$data['comment'] = $this->receiving_lib->get_comment();
+		$data['reference'] = $this->receiving_lib->get_reference();
+		$data['payment_type'] = $this->input->post('payment_type');
+		$data['show_stock_locations'] = $this->Stock_location->show_locations('receivings');
+		$data['stock_location'] = $this->receiving_lib->get_stock_source();
+		if($this->input->post('amount_tendered') != NULL)
+		{
+			$data['amount_tendered'] = $this->input->post('amount_tendered');
+			$data['amount_change'] = to_currency($data['amount_tendered'] - $data['total']);
+		}
+		
+		$employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+		$employee_info = $this->Employee->get_info($employee_id);
+		$data['employee'] = $employee_info->first_name . ' ' . $employee_info->last_name;
+
+		$supplier_info = '';
+		$supplier_id = $this->receiving_lib->get_supplier();
+		if($supplier_id != -1)
+		{
+			$supplier_info = $this->Supplier->get_info($supplier_id);
+			$data['supplier'] = $supplier_info->company_name;
+			$data['first_name'] = $supplier_info->first_name;
+			$data['last_name'] = $supplier_info->last_name;
+			$data['supplier_email'] = $supplier_info->email;
+			$data['supplier_address'] = $supplier_info->address_1;
+			if(!empty($supplier_info->zip) or !empty($supplier_info->city))
+			{
+				$data['supplier_location'] = $supplier_info->zip . ' ' . $supplier_info->city;				
+			}
+			else
+			{
+				$data['supplier_location'] = '';
+			}
+		}
+
+		//SAVE receiving to database
+		// save($items, $supplier_id, $employee_id, $comment, $reference, $payment_type, $receiving_id = FALSE)
+		$data['receiving_id'] = 'RECV ' . $this->Receiving->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['reference'], $data['payment_type'], $data['stock_location']);
+
+		$this->receiving_lib->clear_all();
+		*/
+	}
+
 }
+
 ?>
