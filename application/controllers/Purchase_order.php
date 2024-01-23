@@ -6,7 +6,7 @@ class purchase_order extends Secure_Controller
 {
 	public function __construct()
 	{
-		error_reporting(E_ERROR | E_WARNING | E_PARSE);
+		//error_reporting(E_ERROR | E_WARNING | E_PARSE);
 		parent::__construct('purchase_order');
 
 		$this->load->library('purchase_order_lib');		
@@ -96,6 +96,10 @@ class purchase_order extends Secure_Controller
 	public function new_po(){
 		$data['total'] = $this->purchase_order_lib->get_total();
 		$data['cart'] = $this->purchase_order_lib->get_cart();
+		$data['items_module_allowed'] = $this->Employee->has_grant('items', $this->Employee->get_logged_in_employee_info()->person_id);
+		$data['comment'] = $this->purchase_order_lib->get_comment();
+		$data['print_after_sale'] = $this->purchase_order_lib->is_print_after_sale();
+		$data['payment_options'] = $this->Receiving->get_payment_options();
 		$data['mode']='po';
 		$this->load->view('purchase_order/po',$data) ; 
 		
