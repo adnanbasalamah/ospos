@@ -56,7 +56,7 @@ function transform_headers($array, $readonly = FALSE, $editable = TRUE)
 /*
 Get the header for the sales tabular view
 */
-function get_sales_manage_table_headers()
+function get_sales_manage_table_headers_original()
 {
 	$CI =& get_instance();
 
@@ -78,6 +78,33 @@ function get_sales_manage_table_headers()
 		$headers[] = array('invoice' => '&nbsp', 'sortable' => FALSE, 'escape' => FALSE);
 	}
 
+	$headers[] = array('receipt' => '&nbsp', 'sortable' => FALSE, 'escape' => FALSE);
+
+	return transform_headers($headers);
+}
+
+function get_sales_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('sale_id' => $CI->lang->line('common_id')),
+		array('sale_time' => $CI->lang->line('sales_sale_time')),
+	);
+	if($CI->config->item('invoice_enable') == TRUE)
+	{
+		$headers[] = array('invoice_number' => $CI->lang->line('sales_invoice_number'));
+	}
+	$headers[] = array('customer_name' => $CI->lang->line('customers_customer'));
+	$headers[] = array('total_order' => $CI->lang->line('sales_order_total'));
+	$headers[] = array('total_paid' => $CI->lang->line('sales_total_paid'));
+	$headers[] = array('total_unpaid' => $CI->lang->line('sales_total_unpaid'));
+	$headers[] = array('payment_type' => $CI->lang->line('sales_payment_type'));
+	$headers[] = array('payment_status' => $CI->lang->line('sales_payment_status'), 'escape' => FALSE );
+	if($CI->config->item('invoice_enable') == TRUE)
+	{
+		$headers[] = array('invoice' => '&nbsp', 'sortable' => FALSE, 'escape' => FALSE);
+	}
 	$headers[] = array('receipt' => '&nbsp', 'sortable' => FALSE, 'escape' => FALSE);
 
 	return transform_headers($headers);
@@ -130,30 +157,30 @@ function get_sale_data_row($sale)
 	$arr_status_color = array_payment_status_color();
 	$row = array (
 		'sale_id' => $sale->sale_id,
-		'sale_time' => to_datetime(strtotime($sale->sale_time)),
-		'customer_name' => $sale->customer_name,
-		'total_order' => to_currency($sale->amount_due),
-		'amount_tendered' => to_currency($sale->amount_tendered),
-		'change_due' => to_currency($sale->change_due),
-		'payment_type' => $sale->payment_type,
-		'payment_status' => '<div class="btn btn-xs btn-block '.$arr_status_color[$sale->payment_status].'">'.$arr_payment_status[$sale->payment_status].'</div>'
+		'sale_time' => to_datetime(strtotime($sale->sale_time))
 	);
-
 	if($CI->config->item('invoice_enable'))
 	{
 		$row['invoice_number'] = $sale->invoice_number;
+	}
+	$row['customer_name'] = $sale->customer_name;
+	$row['total_order'] = to_currency($sale->total_order);
+	$row['total_paid'] = to_currency($sale->total_paid);
+	$row['total_unpaid'] = to_currency($sale->total_unpaid);
+	$row['payment_type'] = $sale->payment_type;
+	$row['payment_status'] = '<div class="btn btn-xs btn-block '.$arr_status_color[$sale->payment_status].'">'.$arr_payment_status[$sale->payment_status].'</div>';
+	if($CI->config->item('invoice_enable'))
+	{
 		$row['invoice'] = empty($sale->invoice_number) ? '' : anchor($controller_name."/invoice/$sale->sale_id", '<span class="glyphicon glyphicon-list-alt"></span>',
 			array('title'=>$CI->lang->line('sales_show_sales_order_detail'))
 		);
 	}
-
 	$row['receipt'] = anchor($controller_name."/receipt/$sale->sale_id", '<span class="glyphicon glyphicon-usd"></span>',
 		array('title' => $CI->lang->line('sales_show_receipt'))
 	);
 	$row['edit'] = anchor($controller_name."/edit/$sale->sale_id", '<span class="glyphicon glyphicon-edit"></span>',
 		array('class' => 'modal-dlg print_hide', 'data-btn-delete' => $CI->lang->line('common_delete'), 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
 	);
-
 	return $row;
 }
 
@@ -230,7 +257,7 @@ function get_sale_order_items_data_row($so_item)
 /*
 Get the html data last row for the sales
 */
-function get_sale_data_last_row($sales)
+function get_sale_data_last_row_original($sales)
 {
 	$CI =& get_instance();
 
@@ -251,6 +278,30 @@ function get_sale_data_last_row($sales)
 		'amount_due' => to_currency($sum_amount_due),
 		'amount_tendered' => to_currency($sum_amount_tendered),
 		'change_due' => to_currency($sum_change_due)
+	);
+}
+
+function get_sale_data_last_row($sales)
+{
+	$CI =& get_instance();
+
+	$sum_total_order = 0;
+	$sum_total_paid = 0;
+	$sum_total_unpaid = 0;
+
+	foreach($sales->result() as $key=>$sale)
+	{
+		$sum_total_order += $sale->total_order;
+		$sum_total_paid += $sale->total_paid;
+		$sum_total_unpaid += $sale->total_unpaid;
+	}
+
+	return array(
+		'sale_id' => '-',
+		'sale_time' => $CI->lang->line('sales_total'),
+		'total_order' => to_currency($sum_total_order),
+		'total_paid' => to_currency($sum_total_paid),
+		'total_unpaid' => to_currency($sum_total_unpaid)
 	);
 }
 
