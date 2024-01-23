@@ -186,7 +186,7 @@ class Salesorder extends CI_Model
                 }
             }
         }
-        $this->update_sale_status($sale_order_id, CANCELED);
+        $this->update_sale_status($sale_order_id, 5);
 
         // execute transaction
         $this->db->trans_complete();
@@ -363,7 +363,8 @@ class Salesorder extends CI_Model
         }
         $FieldArr = [
             'so_item.item_id', 'SUM(quantity_purchased) AS total_qty',
-            'GROUP_CONCAT(DISTINCT(customers.company_name) ORDER BY customers.company_name ASC SEPARATOR ", ") AS company_order',
+            'GROUP_CONCAT(DISTINCT(customers.company_name) 
+            ORDER BY customers.company_name ASC SEPARATOR ", ") AS company_order',
             'items.name','items.category','items.item_number',
             'item_cost_price','item_unit_price',
             'SUM(so_item.item_unit_price*so_item.quantity_purchased) AS subtotal'
