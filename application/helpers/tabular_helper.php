@@ -89,7 +89,7 @@ function get_sales_order_manage_table_headers()
 	$CI =& get_instance();
 
 	$headers = array(
-		array('sale_id' => $CI->lang->line('common_id')),
+		array('sale_order_id' => $CI->lang->line('common_id')),
 		array('sale_time' => $CI->lang->line('sales_sale_time')),
 		array('customer_name' => $CI->lang->line('customers_customer')),
 		array('company_name' => $CI->lang->line('sales_company_name')),
@@ -163,7 +163,7 @@ function get_sale_order_data_row($sale)
 	$so_status_color = array_status_color();
 
 	$row = array (
-		'sale_id' => $sale->sale_order_id,
+		'sale_order_id' => $sale->sale_order_id,
 		'sale_time' => to_datetime(strtotime($sale->sale_time)),
 		'customer_name' => $sale->customer_name,
 		'company_name' => $sale->company_name,
@@ -216,7 +216,7 @@ function get_sale_order_items_data_row($so_item)
 		'item_id' => $so_item->item_id,
 		'item_number' => $so_item->item_number,
 		'name' => $so_item->name,
-		'items_quantity' => $so_item->quantity_purchased,
+		'items_quantity' => to_quantity_decimals($so_item->quantity_purchased),
 		'items_unit_price' => to_currency($so_item->item_unit_price),
 		'subtotal_order' => to_currency($so_item->item_unit_price * $so_item->quantity_purchased),
 	);
@@ -262,7 +262,7 @@ function get_sale_order_data_last_row($sales)
 	}
 
 	return array(
-		'sale_id' => '-',
+		'sale_order_id' => '-',
 		'sale_time' => $CI->lang->line('sales_total'),
 		'total_order' => to_currency($sum_total_order),
 	);
@@ -320,7 +320,8 @@ function get_people_manage_table_headers()
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
-		array('employee_category' => $CI->lang->line('items_category'))
+		array('employee_category' => $CI->lang->line('items_category')),
+		array('supplier_id' => $CI->lang->line('suppliers_supplier')),
 	);
 
 	if($CI->Employee->has_grant('messages', $CI->session->userdata('person_id')))
@@ -347,6 +348,7 @@ function get_person_data_row($person)
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
 		'employee_category' => $emp_category[$person->employee_category],
+		'supplier_id' => $person->company_employee,
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',
@@ -1117,7 +1119,7 @@ function get_sales_order_detail_form_table_headers(){
 	return transform_headers($headers);
 }
 function array_status_color(){
-	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-danger' ];
+	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-default' ];
 }
 
 function get_inventory_outlet_table_headers(){
@@ -1128,8 +1130,9 @@ function get_inventory_outlet_table_headers(){
 		array('item_number' => $CI->lang->line('items_item_number')),
 		array('name' => $CI->lang->line('items_item')),
 		array('items_quantity' => $CI->lang->line('items_quantity')),
-		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('unit_price' => $CI->lang->line('items_unit_price')),
 		array('subtotal' => $CI->lang->line('sales_sub_total')),
+		array('view_detail' => 'Inventory', 'escape' => FALSE)
 	);
 	return transform_headers($headers);
 }
@@ -1143,8 +1146,13 @@ function get_inventory_outlet_data_row($item_qo)
 		'item_number' => $item_qo->item_number,
 		'name' => $item_qo->name,
 		'items_quantity' => $item_qo->quantity,
-		'items_unit_price' => to_currency($item_qo->unit_price),
+		'unit_price' => to_currency($item_qo->unit_price),
 		'subtotal' => to_currency($item_qo->quantity*$item_qo->unit_price),
+	);
+	$row['edit'] = anchor(
+		$controller_name."/inventory/$item_qo->item_id-$item_qo->customer_id",
+		'<span class="glyphicon glyphicon-list-alt"></span>',
+		array('class' => 'modal-dlg print_hide','title' => $CI->lang->line($controller_name.'_list'))
 	);
 	return $row;
 }
@@ -1154,14 +1162,59 @@ function get_inventory_outlet_data_last_row($items_qo){
 	$total_inventory = 0;
 	foreach($items_qo->result() as $key => $item_qo)
 	{
-		$total_inventory += $item_qo->quantity * $item_qo->unit_price;
+		//print_r($item_qo);
+		$total_inventory = $total_inventory + ($item_qo->quantity * $item_qo->unit_price);
+	}
+
+	return array(
+		'item_id' => '-',
+		'unit_price' => $CI->lang->line('sales_total'),
+		'subtotal' => to_currency($total_inventory),
+	);
+}
+
+function get_sales_order_matrix_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_number' => $CI->lang->line('items_item_number')),
+		array('name' => $CI->lang->line('items_item')),
+		array('total_qty' => $CI->lang->line('items_quantity')),
+		array('items_unit_price' => $CI->lang->line('items_unit_price')),
+		array('subtotal' => $CI->lang->line('sales_sub_total')),
+		array('company_order' => $CI->lang->line('sales_company_name')),
+	);
+	return transform_headers($headers);
+}
+
+function get_sale_order_matrix_data_row($item_so){
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array (
+		'item_id' => $item_so->item_id,
+		'item_number' => $item_so->item_number,
+		'name' => $item_so->name,
+		'total_qty' => $item_so->total_qty,
+		'items_unit_price' => to_currency($item_so->item_unit_price),
+		'subtotal' => to_currency($item_so->subtotal),
+		'company_order' => $item_so->company_order,
+	);
+	return $row;
+}
+
+function get_sale_order_matrix_data_last_row($items_so){
+	$CI =& get_instance();
+	$total_order = 0;
+	foreach($items_so->result() as $key => $item_so)
+	{
+		$total_order += $item_so->subtotal;
 	}
 
 	return array(
 		'item_id' => '-',
 		'items_unit_price' => $CI->lang->line('sales_total'),
-		'subtotal_order' => to_currency($total_inventory),
+		'subtotal' => to_currency($total_order),
 	);
 }
-
 ?>

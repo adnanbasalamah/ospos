@@ -43,7 +43,7 @@ class Employee extends Person
 	*/
 	public function get_all($limit = 10000, $offset = 0)
 	{
-		$this->db->from('employees');
+		$this->db->select('employees.*, people.*, (SELECT company_name FROM ospos_suppliers WHERE person_id = ospos_employees.supplier_id) AS company_employee')->from('employees');
 		$this->db->where('deleted', 0);
 		$this->db->join('people', 'employees.person_id = people.person_id');
 		$this->db->order_by('last_name', 'asc');
@@ -300,7 +300,7 @@ class Employee extends Person
 			$this->db->select('COUNT(employees.person_id) as count');
 		}
 
-		$this->db->from('employees AS employees');
+		$this->db->select('employees.*, people.*, (SELECT company_name FROM ospos_suppliers WHERE person_id = employees.supplier_id) AS company_employee')->from('employees AS employees');
 		$this->db->join('people', 'employees.person_id = people.person_id');
 		$this->db->group_start();
 			$this->db->like('first_name', $search);
@@ -324,8 +324,9 @@ class Employee extends Person
 		{
 			$this->db->limit($rows, $limit_from);
 		}
-
-		return $this->db->get();
+		$ret_dt = $this->db->get();
+		//print $this->db->last_query();
+		return $ret_dt;
 	}
 
 	/*

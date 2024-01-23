@@ -55,6 +55,11 @@ class Sales_order extends Secure_Controller
         $this->load->view('sales_order/view_detail_so', $data);
     }
 
+    public function matrix(){
+        $data['table_headers'] = get_sales_order_matrix_table_headers();
+        $data['page_title'] = 'SALES ORDER MATRIX';
+        $this->load->view('sales_order/sales_order_matrix', $data);
+    }
     public function get_detail_so($sale_order_id){
         $search = $this->input->get('search');
         $limit = $this->input->get('limit');
@@ -73,6 +78,32 @@ class Sales_order extends Secure_Controller
         if($total_rows > 0)
         {
             $data_rows[] = $this->xss_clean(get_sale_order_items_data_last_row($sales_order_items));
+        }
+        $payment_summary = '';
+        echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
+    }
+
+    public function get_matrix_so(){
+        $search = $this->input->get('search');
+        $limit = $this->input->get('limit');
+        $offset = $this->input->get('offset');
+        $sort = $this->input->get('sort');
+        $order = $this->input->get('order');
+        $filters = array(
+            'start_date' => $this->input->get('start_date'),
+            'end_date' => $this->input->get('end_date'),
+        );
+        $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order);
+        $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters);
+        $data_rows = array();
+        foreach($sales_order_items->result() as $so_item)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_matrix_data_row($so_item));
+        }
+
+        if($total_rows > 0)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_matrix_data_last_row($sales_order_items));
         }
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
@@ -312,7 +343,7 @@ class Sales_order extends Secure_Controller
         if ($this->Salesorder->update($sale_order_id, $sale_data)) {
             echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_order_successfully_updated'), 'id' => $sale_order_id,
                 'old-status' => $old_status, 'new-status' => $this->input->post('sale_status'),
-                'status so' => $status_so, 'kalkulasi' => $kalkulasistok));
+                'status so' => $status_so));
         } else {
             echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_order_id));
         }

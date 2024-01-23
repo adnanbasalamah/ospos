@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_sales_order_items` ADD `supplier_id` INT NULL AFTER `qty_delivered`;

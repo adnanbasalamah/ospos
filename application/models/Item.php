@@ -221,8 +221,9 @@ class Item extends CI_Model
 		{
 			$this->db->limit($rows, $limit_from);
 		}
-
-		return $this->db->get();
+		$ret = $this->db->get();
+		//print $this->db->last_query();
+		return $ret;
 	}
 
 	/*

@@ -40,7 +40,7 @@ class Inventoryoutlet extends CI_Model
             'items.*','people_cust.*'
         ];
         $this->db->select(implode(',',$FieldArr))->from('item_quantities_outlet AS item_qo');
-        $this->db->join('items AS items','item_qo.item_id = item_qo.item_id','LEFT');
+        $this->db->join('items AS items','item_qo.item_id = items.item_id','LEFT');
         $this->db->join('people AS people_cust','item_qo.customer_id = people_cust.person_id','LEFT');
         if (isset($filters['customer_id']) && !is_null($filters['customer_id'])){
             $this->db->where('item_qo.customer_id', $filters['customer_id']);
@@ -66,6 +66,7 @@ class Inventoryoutlet extends CI_Model
             $this->db->limit($rows, $limit_from);
         }
         $return_query = $this->db->get();
+        //print_r($this->db->last_query());
         return $return_query;
     }
 

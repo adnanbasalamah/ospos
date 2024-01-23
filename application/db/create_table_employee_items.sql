@@ -1,0 +1,2 @@
+CREATE TABLE `ospos_employees_items` ( `employee_id` INT NOT NULL DEFAULT '0' ,  `item_id` INT NOT NULL DEFAULT '0' ) ENGINE = InnoDB;
+ALTER TABLE `ospos_employees_items` ADD PRIMARY KEY( `employee_id`, `item_id`);
