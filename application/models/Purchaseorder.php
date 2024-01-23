@@ -101,7 +101,9 @@ class Purchaseorder extends CI_Model
 				'item_unit_price' => $item['price'],
 				'item_location' => 0; //$item['item_location']
 			);
-
+			echo('<pre>');
+			print_r($po_items_data);
+			end();
 			$this->db->insert('po_items', $po_items_data);
 
 			$items_received = $item['receiving_quantity'] != 0 ? $item['quantity'] * $item['receiving_quantity'] : $item['quantity'];
