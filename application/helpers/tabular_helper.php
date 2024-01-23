@@ -89,7 +89,7 @@ function get_sales_order_manage_table_headers()
 	$CI =& get_instance();
 
 	$headers = array(
-		array('sale_id' => $CI->lang->line('common_id')),
+		array('sale_order_id' => $CI->lang->line('common_id')),
 		array('sale_time' => $CI->lang->line('sales_sale_time')),
 		array('customer_name' => $CI->lang->line('customers_customer')),
 		array('company_name' => $CI->lang->line('sales_company_name')),
@@ -216,7 +216,7 @@ function get_sale_order_items_data_row($so_item)
 		'item_id' => $so_item->item_id,
 		'item_number' => $so_item->item_number,
 		'name' => $so_item->name,
-		'items_quantity' => $so_item->quantity_purchased,
+		'items_quantity' => to_quantity_decimals($so_item->quantity_purchased),
 		'items_unit_price' => to_currency($so_item->item_unit_price),
 		'subtotal_order' => to_currency($so_item->item_unit_price * $so_item->quantity_purchased),
 	);
