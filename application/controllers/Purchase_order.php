@@ -331,7 +331,7 @@ class purchase_order extends Secure_Controller
 		$data['comment'] = $this->purchase_order_lib->get_comment();
 		$data['reference'] = $this->purchase_order_lib->get_reference();
 		$data['payment_type'] = $this->input->post('payment_type');
-		$data['show_stock_locations'] = '0';//$this->Stock_location->show_locations('receivings');
+		$data['show_stock_locations'] = 0;//$this->Stock_location->show_locations('receivings');
 		$data['stock_location'] = $this->purchase_order_lib->get_stock_source();
 		if($this->input->post('amount_tendered') != NULL)
 		{
