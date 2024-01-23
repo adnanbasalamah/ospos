@@ -367,17 +367,17 @@ if (isset($success))
 $(document).ready(function()
 {
 	const redirect = function() {
-		window.location.href = "<?php echo site_url('receivings'); ?>";
+		window.location.href = "<?php echo site_url('Purchase_order'); ?>";
 	};
 
 	$("#remove_supplier_button").click(function()
 	{
-		$.post("<?php echo site_url('receivings/remove_supplier'); ?>", redirect);
+		$.post("<?php echo site_url('Purchase_order/remove_supplier'); ?>", redirect);
 	});
 
 	$(".delete_item_button").click(function() {
 		const item_id = $(this).data('item-id');
-		$.post("<?php echo site_url('receivings/delete_item/'); ?>" + item_id, redirect);
+		$.post("<?php echo site_url('Purchase_order/delete_item/'); ?>" + item_id, redirect);
 	});
 
 	$("#item").autocomplete(
