@@ -163,7 +163,7 @@ function get_sale_order_data_row($sale)
 	$so_status_color = array_status_color();
 
 	$row = array (
-		'sale_id' => $sale->sale_order_id,
+		'sale_order_id' => $sale->sale_order_id,
 		'sale_time' => to_datetime(strtotime($sale->sale_time)),
 		'customer_name' => $sale->customer_name,
 		'company_name' => $sale->company_name,
@@ -262,7 +262,7 @@ function get_sale_order_data_last_row($sales)
 	}
 
 	return array(
-		'sale_id' => '-',
+		'sale_order_id' => '-',
 		'sale_time' => $CI->lang->line('sales_total'),
 		'total_order' => to_currency($sum_total_order),
 	);
