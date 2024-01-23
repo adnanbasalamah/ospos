@@ -99,7 +99,7 @@ class Purchaseorder extends CI_Model
 				'discount_type' => $item['discount_type'],
 				'item_cost_price' => $cur_item_info->cost_price,
 				'item_unit_price' => $item['price'],
-				'item_location' => 0; //$item['item_location']
+				'item_location' => 0 //$item['item_location']
 			);
 			echo('<pre>');
 			print_r($po_items_data);
