@@ -236,3 +236,5 @@ $lang["delivery_order_number"] = "Delivery Order #";
 $lang["sales_order_print"] = "Print SO";
 $lang["delivery_order_print"] = "Print DO";
 $lang["sales_order_matrix"] = "Sales Order Matrix";
+$lang["sales_payment_status"] = "Payment Status";
+
