@@ -147,13 +147,9 @@ if (isset($success))
 							?>
 							<td>
                             <?php
-                            if (isset($item['receiving_quantity']) && !is_null($item['receiving_quantity'])){
-
-                            }else{
-                                $item['receiving_quantity'] = 0;
-                            }
+                            $item['receiving_quantity'] = !is_null($item['receiving_quantity']) ? $item['receiving_quantity'] : 1;
                             ?>
-							<?php echo to_currency(($item['discount_type'] == PERCENT) ? $item['price']*$item['quantity']*$item['receiving_quantity'] - $item['price'] * $item['quantity'] * $item['receiving_quantity'] * $item['discount'] / 100 : $item['price']*$item['quantity']*$item['receiving_quantity'] - $item['discount']); ?></td> 
+							<?php echo to_currency(($item['discount_type'] == PERCENT) ? $item['price']*$item['quantity']*$item['receiving_quantity'] - $item['price'] * $item['quantity'] * $item['receiving_quantity'] * $item['discount'] / 100 : $item['price']*$item['quantity']*$item['receiving_quantity'] - $item['discount']); ?></td>
 							<td><a href="javascript:$('#<?php echo 'cart_'.$line ?>').submit();" title=<?php echo $this->lang->line('receivings_update')?> ><span class="glyphicon glyphicon-refresh"></span></a></td>
 						</tr>
 						<tr>
