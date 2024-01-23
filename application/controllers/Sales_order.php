@@ -343,7 +343,7 @@ class Sales_order extends Secure_Controller
         if ($this->Salesorder->update($sale_order_id, $sale_data)) {
             echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_order_successfully_updated'), 'id' => $sale_order_id,
                 'old-status' => $old_status, 'new-status' => $this->input->post('sale_status'),
-                'status so' => $status_so, 'kalkulasi' => $kalkulasistok));
+                'status so' => $status_so));
         } else {
             echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('sales_unsuccessfully_updated'), 'id' => $sale_order_id));
         }
