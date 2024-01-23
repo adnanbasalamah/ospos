@@ -38,8 +38,9 @@ class Sales extends Secure_Controller
 				'only_check' => $this->lang->line('sales_check_filter'),
 				'only_creditcard' => $this->lang->line('sales_credit_filter'),
 				'only_invoices' => $this->lang->line('sales_invoice_filter'));
-
-			$this->load->view('sales/manage', $data);
+			$data['filters2'] = arr_sale_payment_status();
+			$data['filters3'] = [SALE_TYPE_INVOICE => 'Invoice', SALE_TYPE_RETURN => 'Return'];
+				$this->load->view('sales/manage', $data);
 		}
 	}
 
@@ -72,9 +73,15 @@ class Sales extends Secure_Controller
 
 		// check if any filter is set in the multiselect dropdown
 		$filledup = array_fill_keys($this->input->get('filters'), TRUE);
+		$payment_status = $this->input->get('payment_status');
+		$sale_type = $this->input->get('sale_type');
 		$filters = array_merge($filters, $filledup);
+		if (is_array($payment_status) && !empty($payment_status)){
+			$sales = $this->Sale->search($search, $filters, $limit, $offset, $sort, $order, FALSE, $payment_status, $sale_type);
+		}else{
+			$sales = $this->Sale->search($search, $filters, $limit, $offset, $sort, $order, FALSE, null, $sale_type);
+		}
 
-		$sales = $this->Sale->search($search, $filters, $limit, $offset, $sort, $order);
 		$total_rows = $this->Sale->get_found_rows($search, $filters);
 		$payments = $this->Sale->get_payments_summary($search, $filters);
 		$payment_summary = $this->xss_clean(get_sales_manage_payments_summary($payments));
