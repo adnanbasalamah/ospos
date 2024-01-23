@@ -210,12 +210,14 @@ class purchase_order extends Secure_Controller
 
 		$mode = $this->purchase_order_lib->get_mode();
 		$item_id_or_number_or_item_kit_or_receipt = $this->input->post('item');
+		$quantity = 1;
+		$item_data = $this->Item->get_info($item_id_or_number_or_item_kit_or_receipt);
+		$price = !empty($item_data->unit_price) ? $item_data->unit_price : 0;
 		$this->token_lib->parse_barcode($quantity, $price, $item_id_or_number_or_item_kit_or_receipt);
 		$quantity = ($mode == 'receive' || $mode == 'requisition') ? $quantity : -$quantity;
 		$item_location = $this->purchase_order_lib->get_stock_source();
 		$discount = $this->config->item('default_receivings_discount');
 		$discount_type = $this->config->item('default_receivings_discount_type');
-
 		if($mode == 'return' && $this->Purchaseorder->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
 		{
 			$this->purchase_order_lib->return_entire_po($item_id_or_number_or_item_kit_or_receipt);
@@ -228,7 +230,6 @@ class purchase_order extends Secure_Controller
 		{
 			$data['error'] = $this->lang->line('receivings_unable_to_add_item');
 		}
-
 		$this->_reload($data);
 	}
 
