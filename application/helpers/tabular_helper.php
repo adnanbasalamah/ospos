@@ -1119,7 +1119,7 @@ function get_sales_order_detail_form_table_headers(){
 	return transform_headers($headers);
 }
 function array_status_color(){
-	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-danger' ];
+	return [0 => 'btn-danger', 1 => 'btn-info', 2 => 'btn-warning', 3 => 'btn-primary', 4 => 'btn-success', 5 => 'btn-default' ];
 }
 
 function get_inventory_outlet_table_headers(){
