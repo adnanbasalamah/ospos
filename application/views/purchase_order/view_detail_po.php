@@ -35,7 +35,7 @@
 <div class="row">&nbsp;</div>
 <div class="row">&nbsp;</div>
 <div class="row">
-    <div class="col-md-2 so-info">Customer</div><div class="col-md-4 so-info so-info-value"><?php echo $po_info_suplier; ?></div>
+    <div class="col-md-2 so-info">Supplier</div><div class="col-md-4 so-info so-info-value"><?php echo $po_info_suplier; ?></div>
     <div class="col-md-2 so-info">Order Date</div><div class="col-md-4 so-info so-info-value"><?php echo $po_info_date; ?></div>
     <div class="col-md-2 so-info">Order Notes</div><div class="col-md-4 so-info so-info-value"><?php echo $po_info_comment;?></div><div class="col-md-2 so-info">&nbsp;</div><div class="col-md-4 so-info so-info-value">&nbsp;</div>
 </div>
