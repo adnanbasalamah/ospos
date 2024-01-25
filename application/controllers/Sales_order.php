@@ -379,8 +379,7 @@ class Sales_order extends Secure_Controller
 
         $employee_info = $this->Employee->get_info($this->sale_lib->get_employee());
         $data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
-        $this->_load_customer_data($this->sale_lib->get_customer(), $data);
-
+        $this->_load_customer_data($sale_info['customer_id'], $data);
         $data['sale_order_id_num'] = $sale_order_id;
         $data['sale_order_id'] = $sale_order_id;
         $data['comments'] = $sale_info['comment'];
