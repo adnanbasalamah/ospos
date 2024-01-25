@@ -387,7 +387,9 @@ class purchase_order extends Secure_Controller
 		}
 
 		$data['print_after_sale'] = $this->purchase_order_lib->is_print_after_sale();
-
+			echo "<pre>";
+			print_r($data);
+			die();
 		$this->load->view("purchase_order/receipt",$data);
 
 		$this->purchase_order_lib->clear_all();
