@@ -166,6 +166,16 @@ class Suppliers extends Persons
 			echo json_encode(array('success' => FALSE,'message' => $this->lang->line('suppliers_cannot_be_deleted')));
 		}
 	}
-	
+
+	public function payment(){
+		$data = [];
+		$data['table_headers'] = get_payment_paid_items_table_headers();
+		$this->load->view("suppliers/payment_supplier", $data);
+	}
+
+	function search_paid_items_supp(){
+		$this->Suppliers->search_paid_items();
+	}
+
 }
 ?>

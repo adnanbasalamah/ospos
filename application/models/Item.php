@@ -105,6 +105,7 @@ class Item extends CI_Model
 
 			$this->db->select('MAX(suppliers.person_id) AS person_id');
 			$this->db->select('MAX(suppliers.company_name) AS company_name');
+			$this->db->select('(SELECT phone_number FROM ospos_people WHERE ospos_people.person_id = suppliers.person_id) AS phone_number');
 			$this->db->select('MAX(suppliers.agency_name) AS agency_name');
 			$this->db->select('MAX(suppliers.account_number) AS account_number');
 			$this->db->select('MAX(suppliers.deleted) AS deleted');

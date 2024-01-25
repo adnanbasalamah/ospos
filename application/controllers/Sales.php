@@ -1577,5 +1577,37 @@ class Sales extends Secure_Controller
 
 		return NULL;
 	}
+
+	public function search_paid_items()
+	{
+		$search = $this->input->get('search');
+		$limit = $this->input->get('limit');
+		$offset = $this->input->get('offset');
+		$sort = $this->input->get('sort');
+		$order = $this->input->get('order');
+
+		$filters = [];
+
+		// check if any filter is set in the multiselect dropdown
+		$supplier_id = $this->input->get('supplier_id');
+		if (!empty($supplier_id)){
+			$sales = $this->Sale->get_paid_sales_by_items($search, $filters, $limit, $offset, $sort, $order, FALSE, $supplier_id);
+		}else{
+			$sales = $this->Sale->get_paid_sales_by_items($search, $filters, $limit, $offset, $sort, $order, FALSE, null);
+		}
+		$total_rows = $this->Sale->get_found_paid_items_rows($search, $filters);
+		$data_rows = array();
+		foreach($sales->result() as $sale)
+		{
+			$data_rows[] = $this->xss_clean(get_paid_sale_item_data_row($sale));
+		}
+
+		if($total_rows > 0)
+		{
+			$data_rows[] = $this->xss_clean(get_paid_sale_item_data_last_row($sales));
+		}
+
+		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
 }
 ?>
