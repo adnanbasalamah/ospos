@@ -533,6 +533,7 @@ function get_items_manage_table_headers()
 		array('name' => $CI->lang->line('items_name')),
 		array('category' => $CI->lang->line('items_category')),
 		array('company_name' => $CI->lang->line('suppliers_company_name')),
+		array('phone_number' => $CI->lang->line('common_phone_number')),
 		array('cost_price' => $CI->lang->line('items_cost_price')),
 		array('unit_price' => $CI->lang->line('items_unit_price')),
 		array('quantity' => $CI->lang->line('items_quantity'))
@@ -548,7 +549,7 @@ function get_items_manage_table_headers()
 
 	}
 
-	$headers[] = array('item_pic' => $CI->lang->line('items_image'), 'sortable' => FALSE);
+	$headers[] = array('item_pic' => $CI->lang->line('items_image'), 'sortable' => FALSE, 'visible' => FALSE);
 
 	foreach($definition_names as $definition_id => $definition_name)
 	{
@@ -629,6 +630,7 @@ function get_item_data_row($item)
 		'name' => $item->name,
 		'category' => $item->category,
 		'company_name' => $item->company_name,
+		'phone_number' => $item->phone_number,
 		'cost_price' => to_currency($item->cost_price),
 		'unit_price' => to_currency($item->unit_price),
 		'quantity' => to_quantity_decimals($item->quantity),
@@ -1276,6 +1278,50 @@ function get_sale_order_matrix_data_last_row($items_so){
 		'item_id' => '-',
 		'items_unit_price' => $CI->lang->line('sales_total'),
 		'subtotal' => to_currency($total_order),
+	);
+}
+
+function get_payment_paid_items_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('item_id' => $CI->lang->line('common_id')),
+		array('item_number' => $CI->lang->line('items_item_number')),
+		array('name' => $CI->lang->line('items_item')),
+		array('total_qty' => $CI->lang->line('items_quantity')),
+		array('min_price' => $CI->lang->line('items_min_cost_price')),
+		array('max_price' => $CI->lang->line('items_max_cost_price')),
+		array('total_payment' => $CI->lang->line('sales_payments_total')),
+	);
+	return transform_headers($headers);
+}
+
+function get_paid_sale_item_data_row($paid_items){
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$row = array (
+		'item_id' => $paid_items->item_id,
+		'item_number' => $paid_items->item_number,
+		'name' => $paid_items->name,
+		'total_qty' => to_quantity_decimals($paid_items->total_qty),
+		'min_price' => to_currency($paid_items->min_price),
+		'max_price' => to_currency($paid_items->max_price),
+		'total_payment' => to_currency($paid_items->total_payment)
+	);
+	return $row;
+}
+function get_paid_sale_item_data_last_row($paid_items){
+	$CI =& get_instance();
+	$total_payment = 0;
+	foreach($paid_items->result() as $key => $paid_item)
+	{
+		$total_payment += $paid_item->total_payment;
+	}
+
+	return array(
+		'item_id' => '-',
+		'max_price' => $CI->lang->line('sales_total'),
+		'total_payment' => to_currency($total_payment),
 	);
 }
 ?>

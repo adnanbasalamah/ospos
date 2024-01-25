@@ -1361,5 +1361,37 @@ class Sale extends CI_Model
 		}
 		return $sale_status;
 	}
+
+	public function get_paid_sales_by_items($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_items.supplier_id', $order = 'asc', $count_only = FALSE, $supplier_id = null){
+		$where = 'sales.payment_status = 2 ';
+		if (!is_null($supplier_id)){
+			$where .= 'AND sales_items.supplier_id = '.$supplier_id;
+		}
+		$str_field = 'DISTINCT(items.item_id), DISTINCT(items.item_number), DISTINCT(items.name), SUM(quantity_purchased) AS total_qty, MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
+		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
+		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = ospos_sales_items.supplier_id) AS supplier_name,';
+		$str_field .= 'GROUP_CONCAT(DISTINCT(sales.invoice_number) 
+            ORDER BY sales.sale_id ASC SEPARATOR ", ") AS related_invoices';
+		$this->db->select($str_field)->from('sales_items AS sales_items');
+		$this->db->join('sales AS sales','sales_items.sale_id = sales.sale_id','LEFT');
+		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
+		$this->db->where($where);
+		$this->db->group_by('sales_items.item_id');
+		$this->db->group_by('sales_items.supplier_id');
+		if($count_only == TRUE) {
+			return $this->db->get()->num_rows();
+		}
+		// order by sale time by default
+		$this->db->order_by($sort, $order);
+		if($rows > 0) {
+			$this->db->limit($rows, $limit_from);
+		}
+		$return_dt = $this->db->get();
+		//print $this->db->last_query();
+		return $return_dt;
+	}
+	public function get_found_paid_items_rows(){
+
+	}
 }
 ?>

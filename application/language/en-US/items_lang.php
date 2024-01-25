@@ -122,3 +122,5 @@ $lang["items_ordered"] = "Qty Ordered";
 $lang["items_delivered"] = "Delivered";
 $lang["inventory_outlet_list"] = "View inventory outlet history";
 $lang["inventory_outlet_no_inventory_outlet_to_display"] = "No Items to display.";
+$lang["items_min_cost_price"] = "Min Price";
+$lang["items_max_cost_price"] = "Max Price";
