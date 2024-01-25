@@ -22,6 +22,10 @@ class purchase_order_lib
 			$this->set_cart(array());
 		}
 
+		echo "<pre>";
+		print_r($_SESSION);
+		
+
 		return $this->CI->session->userdata('recv_cart');
 	}
 
@@ -364,10 +368,11 @@ class purchase_order_lib
 		$this->clear_reference();
 	}
 
-	public function get_item_total($quantity, $price, $discount, $discount_type, $receiving_quantity)
+	public function get_item_total($quantity, $price, $discount, $discount_type, $po_quantity)
 	{
-		$extended_quantity = bcmul($quantity, $receiving_quantity);
+		$extended_quantity = bcmul($quantity, $po_quantity);
 		$total = bcmul($extended_quantity, $price);
+		echo 'quantity='.$quantity.'x po_quantity='.$po_quantity.'=extended_quantity='.$extended_quantity.'x price'.$price.'=total='.$total;
 		$discount_amount = $discount;
 		if($discount_type == PERCENT)
 		{

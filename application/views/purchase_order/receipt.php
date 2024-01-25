@@ -38,7 +38,7 @@
 
 		<div id="company_address"><?php echo nl2br($this->config->item('address')); ?></div>
 		<div id="company_phone"><?php echo $this->config->item('phone'); ?></div>
-		<div id="sale_receipt"><?php echo $this->lang->line('receivings_receipt'); ?></div>
+		<div id="sale_receipt"><?php echo $this->lang->line('purchase_order'); ?></div>
 		<div id="sale_time"><?php echo $transaction_time ?></div>
 	</div>
 
@@ -73,14 +73,17 @@
 
 		<?php
 		foreach(array_reverse($cart, TRUE) as $line=>$item)
+
 		{
+
+			
 		?>
 			<tr>
 				<td><?php echo $item['name'] . ' ' . $item['attribute_values']; ?></td>
 				<td><?php echo to_currency($item['price']); ?></td>
 				<td><?php echo to_quantity_decimals($item['quantity']) . " " . ($show_stock_locations ? " [" . $item['stock_name'] . "]" : ""); 
 				?>&nbsp;&nbsp;&nbsp;x <?php echo $item['receiving_quantity'] != 0 ? to_quantity_decimals($item['receiving_quantity']) : 1; ?></td>
-				<td><div class="total-value"><?php echo to_currency($item['total']); ?></div></td>
+				<td><div class="total-value"><?php echo  to_currency($item['total']); ?></div></td>
 			</tr>
 			<tr>
 				<td ><?php echo $item['serialnumber']; ?></td>
