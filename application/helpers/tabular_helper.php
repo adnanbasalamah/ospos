@@ -549,7 +549,7 @@ function get_items_manage_table_headers()
 
 	}
 
-	$headers[] = array('item_pic' => $CI->lang->line('items_image'), 'sortable' => FALSE);
+	$headers[] = array('item_pic' => $CI->lang->line('items_image'), 'sortable' => FALSE, 'visible' => FALSE);
 
 	foreach($definition_names as $definition_id => $definition_name)
 	{
