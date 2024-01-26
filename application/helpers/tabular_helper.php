@@ -623,7 +623,9 @@ function get_item_data_row($item)
 	}
 
 	$definition_names = $CI->Attribute->get_definitions_by_flags(Attribute::SHOW_IN_ITEMS);
-
+	if (!isset($item->phone_number)){
+		$item->phone_number = '-';
+	}
 	$columns = array (
 		'items.item_id' => $item->item_id,
 		'item_number' => $item->item_number,

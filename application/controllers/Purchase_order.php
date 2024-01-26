@@ -632,7 +632,7 @@ class purchase_order extends Secure_Controller
 		$data['comments'] = $po_info['comment'];
 		$data['po_number'] = 'PO ' . str_pad($purchase_order_id,5,'0',STR_PAD_LEFT);
 		$data['page_title'] = $this->lang->line('purchase_order');
-		$data['transaction_date'] = to_date(strtotime($po_info['delivery_date']));
+		$data['transaction_date'] = to_date(strtotime($po_info['po_time']));
 		$data['total'] = '-';
 		$data['company_info'] = implode("\n", array(
 			$this->config->item('address'),
