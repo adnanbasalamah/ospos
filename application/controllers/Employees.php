@@ -63,7 +63,7 @@ class Employees extends Persons
 		$data['employee_id'] = $employee_id;
 		$data['employee_category'] = $this->employee_category();
 		$supplier_array = $this->Supplier->get_all()->result();
-		$supplier_opt = [];
+		$supplier_opt = [ 0 => 'Select None'];
 		foreach($supplier_array as $idx => $supplier_data){
 			$supplier_opt[$supplier_data->person_id] = $supplier_data->company_name;
 		}
