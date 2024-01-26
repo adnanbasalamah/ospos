@@ -1353,6 +1353,7 @@ class Sale extends CI_Model
 				}
 			}
 			$sale_info = $this->get_info($sales_id)->result();
+			print 'Paid : '.floatval($total_paid).' VS total sale : '.floatval($sale_info[0]->total_order);
 			if (floatval($total_paid) >= floatval($sale_info[0]->total_order)){
 				$sale_status = 2;
 			}else if(floatval($total_paid) < floatval($sale_info[0]->total_order) && floatval($total_paid) > 0){
