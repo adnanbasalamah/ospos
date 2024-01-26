@@ -1038,7 +1038,8 @@ function get_po_manage_table_headers()
 		array('delivery_date' => $CI->lang->line('sales_order_delivery_date')),
 		array('po_status' => $CI->lang->line('sales_order_status')),
 		array('total_order' => $CI->lang->line('sales_order_total')),
-		array('view_detail' => 'Detail', 'escape' => FALSE)
+		array('view_detail' => 'Detail', 'escape' => FALSE),
+		array('print_po' => 'Print', 'escape' => FALSE)
 	);
 	return transform_headers($headers);
 }
@@ -1097,6 +1098,11 @@ function get_purchase_order_data_row($po)
 		$controller_name."/detailpo/$po->po_id",
 		'<span class="glyphicon glyphicon-list-alt"></span>',
 		array('title'=>$CI->lang->line('sales_show_invoice'))
+	);
+	$row['print_po'] = anchor(
+		$controller_name."/purchade_order_print/$po->po_id",
+		'<span class="glyphicon glyphicon-print"></span>',
+		array('title'=>$CI->lang->line('po_show_invoice'))
 	);
 	/*
 	if($CI->config->item('invoice_enable'))

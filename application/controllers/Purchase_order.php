@@ -37,6 +37,9 @@ class purchase_order extends Secure_Controller
 		
         $sort = $this->input->get('sort');
         $order = $this->input->get('order');
+		$search = $this->input->get('search');
+		$limit = $this->input->get('limit');
+		$offset = $this->input->get('offset');
 
         $filters = array('sale_type' => 'all',
             'location_id' => 'all',
@@ -597,7 +600,108 @@ class purchase_order extends Secure_Controller
 		$this->receiving_lib->clear_all();
 		*/
 	}
+	public function purchade_order_print($purchase_order_id)
+	{
+		$data = $this->_load_purchase_order_data($purchase_order_id);
+		$data['cart'] = $this->Purchaseorder->get_purchase_order_items($purchase_order_id)->result();
+		$total_order = 0;
+		foreach ($data['cart'] as $idx => $cart){
+			$qty_item = $cart->quantity_purchased;
+			$total_order += $cart->item_cost_price*$qty_item;
+		}
+		$data['total'] = to_currency($total_order);
+		$this->load->view('purchase_order/po_print', $data);
+	}
 
+	public function _load_purchase_order_data($purchase_order_id)
+	{
+		$po_info = $this->Purchaseorder->get_info($purchase_order_id)->row_array();
+		$data = array();
+		$data['transaction_time'] = to_datetime(strtotime($po_info['delivery_date']));
+		$data['show_stock_locations'] = $this->Stock_location->show_locations('purchase_order');
+
+		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
+		$totals = 0;//$this->sale_lib->get_totals();
+		$data['subtotal'] = $totals['subtotal'];
+
+		$employee_info = $this->Employee->get_info($po_info['employee_id']);
+		$data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
+		$this->_load_supplier_data($po_info['supplier_id'], $data);
+		$data['purchase_order_id_num'] = $purchase_order_id;
+		$data['purchase_order_id'] = $purchase_order_id;
+		$data['comments'] = $po_info['comment'];
+		$data['po_number'] = 'PO ' . str_pad($purchase_order_id,5,'0',STR_PAD_LEFT);
+		$data['page_title'] = $this->lang->line('purchase_order');
+		$data['transaction_date'] = to_date(strtotime($po_info['delivery_date']));
+		$data['total'] = '-';
+		$data['company_info'] = implode("\n", array(
+			$this->config->item('address'),
+			$this->config->item('phone')
+		));
+		if($this->config->item('account_number'))
+		{
+			$data['company_info'] .= "\n" . $this->lang->line('sales_account_number') . ": " . $this->config->item('account_number');
+		}
+		if($this->config->item('tax_id') != '')
+		{
+			$data['company_info'] .= "\n" . $this->lang->line('sales_tax_id') . ": " . $this->config->item('tax_id');
+		}
+
+		$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['po_number']);
+		$data['print_after_sale'] = FALSE;
+		$data['price_work_orders'] = FALSE;
+		return $this->xss_clean($data);
+	}
+
+	private function _load_supplier_data($supplier_id, &$data, $stats = FALSE)
+	{
+		$supplier_info = '';
+
+		if($supplier_id != -1)
+		{
+			$supplier_info = $this->Supplier->get_info($supplier_id);
+			$data['supplier_id'] = $supplier_id;
+			if(!empty($supplier_info->company_name))
+			{
+				$data['supplier'] = $supplier_info->company_name;
+			}
+			else
+			{
+				$data['supplier'] = $supplier_info->first_name . ' ' . $supplier_info->last_name;
+			}
+			$data['first_name'] = $supplier_info->first_name;
+			$data['last_name'] = $supplier_info->last_name;
+			$data['supplier_email'] = $supplier_info->email;
+			$data['supplier_address'] = $supplier_info->address_1;
+			if(!empty($supplier_info->zip) || !empty($supplier_info->city))
+			{
+				$data['supplier_location'] = $supplier_info->zip . ' ' . $supplier_info->city . "\n" . $supplier_info->state;
+			}
+			else
+			{
+				$data['supplier_location'] = '';
+			}
+			$data['supplier_account_number'] = $supplier_info->account_number;
+
+			$data['supplier_info'] = implode("\n", array(
+				$data['supplier'],
+				$data['supplier_address'],
+				$data['supplier_location']
+			));
+
+			if($data['supplier_account_number'])
+			{
+				$data['supplier_info'] .= "\n" . $this->lang->line('sales_account_number') . ": " . $data['supplier_account_number'];
+			}
+			if($supplier_info->tax_id != '')
+			{
+				$data['supplier_info'] .= "\n" . $this->lang->line('sales_tax_id') . ": " . $supplier_info->tax_id;
+			}
+			$data['tax_id'] = $supplier_info->tax_id;
+		}
+
+		return $supplier_info;
+	}
 }
 
 ?>

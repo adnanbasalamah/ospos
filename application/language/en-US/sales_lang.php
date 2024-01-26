@@ -239,5 +239,8 @@ $lang["sales_order_matrix"] = "Sales Order Matrix";
 $lang["sales_payment_status"] = "Payment Status";
 $lang["sales_total_paid"] = "Total Paid";
 $lang["sales_total_unpaid"] = "Total Unpaid";
-
-
+$lang["po_show_invoice"] = "Print Purchase Order";
+$lang["po_send_invoice"] = "Send Purchase Order";
+$lang["purchase_order_list"] = "Purchase Order List";
+$lang["purchase_order_total"] = "Total PO";
+$lang["purchase_order_number"] = "PO Number";

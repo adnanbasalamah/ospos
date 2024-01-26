@@ -14,7 +14,7 @@ if(isset($error_message))
         {
             var send_email = function()
             {
-                $.get('<?php echo site_url() . "sales_order/send_pdf/" . $sale_order_id_num; ?>',
+                $.get('<?php echo site_url() . "purchase_order/send_pdf/" . $purchase_order_id_num; ?>',
                     function(response)
                     {
                         $.notify({ message: response.message }, { type: response.success ? 'success' : 'danger'});
@@ -36,10 +36,10 @@ if(isset($error_message))
 <div class="print_hide" id="control_buttons" style="text-align:right">
     <a href="javascript:printdoc();"><div class="btn btn-info btn-sm", id="show_print_button"><?php echo '<span class="glyphicon glyphicon-print">&nbsp</span>' . $this->lang->line('common_print'); ?></div></a>
     <?php /* this line will allow to print and go back to sales automatically.... echo anchor("sales", '<span class="glyphicon glyphicon-print">&nbsp</span>' . $this->lang->line('common_print'), array('class'=>'btn btn-info btn-sm', 'id'=>'show_print_button', 'onclick'=>'window.print();')); */ ?>
-    <?php if(isset($customer_email) && !empty($customer_email)): ?>
-        <a href="javascript:void(0);"><div class="btn btn-info btn-sm", id="show_email_button"><?php echo '<span class="glyphicon glyphicon-envelope">&nbsp</span>' . $this->lang->line('sales_send_invoice'); ?></div></a>
+    <?php if(isset($supplier_email) && !empty($supplier_email)): ?>
+        <a href="javascript:void(0);"><div class="btn btn-info btn-sm", id="show_email_button"><?php echo '<span class="glyphicon glyphicon-envelope">&nbsp</span>' . $this->lang->line('po_send_invoice'); ?></div></a>
     <?php endif; ?>
-    <?php echo anchor("sales_order/manage", '<span class="glyphicon glyphicon-list-alt">&nbsp</span>' . $this->lang->line('sales_order_list'), array('class'=>'btn btn-info btn-sm', 'id'=>'show_takings_button')); ?>
+    <?php echo anchor("sales_order/manage", '<span class="glyphicon glyphicon-list-alt">&nbsp</span>' . $this->lang->line('purchase_order_list'), array('class'=>'btn btn-info btn-sm', 'id'=>'show_takings_button')); ?>
 </div>
 
 <div id="page-wrap">
@@ -47,16 +47,16 @@ if(isset($error_message))
     <div id="block1">
         <div id="customer-title">
             <?php
-            if(isset($customer))
+            if(isset($supplier))
             {
                 ?>
-                <div id="customer"><?php echo nl2br($customer_info) ?></div>
+                <div id="customer"><?php echo nl2br($supplier_info) ?></div>
                 <?php
             }
             ?>
         </div>
 
-        <div id="logo">
+        <div id="logo" style="text-align: left;">
             <?php
             if($this->Appconfig->get('company_logo') != '')
             {
@@ -81,39 +81,15 @@ if(isset($error_message))
         <div id="company-title"><?php echo nl2br($company_info) ?></div>
         <table id="meta">
             <tr>
-                <?php
-                if ((int)$sale_status == 2){
-                ?>
-                    <td class="meta-head"><?php echo $this->lang->line('delivery_order_number');?> </td>
-                <?php
-                }else{
-                ?>
-                    <td class="meta-head"><?php echo $this->lang->line('sales_order_number');?> </td>
-                <?php
-                }
-                ?>
-                <td><?php echo $so_number; ?></td>
+                <td class="meta-head"><?php echo $this->lang->line('purchase_order_number');?> </td>
+                <td><?php echo $po_number; ?></td>
             </tr>
             <tr>
-                <?php
-                if ((int)$sale_status == 2){
-                ?>
-                    <td class="meta-head"><?php echo 'Shipping '. $this->lang->line('common_date'); ?></td>
-                    <?php
-                }elseif ((int)$sale_status == 3 || (int)$sale_status == 4){
-                ?>
-                    <td class="meta-head"><?php echo 'Delivery '.$this->lang->line('common_date'); ?></td>
-                    <?php
-                }else{
-                    ?>
-                    <td class="meta-head"><?php echo 'Order '.$this->lang->line('common_date'); ?></td>
-                    <?php
-                }
-                ?>
+                <td class="meta-head"><?php echo 'Purchase Order '. $this->lang->line('common_date'); ?></td>
                 <td><?php echo $transaction_date; ?></td>
             </tr>
             <tr>
-                <td class="meta-head"><?php echo $this->lang->line('sales_order_total'); ?></td>
+                <td class="meta-head"><?php echo $this->lang->line('purchase_order_total'); ?></td>
                 <td><?php echo $total; ?></td>
             </tr>
         </table>
@@ -127,45 +103,23 @@ if(isset($error_message))
             ?>
             <th><?php echo $this->lang->line('sales_item_name'); ?></th>
             <th><?php echo $this->lang->line('sales_quantity'); ?></th>
-            <?php
-            if ((int)$sale_status != 2){
-            ?>
-                <th><?php echo $this->lang->line('sales_price'); ?></th>
-                <th><?php echo $this->lang->line('sales_total'); ?></th>
-            <?php
-            }
-            ?>
+            <th><?php echo $this->lang->line('sales_price'); ?></th>
+            <th><?php echo $this->lang->line('sales_total'); ?></th>
         </tr>
 
         <?php
         //var_dump($cart);
         foreach($cart as $line=>$item)
         {
-        ?>
+            ?>
             <tr class="item-row">
                 <td><?php echo $item->item_number; ?></td>
                 <td><?php echo $item->name; ?></td>
-                <?php
-                if ((int)$sale_status != 2) {
-                    $qty_item = $item->quantity_purchased;
-                    if ((int)$sale_status == 3 || (int)$sale_status == 4) {
-                        $qty_item = $item->qty_delivered;
-                    }
-                }else{
-                    $qty_item = $item->qty_shipped;
-                }
-                ?>
-                <td style='text-align:center;'><?php echo to_quantity_decimals($qty_item); ?></td>
-                <?php
-                if ((int)$sale_status != 2){
-                    ?>
-                    <td><?php echo $item->item_unit_price; ?></td>
-                    <td><?php echo to_currency($qty_item*$item->item_unit_price); ?></td>
-                <?php
-                }
-                ?>
+                <td style='text-align:center;'><?php echo to_quantity_decimals($item->quantity_purchased); ?></td>
+                <td><?php echo to_currency($item->item_unit_price); ?></td>
+                <td><?php echo to_currency($item->quantity_purchased*$item->item_unit_price); ?></td>
             </tr>
-        <?php
+            <?php
         }
         ?>
     </table>
@@ -180,7 +134,7 @@ if(isset($error_message))
         </div>
         <div id='barcode'>
             <img style='padding-top:4%;' src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
-            <?php echo $so_number; ?>
+            <?php echo $po_number; ?>
         </div>
     </div>
 </div>

@@ -358,18 +358,32 @@ class Sales_order extends Secure_Controller
     {
         $data = $this->_load_sale_order_data($sale_order_id);
         $data['cart'] = $this->Salesorder->get_sale_order_items($sale_order_id)->result();
+        $total_order = 0;
+        foreach ($data['cart'] as $idx => $cart){
+            if ($data['sale_status'] == 2){
+                $qty_item = $cart->qty_shipped;
+            }else{
+                $qty_item = $cart->quantity_purchased;
+                if($data['sale_status'] == 3 || $data['sale_status'] == 4){
+                    $qty_item = $cart->qty_delivered;
+                }
+            }
+            $total_order += $cart->item_unit_price*$qty_item;
+        }
+        $data['total'] = to_currency($total_order);
         $this->load->view('sales_order/sales_order_print', $data);
     }
     public function _load_sale_order_data($sale_order_id)
     {
-        $this->sale_lib->clear_all();
-        $cash_rounding = $this->sale_lib->reset_cash_rounding();
-        $data['cash_rounding'] = $cash_rounding;
+        //$this->sale_lib->clear_all();
+        //$cash_rounding = $this->sale_lib->reset_cash_rounding();
+        //$data['cash_rounding'] = $cash_rounding;
 
         $sale_info = $this->Salesorder->get_info($sale_order_id)->row_array();
-        $this->sale_lib->copy_entire_sale($sale_order_id);
+        //var_dump($sale_info);
+        //$this->sale_lib->copy_entire_sale($sale_order_id);
         $data = array();
-        $data['discount'] = $this->sale_lib->get_discount();
+        //$data['discount'] = $this->sale_lib->get_discount();
         $data['transaction_time'] = to_datetime(strtotime($sale_info['sale_time']));
         $data['show_stock_locations'] = $this->Stock_location->show_locations('sales');
 
@@ -377,7 +391,7 @@ class Sales_order extends Secure_Controller
         $totals = 0;//$this->sale_lib->get_totals();
         $data['subtotal'] = $totals['subtotal'];
 
-        $employee_info = $this->Employee->get_info($this->sale_lib->get_employee());
+        $employee_info = $this->Employee->get_info($sale_info['employee_id']);
         $data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
         $this->_load_customer_data($sale_info['customer_id'], $data);
         $data['sale_order_id_num'] = $sale_order_id;

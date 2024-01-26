@@ -194,13 +194,13 @@ class Purchaseorder extends CI_Model
 
 		return $this->db->get();
 	}
-	
-	public function get_supplier($receiving_id)
-	{
-		$this->db->from('receivings');
-		$this->db->where('receiving_id', $receiving_id);
 
-		return $this->Supplier->get_info($this->db->get()->row()->supplier_id);
+	public function get_purchase_order_items($po_id)
+	{
+		$this->db->from('po_items');
+		$this->db->join('items AS items','po_items.item_id = items.item_id','LEFT');
+		$this->db->where('po_id', $po_id);
+		return $this->db->get();
 	}
 
 	public function get_payment_options()
