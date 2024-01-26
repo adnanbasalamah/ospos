@@ -174,7 +174,31 @@ class Suppliers extends Persons
 	}
 
 	function search_paid_items_supp(){
-		$this->Suppliers->search_paid_items();
+		$search  = $this->input->get('search');
+		$limit   = $this->input->get('limit');
+		$offset  = $this->input->get('offset');
+		$sort    = $this->input->get('sort');
+		$order   = $this->input->get('order');
+		$filters = $this->input->get('filters');
+		$supplier_id = $this->input->get('supplier_id');
+		$filters = array(
+			'start_date' => $this->input->get('start_date'),
+			'end_date' => $this->input->get('end_date'),
+		);
+
+		$items_paid = $this->Sale->get_paid_sales_by_items($search, $filters, $limit, $offset, $sort, $order, FALSE, $supplier_id);
+		$total_rows = $this->Sale->get_paid_sales_by_items_found_rows($search, $filters);
+
+		$data_rows = array();
+		foreach($items_paid->result() as $item_paid)
+		{
+			$data_rows[] = $this->xss_clean(get_paid_sale_item_data_row($item_paid));
+		}
+		if($total_rows > 0)
+		{
+			$data_rows[] = $this->xss_clean(get_paid_sale_item_data_last_row($items_paid));
+		}
+		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
 	}
 
 }

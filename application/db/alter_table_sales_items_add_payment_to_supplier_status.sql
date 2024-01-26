@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_sales_items` ADD `payment_to_supplier_status` INT NOT NULL DEFAULT '0' FIRST;

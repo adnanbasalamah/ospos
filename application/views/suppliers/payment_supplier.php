@@ -8,6 +8,31 @@
             table_support.refresh();
         });
 
+        // when any filter is clicked and the dropdown window is closed
+        $('#filters').on('keyup', function(e) {
+            if ($(this).val() == '') {
+                $('input[name="supplier_id"]').val('');
+                table_support.refresh();
+            }
+        });
+
+        $('#filters').autocomplete( {
+            source: "<?php echo site_url('suppliers/suggest'); ?>",
+            minChars: 0,
+            delay: 15,
+            cacheLength: 1,
+            appendTo: '.modal-content',
+            select: function( event, ui ) {
+                event.preventDefault();
+                $('#filters').val(ui.item.label);
+                if (parseInt(ui.item.value) > 0){
+                    $('input[name="supplier_id"]').val(ui.item.value);
+                    table_support.refresh();
+                }
+                return ui.item.label;
+            }
+        });
+
         <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
         table_support.query_params = function()
         {
@@ -27,6 +52,9 @@
                 if($("#table tbody tr").length > 1) {
                     $("#table tbody tr:last td:first").html("");
                     $("#table tbody tr:last").css('font-weight', 'bold');
+                    $("#table tbody tr td").each(function(){
+                      $(this).css('line-height', '2px');
+                    })
                 }
             },
             queryParams: function() {

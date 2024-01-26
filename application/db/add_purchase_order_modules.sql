@@ -1,0 +1,2 @@
+INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_id`) VALUES ('module_purchase_order', 'module_purchase_order_desc', 45, 'purchase_order');
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('purchase_order', 'purchase_order', NULL);

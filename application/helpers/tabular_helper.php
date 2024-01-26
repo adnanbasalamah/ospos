@@ -1292,8 +1292,10 @@ function get_payment_paid_items_table_headers(){
 		array('min_price' => $CI->lang->line('items_min_cost_price')),
 		array('max_price' => $CI->lang->line('items_max_cost_price')),
 		array('total_payment' => $CI->lang->line('sales_payments_total')),
+		array('supplier_name' => $CI->lang->line('suppliers_supplier')),
+		array('related_invoices' => 'Related '.$CI->lang->line('sales_invoice'), 'escape' => FALSE),
 	);
-	return transform_headers($headers);
+	return transform_headers($headers, TRUE, FALSE);
 }
 
 function get_paid_sale_item_data_row($paid_items){
@@ -1306,7 +1308,9 @@ function get_paid_sale_item_data_row($paid_items){
 		'total_qty' => to_quantity_decimals($paid_items->total_qty),
 		'min_price' => to_currency($paid_items->min_price),
 		'max_price' => to_currency($paid_items->max_price),
-		'total_payment' => to_currency($paid_items->total_payment)
+		'total_payment' => to_currency($paid_items->total_payment),
+		'supplier_name' => $paid_items->supplier_name,
+		'related_invoices' => $paid_items->related_invoices
 	);
 	return $row;
 }

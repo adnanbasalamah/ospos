@@ -45,7 +45,6 @@ $(document).ready(function()
 		<span class="glyphicon glyphicon-user">&nbsp</span><?php echo $this->lang->line($controller_name . '_new'); ?>
 	</button>
     <?php
-    print  $controller_name;
     if ($controller_name == 'suppliers')
     {
         echo anchor("suppliers/payment", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('supplier_payment'), array('class'=>'btn btn-warning btn-sm pull-right', 'id'=>'supplier_payment'));

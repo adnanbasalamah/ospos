@@ -1363,15 +1363,29 @@ class Sale extends CI_Model
 	}
 
 	public function get_paid_sales_by_items($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_items.supplier_id', $order = 'asc', $count_only = FALSE, $supplier_id = null){
-		$where = 'sales.payment_status = 2 ';
-		if (!is_null($supplier_id)){
-			$where .= 'AND sales_items.supplier_id = '.$supplier_id;
+		$where = 'sales.payment_status = 2 AND sales_items.payment_to_supplier_status = 0 ';
+		if (!empty($supplier_id)){
+			$where .= 'AND sales_items.supplier_id = '.$supplier_id.' ';
 		}
-		$str_field = 'DISTINCT(items.item_id), DISTINCT(items.item_number), DISTINCT(items.name), SUM(quantity_purchased) AS total_qty, MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
+
+		if(empty($this->config->item('date_or_time_format')))
+		{
+			$where .= 'AND DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+		}
+		else
+		{
+			$where .= 'AND sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+		}
+
+		if (!empty($search)){
+			$where .= ' AND (items.item_number LIKE "%'.$search.'%" OR items.name LIKE "%'.$search.'%")';
+		}
+		$arr_status_payment = arr_sale_payment_status();
+		$str_field = 'items.item_id, items.item_number, items.name, SUM(quantity_purchased) AS total_qty, MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
 		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
-		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = ospos_sales_items.supplier_id) AS supplier_name,';
-		$str_field .= 'GROUP_CONCAT(DISTINCT(sales.invoice_number) 
-            ORDER BY sales.sale_id ASC SEPARATOR ", ") AS related_invoices';
+		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) AS supplier_name,';
+		$str_field .= 'GROUP_CONCAT(DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<a class=\"btn btn-xs btn-info\">PAYMENT</a>")) 
+            ORDER BY sales.sale_id ASC SEPARATOR "<br><br>") AS related_invoices';
 		$this->db->select($str_field)->from('sales_items AS sales_items');
 		$this->db->join('sales AS sales','sales_items.sale_id = sales.sale_id','LEFT');
 		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
@@ -1390,8 +1404,10 @@ class Sale extends CI_Model
 		//print $this->db->last_query();
 		return $return_dt;
 	}
-	public function get_found_paid_items_rows(){
 
+	public function get_paid_sales_by_items_found_rows($search, $filters)
+	{
+		return $this->get_paid_sales_by_items($search, $filters, 0, 0, 'sales.sale_time', 'desc', TRUE);
 	}
 }
 ?>

@@ -1,0 +1,1 @@
+ALTER TABLE `ospos_employees` ADD `employee_category` varchar(255) NULL;

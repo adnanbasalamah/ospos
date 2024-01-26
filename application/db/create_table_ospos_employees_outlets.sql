@@ -1,0 +1,1 @@
+CREATE TABLE `ospos_server_new`.`ospos_employees_outlets` ( `employee_id` INT NOT NULL ,  `customer_id` INT NOT NULL ,    PRIMARY KEY  (`employee_id`, `customer_id`)) ENGINE = InnoDB;
