@@ -127,7 +127,7 @@ class Item_quantity extends CI_Model
         $this->db->where('item_id', $item_id);
         $this->db->where('customer_id', $customer_id);
         $ret_data = ($this->db->get()->num_rows() == 1);
-        print $this->db->last_query();
+        //print $this->db->last_query();
         return $ret_data;
     }
 }
