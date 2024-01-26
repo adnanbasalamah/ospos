@@ -377,7 +377,6 @@ class Customer extends Person
 		{
 			$this->db->select('COUNT(customers.person_id) as count');
 		}
-
 		$this->db->from('customers AS customers');
 		$this->db->join('people', 'customers.person_id = people.person_id');
 		$this->db->group_start();
@@ -406,6 +405,32 @@ class Customer extends Person
 		$ret = $this->db->get();
 		//print $this->db->last_query();
 		return $ret;
+	}
+
+	public function save_employee_customers($employee_id = null, $customer_id = null){
+		$return = FALSE;
+		if (!empty($employee_id) && !empty($customer_id)){
+			$employees_outlets_data = ['employee_id' => $employee_id, 'customer_id' => $customer_id];
+			$return = $this->db->insert('employees_outlets', $employees_outlets_data);
+		}
+		return $return;
+	}
+
+	public function get_employees_outlets($customer_id){
+		$ret = null;
+		if (!empty($customer_id)){
+			$ret = $this->db->from('employees_outlets')->where('customer_id',$customer_id)->get();
+		}
+		return $ret;
+	}
+
+	public function delete_employee_outlets($customer_id){
+		$data_delete = FALSE;
+		if (!empty($customer_id)) {
+			$this->db->where('customer_id', $customer_id);
+			$data_delete = $this->db->delete('employees_outlets');
+		}
+		return $data_delete;
 	}
 }
 ?>

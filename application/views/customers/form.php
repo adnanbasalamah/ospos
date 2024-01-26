@@ -194,13 +194,13 @@
 								'value'=>$employee,
 								'readonly'=>'true')
 								);*/
-                        echo form_dropdown(
+                        echo form_multiselect(
                             array(
-                                'name'=>'employee_id',
+                                'name'=>'employee_id[]',
                                 'id'=>'employee_id'
                             ),
                             $employee_option,
-                            $person_info->employee_id,
+                            $selected_employee,
                             array('class' => 'form-control input-sm')
                         );
 

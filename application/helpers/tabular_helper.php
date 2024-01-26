@@ -447,7 +447,6 @@ function get_customer_data_row($person, $stats, $employee_name = '')
 	$CI =& get_instance();
 
 	$controller_name = strtolower(get_class($CI));
-
 	return array (
 		'people.person_id' => $person->person_id,
 		'last_name' => $person->last_name,

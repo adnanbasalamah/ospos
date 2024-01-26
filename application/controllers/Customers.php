@@ -84,8 +84,20 @@ class Customers extends Persons
 				$stats->avg_discount = 0;
 				$stats->quantity = 0;
 			}
-
-			$data_rows[] = $this->xss_clean(get_customer_data_row($person, $stats, $EmpOption[$person->employee_id]));
+			$employees_outlets = $this->Customer->get_employees_outlets($person->person_id)->result();
+			$selected_employee = [];
+			$Employee_name = '';
+			if (!empty($employees_outlets)){
+				foreach ($employees_outlets AS $idx => $employee_outlet){
+					$selected_employee[] = $employee_outlet->employee_id;
+					if (!empty($Employee_name)){
+						$Employee_name .= ', '.$EmpOption[$employee_outlet->employee_id];
+					}else {
+						$Employee_name .= $EmpOption[$employee_outlet->employee_id];
+					}
+				}
+			}
+			$data_rows[] = $this->xss_clean(get_customer_data_row($person, $stats, $Employee_name));
 		}
 
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
@@ -228,7 +240,14 @@ class Customers extends Persons
 				}
 			}
 		}
-
+		$employees_outlets = $this->Customer->get_employees_outlets($customer_id);
+		$selected_employee = [];
+		if (!empty($employees_outlets)){
+			foreach ($employees_outlets->result() AS $idx => $employee_outlet){
+				$selected_employee[] = $employee_outlet->employee_id;
+			}
+		}
+		$data['selected_employee'] = $selected_employee;
 		$this->load->view("customers/form", $data);
 	}
 
@@ -272,10 +291,16 @@ class Customers extends Persons
 			'package_id' => $this->input->post('package_id') == '' ? NULL : $this->input->post('package_id'),
 			'taxable' => $this->input->post('taxable') != NULL,
 			'date' => $date_formatter->format('Y-m-d H:i:s'),
-			'employee_id' => $this->input->post('employee_id'),
+			//'employee_id' => $this->input->post('employee_id'),
 			'sales_tax_code_id' => $this->input->post('sales_tax_code_id') == '' ? NULL : $this->input->post('sales_tax_code_id')
 		);
-
+		if (!empty($this->input->post('employee_id'))){
+			$arr_employee = $this->input->post('employee_id');
+			$this->Customer->delete_employee_outlets($customer_id);
+			foreach ($arr_employee AS $idx => $employee_id){
+				$this->save_employee_outlets($employee_id,$customer_id);
+			}
+		}
 		if($this->Customer->save_customer($person_data, $customer_data, $customer_id))
 		{
 			// save customer to Mailchimp selected list
@@ -303,6 +328,13 @@ class Customers extends Persons
 		}
 	}
 
+	function save_employee_outlets($employee_id = null, $customer_id = null){
+		$return = FALSE;
+		if (!empty($employee_id) && !empty($customer_id)){
+			$return = $this->Customer->save_employee_customers($employee_id,$customer_id);
+		}
+		return $return;
+	}
 	/*
 	AJAX call to verify if an email address already exists
 	*/
