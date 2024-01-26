@@ -389,7 +389,7 @@ class Sales_order extends Secure_Controller
 
         // Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
         $totals = 0;//$this->sale_lib->get_totals();
-        $data['subtotal'] = $totals['subtotal'];
+        //$data['subtotal'] = $totals['subtotal'];
 
         $employee_info = $this->Employee->get_info($sale_info['employee_id']);
         $data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
