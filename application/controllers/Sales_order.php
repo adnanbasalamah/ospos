@@ -173,7 +173,7 @@ class Sales_order extends Secure_Controller
         {
             $sale_order_ids = $sale_order_id == -1 ? $this->input->post('ids') : array($sale_order_id);
 
-            if($this->Salesorder->delete_list($sale_order_ids, $employee_id))
+            if($this->Salesorder->delete_list($sale_order_ids))
             {
                 echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('sales_successfully_deleted') . ' ' .
                     count($sale_order_ids) . ' ' . $this->lang->line('sales_one_or_multiple'), 'ids' => $sale_order_ids));

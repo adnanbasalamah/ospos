@@ -50,7 +50,7 @@ if(isset($error_message))
             if(isset($supplier))
             {
                 ?>
-                <div id="customer"><?php echo nl2br($supplier_info) ?></div>
+                <div id="customer"><?php echo nl2br($company_info) ?></div>
                 <?php
             }
             ?>
@@ -78,7 +78,7 @@ if(isset($error_message))
     </div>
 
     <div id="block2">
-        <div id="company-title"><?php echo nl2br($company_info) ?></div>
+        <div id="company-title"><?php echo nl2br($supplier_info); ?></div>
         <table id="meta">
             <tr>
                 <td class="meta-head"><?php echo $this->lang->line('purchase_order_number');?> </td>

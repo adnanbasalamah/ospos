@@ -122,13 +122,12 @@ class Salesorder extends CI_Model
     /**
      * Deletes list of sales
      */
-    public function delete_list($sale_order_ids, $employee_id, $update_inventory = TRUE)
+    public function delete_list($sale_order_ids)
     {
         $result = TRUE;
-
         foreach($sale_order_ids as $sale_order_id)
         {
-            $result &= $this->delete($sale_order_id, $employee_id, $update_inventory);
+            $result &= $this->delete($sale_order_id);
         }
 
         return $result;
@@ -152,41 +151,23 @@ class Salesorder extends CI_Model
      * When a sale is "deleted" it is simply changed to a status of canceled.
      * However, if applicable the inventory still needs to be updated
      */
-    public function delete($sale_order_id, $employee_id, $update_inventory = TRUE)
+    public function delete($sale_order_id)
     {
         // start a transaction to assure data integrity
         $this->db->trans_start();
 
         $sale_status = $this->get_sale_status($sale_order_id);
-        if($update_inventory && ((int)$sale_status == COMPLETED || (int)$sale_status == PARTIALLY_DELIVERED))
+        if((int)$sale_status == 2 || (int)$sale_status == 3 || (int)$sale_status == 4)
         {
-            // defect, not all item deletions will be undone??
-            // get array with all the items involved in the sale to update the inventory tracking
-            $items = $this->get_sale_order_items($sale_order_id)->result_array();
-            foreach($items as $item)
-            {
-                $cur_item_info = $this->Item->get_info($item['item_id']);
 
-                if($cur_item_info->stock_type == HAS_STOCK)
-                {
-                    // create query to update inventory tracking
-                    $inv_data = array(
-                        'trans_date' => date('Y-m-d H:i:s'),
-                        'trans_items' => $item['item_id'],
-                        'trans_user' => $employee_id,
-                        'trans_comment' => 'Deleting sale ' . $sale_order_id,
-                        'trans_location' => $item['item_location'],
-                        'trans_inventory' => $item['quantity_purchased']
-                    );
-                    // update inventory
-                    $this->Inventory->insert($inv_data);
-
-                    // update quantities
-                    $this->Item_quantity->change_quantity($item['item_id'], $item['item_location'], $item['quantity_purchased']);
-                }
-            }
+        }elseif ((int)$sale_status == 0 || (int)$sale_status == 1){
+            $this->update_sale_status($sale_order_id, 5);
+        }elseif ((int)$sale_status == 5){
+            $this->db->where('sale_order_id', $sale_order_id);
+            $data_delete = $this->db->delete('sales_order_items');
+            $this->db->where('sale_order_id', $sale_order_id);
+            $data_delete = $this->db->delete('sales_order');
         }
-        $this->update_sale_status($sale_order_id, 5);
 
         // execute transaction
         $this->db->trans_complete();

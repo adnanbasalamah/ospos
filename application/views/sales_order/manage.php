@@ -50,7 +50,7 @@
             resource: '<?php echo site_url($controller_name);?>',
             headers: <?php echo $table_headers; ?>,
             pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
-            uniqueId: 'sale_id',
+            uniqueId: 'sale_order_id',
             onLoadSuccess: function(response) {
                 if($("#table tbody tr").length > 1) {
                     $("#payment_summary").html(response.payment_summary);
