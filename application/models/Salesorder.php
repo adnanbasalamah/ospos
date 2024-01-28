@@ -332,8 +332,12 @@ class Salesorder extends CI_Model
         print $this->db->last_query();*/
         return $this->db->get();
     }
-    function search_detail_matrix($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_order_items.item_id', $order = 'asc', $count_only = FALSE){
+    function search_detail_matrix($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_order_items.item_id', $order = 'asc', $count_only = FALSE, $sales_order_status = null){
         $where = '';
+        if (!is_null($sales_order_status) && count($sales_order_status)){
+            $sales_order_status_value = implode(',',$sales_order_status);
+            $where = '(sale_status IN ('.$sales_order_status_value.')) AND ';
+        }
         if(empty($this->config->item('date_or_time_format')))
         {
             $where .= 'DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
@@ -370,8 +374,8 @@ class Salesorder extends CI_Model
         //print $this->db->last_query();
         return $return_dt;
     }
-    function get_detail_found_rows_matrix($search, $filters){
-        return $this->search_detail_matrix($search, $filters, 0, 0, 'item_id', 'desc', TRUE);
+    function get_detail_found_rows_matrix($search, $filters, $sales_order_status){
+        return $this->search_detail_matrix($search, $filters, 0, 0, 'item_id', 'desc', TRUE, $sales_order_status);
     }
 }
 ?>

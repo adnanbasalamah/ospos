@@ -7,6 +7,10 @@
             table_support.refresh();
         });
 
+        $('#sale_order_status').on('hidden.bs.select', function(e) {
+            table_support.refresh();
+        });
+
         <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 
         table_support.query_params = function()
@@ -14,7 +18,8 @@
             return {
                 start_date: start_date,
                 end_date: end_date,
-                filters: $("#filters").val() || ''
+                filters: $("#filters").val() || '',
+                sale_order_status: $("#sale_order_status").val() || -1,
             }
         };
         table_support.init({
@@ -47,6 +52,7 @@
     <div class="pull-left form-inline" role="toolbar">
         <?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm', 'id'=>'daterangepicker')); ?>
     </div>
+    <?php echo form_multiselect('sale_order_status', $filters2, '', array('id'=>'sale_order_status', 'data-none-selected-text'=>$this->lang->line('common_none_selected_text'), 'class'=>'selectpicker show-menu-arrow', 'data-selected-text-format'=>'count > 1', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
 </div>
 <div id="table_holder">
     <table id="table"></table>

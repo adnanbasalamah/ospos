@@ -58,6 +58,7 @@ class Sales_order extends Secure_Controller
     public function matrix(){
         $data['table_headers'] = get_sales_order_matrix_table_headers();
         $data['page_title'] = 'SALES ORDER MATRIX';
+        $data['filters2'] = arr_sales_order_status();
         $this->load->view('sales_order/sales_order_matrix', $data);
     }
     public function get_detail_so($sale_order_id){
@@ -89,12 +90,17 @@ class Sales_order extends Secure_Controller
         $offset = $this->input->get('offset');
         $sort = $this->input->get('sort');
         $order = $this->input->get('order');
+        $sales_order_status = $this->input->get('sale_order_status');
+        $sales_order_status_select = null;
+        if (is_array($sales_order_status) && count($sales_order_status)){
+            $sales_order_status_select = $sales_order_status;
+        }
         $filters = array(
             'start_date' => $this->input->get('start_date'),
             'end_date' => $this->input->get('end_date'),
         );
-        $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order);
-        $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters);
+        $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
+        $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters, $sales_order_status_select);
         $data_rows = array();
         foreach($sales_order_items->result() as $so_item)
         {
