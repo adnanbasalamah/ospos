@@ -41,40 +41,30 @@ if(isset($error_message))
     <?php endif; ?>
     <?php echo anchor("sales_order/manage", '<span class="glyphicon glyphicon-list-alt">&nbsp</span>' . $this->lang->line('purchase_order_list'), array('class'=>'btn btn-info btn-sm', 'id'=>'show_takings_button')); ?>
 </div>
-
+<div id="page-wrap">
+    <?php
+    if($this->Appconfig->get('company_logo') != '')
+    {
+        ?>
+        <div class="company-logo-po">
+        <img width="100" style="vertical-align: middle;"  id="image" src="<?php echo base_url('uploads/' . $this->Appconfig->get('company_logo')); ?>" alt="company_logo" />
+        </div>
+        <?php
+    }
+    ?>
+    <?php
+    if(isset($supplier))
+    {
+    ?>
+        <div class="company-title-po"><?php echo nl2br($company_info) ?></div>
+    <?php
+    }
+    ?>
+</div>
 <div id="page-wrap">
     <div id="header"><?php echo $page_title; ?></div>
     <div id="block1">
-        <div id="customer-title">
-            <?php
-            if(isset($supplier))
-            {
-                ?>
-                <div id="customer"><?php echo nl2br($company_info) ?></div>
-                <?php
-            }
-            ?>
-        </div>
 
-        <div id="logo" style="text-align: left;">
-            <?php
-            if($this->Appconfig->get('company_logo') != '')
-            {
-                ?>
-                <img id="image" src="<?php echo base_url('uploads/' . $this->Appconfig->get('company_logo')); ?>" alt="company_logo" />
-                <?php
-            }
-            ?>
-            <div>&nbsp</div>
-            <?php
-            if($this->Appconfig->get('receipt_show_company_name'))
-            {
-                ?>
-                <div id="company_name"><?php echo $this->config->item('company'); ?></div>
-                <?php
-            }
-            ?>
-        </div>
     </div>
 
     <div id="block2">
