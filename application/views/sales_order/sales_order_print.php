@@ -43,42 +43,37 @@ if(isset($error_message))
 </div>
 
 <div id="page-wrap">
+    <?php
+    if($this->Appconfig->get('company_logo') != '')
+    {
+        ?>
+        <div class="company-logo-po">
+            <img width="100" style="vertical-align: middle;"  id="image" src="<?php echo base_url('uploads/' . $this->Appconfig->get('company_logo')); ?>" alt="company_logo" />
+        </div>
+        <?php
+    }
+    ?>
+    <?php
+    if(isset($company_info))
+    {
+        ?>
+        <div class="company-title-po"><?php echo nl2br($company_info) ?></div>
+        <?php
+    }
+    ?>
+</div>
+
+<div id="page-wrap">
     <div id="header"><?php echo $page_title; ?></div>
-    <div id="block1">
-        <div id="customer-title">
-            <?php
-            if(isset($customer))
-            {
-                ?>
-                <div id="customer"><?php echo nl2br($customer_info) ?></div>
-                <?php
-            }
-            ?>
-        </div>
-
-        <div id="logo">
-            <?php
-            if($this->Appconfig->get('company_logo') != '')
-            {
-                ?>
-                <img id="image" src="<?php echo base_url('uploads/' . $this->Appconfig->get('company_logo')); ?>" alt="company_logo" />
-                <?php
-            }
-            ?>
-            <div>&nbsp</div>
-            <?php
-            if($this->Appconfig->get('receipt_show_company_name'))
-            {
-                ?>
-                <div id="company_name"><?php echo $this->config->item('company'); ?></div>
-                <?php
-            }
-            ?>
-        </div>
-    </div>
-
     <div id="block2">
-        <div id="company-title"><?php echo nl2br($company_info) ?></div>
+        <?php
+        if(isset($customer))
+        {
+        ?>
+        <div id="company-title"><?php echo nl2br($customer_info) ?></div>
+        <?php
+        }
+        ?>
         <table id="meta">
             <tr>
                 <?php

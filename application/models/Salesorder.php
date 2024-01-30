@@ -348,8 +348,11 @@ class Salesorder extends CI_Model
         }
         $FieldArr = [
             'so_item.item_id', 'SUM(quantity_purchased) AS total_qty',
-            'GROUP_CONCAT(DISTINCT(customers.company_name) 
+            'GROUP_CONCAT(DISTINCT(customers.company_name)  
             ORDER BY customers.company_name ASC SEPARATOR ", ") AS company_order',
+            'GROUP_CONCAT(DISTINCT(SELECT CONCAT(first_name," ",last_name) FROM 
+            ospos_people AS people WHERE people.person_id = sales_order.customer_id) 
+            ORDER BY customers.company_name ASC SEPARATOR ", ") AS company_list',
             'items.name','items.category','items.item_number',
             'item_cost_price','item_unit_price',
             'SUM(so_item.item_unit_price*so_item.quantity_purchased) AS subtotal'

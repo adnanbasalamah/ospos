@@ -53,7 +53,7 @@ if(isset($error_message))
     }
     ?>
     <?php
-    if(isset($supplier))
+    if(isset($company_info))
     {
     ?>
         <div class="company-title-po"><?php echo nl2br($company_info) ?></div>

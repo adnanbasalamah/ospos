@@ -1265,10 +1265,10 @@ function get_sale_order_matrix_data_row($item_so){
 		'item_id' => $item_so->item_id,
 		'item_number' => $item_so->item_number,
 		'name' => $item_so->name,
-		'total_qty' => $item_so->total_qty,
+		'total_qty' => to_quantity_decimals($item_so->total_qty),
 		'items_unit_price' => to_currency($item_so->item_unit_price),
 		'subtotal' => to_currency($item_so->subtotal),
-		'company_order' => $item_so->company_order,
+		'company_order' => $item_so->company_list,
 	);
 	return $row;
 }
