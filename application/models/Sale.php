@@ -1384,8 +1384,14 @@ class Sale extends CI_Model
 		$str_field = 'items.item_id, items.item_number, items.name, SUM(quantity_purchased) AS total_qty, MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
 		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
 		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) AS supplier_name,';
-		$str_field .= 'GROUP_CONCAT(DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<a class=\"btn btn-xs btn-info\">PAYMENT</a>")) 
-            ORDER BY sales.sale_id ASC SEPARATOR "<br><br>") AS related_invoices';
+		$str_field .= 'CASE 
+		WHEN sales_items.payment_to_supplier_status = 0 THEN GROUP_CONCAT(
+		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<a class=\"btn btn-xs btn-warning\">UNPAID</a>"))
+        ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
+		WHEN sales_items.payment_to_supplier_status = 1 THEN GROUP_CONCAT(
+		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<button class=\"btn btn-xs btn-success\">PAID</button>"))
+        ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
+        END AS related_invoices';
 		$this->db->select($str_field)->from('sales_items AS sales_items');
 		$this->db->join('sales AS sales','sales_items.sale_id = sales.sale_id','LEFT');
 		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
