@@ -23,7 +23,7 @@
             }
         };
         table_support.init({
-            resource: '<?php echo site_url($controller_name) . '/get_matrix_so/'; ?>',
+            resource: '<?php echo site_url($controller_name) . '/get_summary_so/'; ?>',
             headers: <?php echo $table_headers; ?>,
             pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
             onLoadSuccess: function (response) {
@@ -45,7 +45,7 @@
         <span class="glyphicon glyphicon-print">&nbsp</span><?php echo $this->lang->line('common_print'); ?>
     </button>
     <?php echo anchor("sales_order", '<span class="glyphicon glyphicon-shopping-cart">&nbsp</span>' . $this->lang->line('sales_order_list'), array('class'=>'btn btn-info btn-sm pull-right', 'id'=>'show_sales_button')); ?>
-    <?php echo anchor("sales_order/summary", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('sales_order_summary'), array('class'=>'btn btn-warning btn-sm pull-right', 'id'=>'show_sales_summary')); ?>
+    <?php echo anchor("sales_order/matrix", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('sales_order_matrix'), array('class'=>'btn btn-danger btn-sm pull-right', 'id'=>'show_sales_matrix')); ?>
 </div>
 <div id="page_title"><?php echo $page_title; ?></div>
 <div class="row">&nbsp;</div>

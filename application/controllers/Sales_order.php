@@ -61,6 +61,13 @@ class Sales_order extends Secure_Controller
         $data['filters2'] = arr_sales_order_status();
         $this->load->view('sales_order/sales_order_matrix', $data);
     }
+
+    public function summary(){
+        $data['table_headers'] = get_sales_order_summary_table_headers();
+        $data['page_title'] = 'LAPORAN PENGHANTARAN';
+        $data['filters2'] = arr_sales_order_status();
+        $this->load->view('sales_order/sales_order_summary', $data);
+    }
     public function get_detail_so($sale_order_id){
         $search = $this->input->get('search');
         $limit = $this->input->get('limit');
@@ -503,5 +510,36 @@ class Sales_order extends Secure_Controller
         }
 
         return $customer_info;
+    }
+
+    public function get_summary_so(){
+        $search = $this->input->get('search');
+        $limit = $this->input->get('limit');
+        $offset = $this->input->get('offset');
+        $sort = $this->input->get('sort');
+        $order = $this->input->get('order');
+        $sales_order_status = $this->input->get('sale_order_status');
+        $sales_order_status_select = null;
+        if (is_array($sales_order_status) && count($sales_order_status)){
+            $sales_order_status_select = $sales_order_status;
+        }
+        $filters = array(
+            'start_date' => $this->input->get('start_date'),
+            'end_date' => $this->input->get('end_date'),
+        );
+        $sales_order_summary = $this->Salesorder->search_summary_so($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
+        $total_rows = $this->Salesorder->get_summary_found_rows($search, $filters, $sales_order_status_select);
+        $data_rows = array();
+        foreach($sales_order_summary->result() as $so_sums)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_summary_data_row($so_sums));
+        }
+
+        if($total_rows > 0)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_summary_data_last_row($sales_order_summary));
+        }
+        $payment_summary = '';
+        echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
 }

@@ -380,5 +380,50 @@ class Salesorder extends CI_Model
     function get_detail_found_rows_matrix($search, $filters, $sales_order_status){
         return $this->search_detail_matrix($search, $filters, 0, 0, 'item_id', 'desc', TRUE, $sales_order_status);
     }
+
+    function search_summary_so($search, $filters, $rows = 0, $limit_from = 0, $sort = 'people.city,people.last_name', $order = 'asc', $count_only = FALSE, $sales_order_status = null){
+        $where = '';
+        if (!is_null($sales_order_status) && count($sales_order_status)){
+            $sales_order_status_value = implode(',',$sales_order_status);
+            $where = '(sale_status IN ('.$sales_order_status_value.')) AND ';
+        }
+        if(empty($this->config->item('date_or_time_format')))
+        {
+            $where .= 'DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+        }
+        else
+        {
+            $where .= 'sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+        }
+        $FieldArr = [
+            'SUM(sales_order.total_order) AS sum_total_order',
+            'CONCAT(people.first_name," ",people.last_name) AS outlet',
+            'people.city AS location',
+            'SUM((SELECT SUM(quantity_purchased) FROM ospos_sales_order_items WHERE sale_order_id = 
+            sales_order.sale_order_id GROUP BY sale_order_id)) AS total_qty_order',
+            'SUM((SELECT SUM(qty_delivered) FROM ospos_sales_order_items WHERE sale_order_id = 
+            sales_order.sale_order_id GROUP BY sale_order_id)) AS total_qty_delivered',
+        ];
+        $this->db->select(implode(',',$FieldArr))->from('sales_order AS sales_order');
+        $this->db->join('people AS people', 'sales_order.customer_id = people.person_id', 'left');
+        $this->db->where($where);
+        $this->db->group_by('sales_order.customer_id');
+        if($count_only == TRUE)
+        {
+            return $this->db->get()->num_rows();
+        }
+        // order by sale time by default
+        $this->db->order_by($sort, $order);
+        if($rows > 0)
+        {
+            $this->db->limit($rows, $limit_from);
+        }
+        $return_dt = $this->db->get();
+        //print $this->db->last_query();
+        return $return_dt;
+    }
+    function get_summary_found_rows($search, $filters, $sales_order_status){
+        return $this->search_summary_so($search, $filters, 0, 0, 'people.city,people.last_name', 'asc', TRUE, $sales_order_status);
+    }
 }
 ?>

@@ -87,3 +87,4 @@ $lang["common_you_are_using_ospos"] = "";
 $lang["common_zip"] = "Postal Code";
 $lang["common_sales"] = "Sales";
 $lang["common_add"] = "Add";
+$lang["common_location"] = "Location";

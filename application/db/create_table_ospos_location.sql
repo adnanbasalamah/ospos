@@ -1,0 +1,1 @@
+CREATE TABLE `ospos_location` ( `location_id` INT NOT NULL AUTO_INCREMENT ,  `location_name` VARCHAR(255) NULL DEFAULT NULL ,    PRIMARY KEY  (`location_id`)) ENGINE = InnoDB;

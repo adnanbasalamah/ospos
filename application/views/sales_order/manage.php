@@ -72,6 +72,7 @@
 <?php $this->load->view('partial/print_receipt', array('print_after_sale'=>false, 'selected_printer'=>'takings_printer')); ?>
 <div id="title_bar" class="print_hide btn-toolbar">
     <?php echo anchor("sales_order/matrix", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('sales_order_matrix'), array('class'=>'btn btn-danger btn-sm pull-right', 'id'=>'show_sales_matrix')); ?>
+    <?php echo anchor("sales_order/summary", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('sales_order_summary'), array('class'=>'btn btn-warning btn-sm pull-right', 'id'=>'show_sales_summary')); ?>
     <button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
         <span class="glyphicon glyphicon-print">&nbsp</span><?php echo $this->lang->line('common_print'); ?>
     </button>

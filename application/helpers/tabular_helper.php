@@ -375,6 +375,7 @@ function get_people_manage_table_headers()
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
+		array('city' => $CI->lang->line('common_phone_number')),
 		array('employee_category' => $CI->lang->line('items_category')),
 		array('supplier_id' => $CI->lang->line('suppliers_supplier')),
 	);
@@ -426,6 +427,7 @@ function get_customer_manage_table_headers()
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
+		array('city' => $CI->lang->line('common_city')),
 		array('sales' => $CI->lang->line('common_sales')),
 		array('company_name' => $CI->lang->line('sales_company_name')),
 		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
@@ -453,6 +455,7 @@ function get_customer_data_row($person, $stats, $employee_name = '')
 		'first_name' => $person->first_name,
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
+		'city' => $person->city,
 		'employee_category' => $person->employee_category,
 		'sales' => $employee_name,
 		'company_name' => $person->company_name,
@@ -1333,6 +1336,50 @@ function get_paid_sale_item_data_last_row($paid_items){
 		'item_id' => '-',
 		'max_price' => $CI->lang->line('sales_total'),
 		'total_payment' => to_currency($total_payment),
+	);
+}
+
+function get_sales_order_summary_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('location' => $CI->lang->line('common_location')),
+		array('outlet' => $CI->lang->line('customers_mesra_name')),
+		array('sum_total_order' => $CI->lang->line('sum_total_order')),
+		array('total_qty' => $CI->lang->line('items_quantity'))
+	);
+	return transform_headers($headers);
+}
+
+function get_sale_order_summary_data_row($sum_data){
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$qty_count = !empty($sum_data->total_qty_delivered) ? $sum_data->total_qty_delivered : $sum_data->total_qty_order;
+	$row = array (
+		'location' => $sum_data->location,
+		'outlet' => $sum_data->outlet,
+		'sum_total_order' => to_currency($sum_data->sum_total_order),
+		'total_qty' => to_quantity_decimals($qty_count),
+	);
+	return $row;
+}
+
+function get_sale_order_summary_data_last_row($sum_datas){
+	$CI =& get_instance();
+	$total_order = 0;
+	$total_qty = 0;
+	foreach($sum_datas->result() as $key => $sum_data)
+	{
+		$qty_count = !empty($sum_data->total_qty_delivered) ? $sum_data->total_qty_delivered : $sum_data->total_qty_order;
+		$total_order += $sum_data->sum_total_order;
+		$total_qty += $qty_count;
+	}
+
+	return array(
+		'item_id' => '-',
+		'location' => $CI->lang->line('sales_total'),
+		'sum_total_order' => to_currency($total_order),
+		'total_qty' => to_quantity_decimals($total_qty),
 	);
 }
 ?>
