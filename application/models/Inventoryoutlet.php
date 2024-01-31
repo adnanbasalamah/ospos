@@ -1,6 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Sale class
+ * Inventoryoutlet class
  */
 class Inventoryoutlet extends CI_Model
 {
@@ -19,6 +19,7 @@ class Inventoryoutlet extends CI_Model
         }
         return $this->db->get();
     }
+
     /**
      * Get number of rows for the inventory outlet view
      */
@@ -99,6 +100,11 @@ class Inventoryoutlet extends CI_Model
     public function get_customer($customer_id)
     {
         return $this->Customer->get_info($customer_id);
+    }
+
+    public function insert_inv_outlet($inventory_data)
+    {
+        return $this->db->insert('inventory_outlet', $inventory_data);
     }
 }
 ?>

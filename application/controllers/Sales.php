@@ -7,7 +7,7 @@ class Sales extends Secure_Controller
 	public function __construct()
 	{
 		parent::__construct('sales');
-
+		$this->load->model('Inventoryoutlet');
 		$this->load->helper('file');
 		$this->load->library('sale_lib');
 		$this->load->library('email_lib');

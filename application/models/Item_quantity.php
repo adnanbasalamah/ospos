@@ -65,6 +65,15 @@ class Item_quantity extends CI_Model
 		return $this->save($location_detail, $item_id, $location_id);
 	}
 
+    public function change_quantity_outlet($item_id, $customer_id, $quantity_change)
+    {
+        $quantity_old = $this->get_item_quantity_outlet($item_id, $customer_id);
+        $quantity_new = $quantity_old->quantity + $quantity_change;
+        $location_detail = array('item_id' => $item_id, 'location_id' => 0, 'quantity' => $quantity_new, 'customer_id' => $customer_id);
+
+        return $this->save_outlet($location_detail, $item_id, $customer_id);
+    }
+
 	/*
 	* Set to 0 all quantity in the given item
 	*/

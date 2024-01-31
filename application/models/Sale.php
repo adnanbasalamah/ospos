@@ -781,7 +781,20 @@ class Sale extends CI_Model
 		$this->db->trans_start();
 
 		$sale_status = $this->get_sale_status($sale_id);
-
+		$sale_type = $this->get_sale_type($sale_id);
+		$customer_id = $this->get_sale_customer($sale_id);
+		$update_inventory_outlet = FALSE;
+		if ($sale_type == SALE_TYPE_POS) {
+			$update_inventory = TRUE;
+		}elseif ($sale_type == SALE_TYPE_INVOICE) {
+			$update_inventory = FALSE;
+			$update_inventory_outlet = TRUE;
+		}elseif ($sale_type == SALE_TYPE_RETURN){
+			$update_inventory = FALSE;
+			$update_inventory_outlet = TRUE;
+		}else{
+			$update_inventory = FALSE;
+		}
 		if ($update_inventory && $sale_status == COMPLETED) {
 			// defect, not all item deletions will be undone??
 			// get array with all the items involved in the sale to update the inventory tracking
@@ -804,6 +817,31 @@ class Sale extends CI_Model
 
 					// update quantities
 					$this->Item_quantity->change_quantity($item['item_id'], $item['item_location'], $item['quantity_purchased']);
+				}
+			}
+		}
+
+		if ($update_inventory_outlet && $sale_status == COMPLETED){
+			$items = $this->get_sale_items($sale_id)->result_array();
+			foreach ($items as $item) {
+				$cur_item_info = $this->Item->get_info($item['item_id']);
+
+				if ($cur_item_info->stock_type == HAS_STOCK) {
+					// create query to update inventory tracking
+					$inv_data = array(
+						'trans_date' => date('Y-m-d H:i:s'),
+						'trans_items' => $item['item_id'],
+						'trans_user' => $employee_id,
+						'trans_comment' => 'Deleting invoice #' . $sale_id,
+						'trans_location' => 0,
+						'trans_inventory' => $item['quantity_purchased'],
+						'customer_id' => $customer_id
+					);
+					// update inventory
+					$this->Inventoryoutlet->insert_inv_outlet($inv_data);
+
+					// update quantities
+					$this->Item_quantity->change_quantity_outlet($item['item_id'], $customer_id, $item['quantity_purchased']);
 				}
 			}
 		}
@@ -1182,6 +1220,14 @@ class Sale extends CI_Model
 		$this->db->where('sale_id', $sale_id);
 
 		return $this->db->get()->row()->sale_status;
+	}
+
+	public function get_sale_customer($sale_id)
+	{
+		$this->db->from('sales');
+		$this->db->where('sale_id', $sale_id);
+
+		return $this->db->get()->row()->customer_id;
 	}
 
 	public function update_sale_status($sale_id, $sale_status)
