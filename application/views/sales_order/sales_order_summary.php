@@ -11,6 +11,10 @@
             table_support.refresh();
         });
 
+        $('#employee_ids').on('hidden.bs.select', function(e) {
+            table_support.refresh();
+        });
+
         <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 
         table_support.query_params = function()
@@ -20,6 +24,7 @@
                 end_date: end_date,
                 filters: $("#filters").val() || '',
                 sale_order_status: $("#sale_order_status").val() || -1,
+                employee_ids: $("#employee_ids").val() || -1,
             }
         };
         table_support.init({
@@ -54,8 +59,9 @@
         <?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm', 'id'=>'daterangepicker')); ?>
     </div>
     <?php echo form_multiselect('sale_order_status', $filters2, '', array('id'=>'sale_order_status', 'data-none-selected-text'=>$this->lang->line('common_none_selected_text'), 'class'=>'selectpicker show-menu-arrow', 'data-selected-text-format'=>'count > 1', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
+    <?php echo form_multiselect('employee_ids', $filters3, '', array('id'=>'employee_ids', 'data-none-selected-text'=>$this->lang->line('common_none_selected_text'), 'class'=>'selectpicker show-menu-arrow', 'data-selected-text-format'=>'count > 1', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
 </div>
 <div id="table_holder">
-    <table id="table"></table>
+    <table id="table" class="summary-table"></table>
 </div>
 <?php $this->load->view("partial/footer"); ?>

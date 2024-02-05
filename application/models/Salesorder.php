@@ -68,15 +68,8 @@ class Salesorder extends CI_Model
         }
         if(!empty($search))
         {
-            if($filters['is_valid_receipt'] != FALSE)
-            {
-                $pieces = explode(' ', $search);
-                $this->db->where('so.sale_order_id', $pieces[1]);
-            }
-            else
-            {
-
-            }
+            $where = '(CONCAT(CONCAT(people_emp.first_name," "), people_emp.last_name)) LIKE "%'.$search.'%"';
+            $this->db->where($where);
         }
 
         // get_found_rows case
@@ -386,6 +379,10 @@ class Salesorder extends CI_Model
         if (!is_null($sales_order_status) && count($sales_order_status)){
             $sales_order_status_value = implode(',',$sales_order_status);
             $where = '(sale_status IN ('.$sales_order_status_value.')) AND ';
+        }
+        if (isset($filters['employee_ids']) && $filters['employee_ids'] != -1){
+            $employee_value = implode(',',$filters['employee_ids']);
+            $where .= '(employee_id IN ('.$employee_value.')) AND ';
         }
         if(empty($this->config->item('date_or_time_format')))
         {

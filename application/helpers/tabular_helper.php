@@ -1345,10 +1345,10 @@ function get_sales_order_summary_table_headers(){
 	$headers = array(
 		array('location' => $CI->lang->line('common_location')),
 		array('outlet' => $CI->lang->line('customers_mesra_name')),
-		array('sum_total_order' => $CI->lang->line('sum_total_order')),
+		array('sum_total_order' => $CI->lang->line('sales_order_total')),
 		array('total_qty' => $CI->lang->line('items_quantity'))
 	);
-	return transform_headers($headers);
+	return transform_headers($headers, TRUE, FALSE);
 }
 
 function get_sale_order_summary_data_row($sum_data){
@@ -1376,8 +1376,7 @@ function get_sale_order_summary_data_last_row($sum_datas){
 	}
 
 	return array(
-		'item_id' => '-',
-		'location' => $CI->lang->line('sales_total'),
+		'outlet' => $CI->lang->line('sales_total'),
 		'sum_total_order' => to_currency($total_order),
 		'total_qty' => to_quantity_decimals($total_qty),
 	);

@@ -66,6 +66,12 @@ class Sales_order extends Secure_Controller
         $data['table_headers'] = get_sales_order_summary_table_headers();
         $data['page_title'] = 'LAPORAN PENGHANTARAN';
         $data['filters2'] = arr_sales_order_status();
+        $EmpArray = $this->Employee->get_all_employee_data();
+        $EmpOption = [];
+        foreach($EmpArray as $EmpData){
+            $EmpOption[$EmpData->person_id] = $EmpData->first_name.' '.$EmpData->last_name;
+        }
+        $data['filters3'] = $EmpOption;
         $this->load->view('sales_order/sales_order_summary', $data);
     }
     public function get_detail_so($sale_order_id){
@@ -519,6 +525,7 @@ class Sales_order extends Secure_Controller
         $sort = $this->input->get('sort');
         $order = $this->input->get('order');
         $sales_order_status = $this->input->get('sale_order_status');
+        $employee_ids = $this->input->get('employee_ids');
         $sales_order_status_select = null;
         if (is_array($sales_order_status) && count($sales_order_status)){
             $sales_order_status_select = $sales_order_status;
@@ -526,6 +533,7 @@ class Sales_order extends Secure_Controller
         $filters = array(
             'start_date' => $this->input->get('start_date'),
             'end_date' => $this->input->get('end_date'),
+            'employee_ids' => $employee_ids
         );
         $sales_order_summary = $this->Salesorder->search_summary_so($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
         $total_rows = $this->Salesorder->get_summary_found_rows($search, $filters, $sales_order_status_select);
