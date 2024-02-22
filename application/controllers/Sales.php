@@ -17,8 +17,9 @@ class Sales extends Secure_Controller
 
 	public function index()
 	{
-		$this->session->set_userdata('allow_temp_items', 1);
-		$this->_reload();
+		/*$this->session->set_userdata('allow_temp_items', 1);
+		$this->_reload();*/
+		$this->manage();
 	}
 
 	public function manage()

@@ -20,8 +20,9 @@ class Sales_order extends Secure_Controller
     {
 
 
-        $data['table_headers'] = get_sales_order_manage_table_headers();
-        $this->load->view('sales_order/manage', $data);
+        /*$data['table_headers'] = get_sales_order_manage_table_headers();
+        $this->load->view('sales_order/manage', $data);*/
+        $this->manage();
     }
 
     public function manage()
