@@ -59,8 +59,13 @@ class Sales extends Secure_Controller
 		$limit = $this->input->get('limit');
 		$offset = $this->input->get('offset');
 		$sort = $this->input->get('sort');
+		if (empty($sort)){
+			$sort = 'sale_id';
+		}
 		$order = $this->input->get('order');
-
+		if (empty($order)){
+			$order = 'desc';
+		}
 		$filters = array('sale_type' => 'all',
 						 'location_id' => 'all',
 						 'start_date' => $this->input->get('start_date'),

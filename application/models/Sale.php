@@ -78,7 +78,7 @@ class Sale extends CI_Model
 	/**
 	 * Get the sales data for the takings (sales/manage) view
 	 */
-	public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales.sale_time', $order = 'desc', $count_only = FALSE, $payment_status = null, $sale_type = SALE_TYPE_INVOICE)
+	public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales.sale_id', $order = 'desc', $count_only = FALSE, $payment_status = null, $sale_type = SALE_TYPE_INVOICE)
 	{
 		// Pick up only non-suspended records
 		$where = 'sales.sale_status = 0 AND sale_type = '.$sale_type.' AND ';
@@ -246,7 +246,7 @@ class Sale extends CI_Model
 			$this->db->limit($rows, $limit_from);
 		}
 		$ret = $this->db->get();
-		//print $this->db->last_query();
+		//print $this->db->last_query().$sort;
 		return $ret;
 	}
 
