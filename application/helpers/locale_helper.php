@@ -292,7 +292,8 @@ function get_payment_options()
 	{
 		$payments[$lang->line('sales_upi')] = $lang->line('sales_upi');
 	}
-
+	// Add new payment method, transfer bank
+	$payments[$lang->line('payment_transfer')] = $lang->line('payment_transfer');
 	return $payments;
 }
 

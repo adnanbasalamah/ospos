@@ -534,11 +534,11 @@ function get_items_manage_table_headers()
 		array('item_number' => $CI->lang->line('items_item_number')),
 		array('name' => $CI->lang->line('items_name')),
 		array('category' => $CI->lang->line('items_category')),
-		array('company_name' => $CI->lang->line('suppliers_company_name')),
+		array('company_name' => $CI->lang->line('suppliers_supplier')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
 		array('cost_price' => $CI->lang->line('items_cost_price')),
 		array('unit_price' => $CI->lang->line('items_unit_price')),
-		array('quantity' => $CI->lang->line('items_quantity'))
+		array('quantity' => $CI->lang->line('items_quantity')),
 	);
 
 	if($CI->config->item('use_destination_based_tax') == '1')
