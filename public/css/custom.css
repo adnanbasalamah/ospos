@@ -49,19 +49,31 @@
     margin-bottom: 25px;
     padding-top: 20px;
 }
-table.summary-table thead th{
+table.summary-table thead th,
+table.sales-summary-table thead th{
     background: #387975 !important;
     color: #fff !important;
     text-transform: uppercase;
 }
 table.summary-table tbody td:nth-child(1),
-table.summary-table tbody td:nth-child(2){
+table.summary-table tbody td:nth-child(2),
+table.sales-summary-table tbody td:nth-child(1),
+table.sales-summary-table tbody td:nth-child(2),
+table.sales-summary-table tbody td:nth-child(3),
+table.sales-summary-table tbody td:nth-child(4)
+{
     background: #99968f !important;
     color: #fff !important;
     text-transform: uppercase;
 }
-table.summary-table tbody tr:last-child td{
+table.summary-table tbody tr:last-child td,
+table.sales-summary-table tbody tr:last-child td{
     background: #fff !important;
     color: #2c3e50 !important;
     text-transform: uppercase;
+    border-top: 1px solid #999;
+}
+table.sales-summary-table td{
+    font-weight: bold;
+    line-height: 18px !important;
 }

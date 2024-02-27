@@ -247,3 +247,4 @@ $lang["purchase_order_number"] = "PO Number";
 $lang["sales_order_confirm_delete"] = "Are you sure you want to delete the selected Sale(s) order...??!";
 $lang["sales_order_summary"] = "Sales Order Summary";
 $lang["payment_transfer"] = "Transfer";
+$lang["sales_summary"] = "Sales Summary";

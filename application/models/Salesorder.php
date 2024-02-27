@@ -422,5 +422,45 @@ class Salesorder extends CI_Model
     function get_summary_found_rows($search, $filters, $sales_order_status){
         return $this->search_summary_so($search, $filters, 0, 0, 'people.city,people.last_name', 'asc', TRUE, $sales_order_status);
     }
+    function search_summary_by_item_supplier($search, $filters, $rows = 0, $limit_from = 0, $sort = 'people.city,people.last_name', $order = 'asc', $count_only = FALSE, $supplier_id = null){
+        $where = 'sale_status = 4 AND ';
+        if (!empty($supplier_id)){
+            $where .= '(so_items.supplier_id = '.$supplier_id.') AND ';
+        }
+        if(empty($this->config->item('date_or_time_format')))
+        {
+            $where .= 'DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+        }
+        else
+        {
+            $where .= 'sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+        }
+        $FieldArr = [
+            'items.item_id,items.item_number, items.name, so_items.supplier_id',
+            'so.sale_time','SUM(so_items.qty_delivered) AS qty_order',
+            '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = so_items.supplier_id) AS supplier_name',
+            'MIN(item_cost_price) AS min_cost_price, MAX(item_cost_price) AS max_cost_price',
+            'MIN(item_unit_price) AS min_unit_price, MAX(item_unit_price) AS max_unit_price'
+        ];
+        $this->db->select(implode(',',$FieldArr))->from('sales_order_items AS so_items');
+        $this->db->join('sales_order AS so', 'so_items.sale_order_id = so.sale_order_id', 'left');
+        $this->db->join('items AS items','so_items.item_id = items.item_id', 'LEFT');
+        $this->db->where($where);
+        $this->db->group_by('so_items.supplier_id');
+        $this->db->group_by('so_items.item_id');
+        if($count_only == TRUE)
+        {
+            return $this->db->get()->num_rows();
+        }
+        // order by sale time by default
+        $this->db->order_by($sort, $order);
+        if($rows > 0)
+        {
+            $this->db->limit($rows, $limit_from);
+        }
+        $return_dt = $this->db->get();
+        //print $this->db->last_query();
+        return $return_dt;
+    }
 }
 ?>

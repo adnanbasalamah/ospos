@@ -22,3 +22,4 @@ $lang["suppliers_supplier_id"] = "Id";
 $lang["suppliers_tax_id"] = "Tax Id";
 $lang["suppliers_update"] = "Update Supplier";
 $lang["supplier_payment"] = "Payment to Supplier";
+$lang["suppliers_supplier_with_id"] = "Supplier Id";

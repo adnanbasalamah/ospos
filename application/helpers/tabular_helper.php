@@ -1381,4 +1381,161 @@ function get_sale_order_summary_data_last_row($sum_datas){
 		'total_qty' => to_quantity_decimals($total_qty),
 	);
 }
+
+function get_sales_summary_table_headers(){
+	$CI =& get_instance();
+	$headers = array(
+		array('no' => $CI->lang->line('common_export_csv_no'),'sortable' => false),
+		array('supplier_id' => 'SUPP ID'),
+		array('supplier_name' => $CI->lang->line('suppliers_supplier')),
+		array('name' => $CI->lang->line('items_item')),
+		array('item_unit_price' => $CI->lang->line('items_unit_price')),
+		array('item_cost_price' => $CI->lang->line('items_cost_price2')),
+		array('qty_order' => 'Hantar'),
+		array('qty_return' => 'Return'),
+		array('qty_sales' => 'Terjual'),
+		array('total_cost_price' => 'P Supplier'),
+		array('total_unit_price' => 'P IMESRA'),
+	);
+	return transform_headers($headers, TRUE, FALSE);
+}
+
+function create_sale_sum_data($sales = null, $sales_order = null){
+	$sales_summary_data = [];
+	if (!empty($sales) || !empty($sales_order)){
+		if (!empty($sales)){
+			foreach ($sales as $idx => $sale_data){
+				if (!isset($sales_summary_data[$sale_data->supplier_id])){
+					$sale_info = new stdClass();
+					$sale_info->supplier_id = $sale_data->supplier_id;
+					$sale_info->supplier_name = $sale_data->supplier_name;
+					$sale_info->name = $sale_data->name;
+					$sale_info->item_unit_price = $sale_data->max_unit_price;
+					$sale_info->item_cost_price = $sale_data->max_cost_price;
+					$sale_info->qty_order = 0;
+					$sale_info->qty_return = 0;
+					$sale_info->qty_sales = 0;
+					if ($sale_data->sale_type == SALE_TYPE_INVOICE){
+						$sale_info->qty_sales = $sale_data->total_qty;
+						$sale_info->total_sales = $sale_data->total_sales;
+						$sale_info->total_payment = $sale_data->total_payment;
+					}else if($sale_data->sale_type == SALE_TYPE_RETURN){
+						$sale_info->qty_return = $sale_data->total_qty;
+					}
+					$sales_summary_data[$sale_data->supplier_id][$sale_data->item_id] = $sale_info;
+				}else{
+					if (!isset($sales_summary_data[$sale_data->supplier_id][$sale_data->item_id])){
+						$sale_info = new stdClass();
+						$sale_info->supplier_id = $sale_data->supplier_id;
+						$sale_info->supplier_name = $sale_data->supplier_name;
+						$sale_info->name = $sale_data->name;
+						$sale_info->item_unit_price = $sale_data->max_unit_price;
+						$sale_info->item_cost_price = $sale_data->max_cost_price;
+						$sale_info->qty_order = 0;
+						$sale_info->qty_return = 0;
+						$sale_info->qty_sales = 0;
+						if ($sale_data->sale_type == SALE_TYPE_INVOICE){
+							$sale_info->qty_sales = $sale_data->total_qty;
+							$sale_info->total_sales = $sale_data->total_sales;
+							$sale_info->total_payment = $sale_data->total_payment;
+						}else if($sale_data->sale_type == SALE_TYPE_RETURN){
+							$sale_info->qty_return = $sale_data->total_qty;
+						}
+						$sales_summary_data[$sale_data->supplier_id][$sale_data->item_id] = $sale_info;
+					}else{
+						$sale_info = $sales_summary_data[$sale_data->supplier_id][$sale_data->item_id];
+						if ($sale_data->sale_type == SALE_TYPE_INVOICE){
+							$sale_info->qty_sales = $sale_data->total_qty;
+							$sale_info->total_sales = $sale_data->total_sales;
+							$sale_info->total_payment = $sale_data->total_payment;
+						}else if($sale_data->sale_type == SALE_TYPE_RETURN){
+							$sale_info->qty_return = $sale_data->total_qty;
+						}
+						$sales_summary_data[$sale_data->supplier_id][$sale_data->item_id] = $sale_info;
+					}
+				}
+			}
+		}
+		if (!empty($sales_order)){
+			foreach ($sales_order as $idx => $so_data){
+				if (!isset($sales_summary_data[$so_data->supplier_id])) {
+					$sale_info = new stdClass();
+					$sale_info->supplier_id = $so_data->supplier_id;
+					$sale_info->supplier_name = $so_data->supplier_name;
+					$sale_info->name = $so_data->name;
+					$sale_info->item_unit_price = $so_data->max_unit_price;
+					$sale_info->item_cost_price = $so_data->max_cost_price;
+					$sale_info->qty_order = $so_data->qty_order;
+					$sale_info->qty_return = 0;
+					$sale_info->qty_sales = 0;
+					$sales_summary_data[$so_data->supplier_id][$so_data->item_id] = $sale_info;
+				}else{
+					if (!isset($sales_summary_data[$so_data->supplier_id][$so_data->item_id])){
+						$sale_info = new stdClass();
+						$sale_info->supplier_id = $so_data->supplier_id;
+						$sale_info->supplier_name = $so_data->supplier_name;
+						$sale_info->name = $so_data->name;
+						$sale_info->item_unit_price = $so_data->max_unit_price;
+						$sale_info->item_cost_price = $so_data->max_cost_price;
+						$sale_info->qty_order = $so_data->qty_order;
+						$sale_info->qty_return = 0;
+						$sale_info->qty_sales = 0;
+						$sales_summary_data[$so_data->supplier_id][$so_data->item_id] = $sale_info;
+					}else{
+						$sale_info = $sales_summary_data[$so_data->supplier_id][$so_data->item_id];
+						$sale_info->qty_order = $so_data->qty_order;
+						$sales_summary_data[$so_data->supplier_id][$so_data->item_id] = $sale_info;
+					}
+				}
+			}
+		}
+	}
+	return $sales_summary_data;
+}
+
+function get_summary_sale_data_row($sale_sum_data, $counter){
+	$CI =& get_instance();
+	$unit_price = !empty($sale_sum_data->item_unit_price) ? to_currency($sale_sum_data->item_unit_price) : ' ';
+	$cost_price = !empty($sale_sum_data->item_cost_price) ? to_currency($sale_sum_data->item_cost_price) : ' ';
+	$qty_order = !empty($sale_sum_data->qty_order) ? to_quantity_decimals($sale_sum_data->qty_order) : ' ';
+	$qty_return = !empty($sale_sum_data->qty_return) ? to_quantity_decimals($sale_sum_data->qty_return) : ' ';
+	$qty_sales = $sale_sum_data->qty_sales != 'SUB TOTAL' ? to_quantity_decimals($sale_sum_data->qty_sales) : $sale_sum_data->qty_sales;
+	$row = array (
+		'no' => $counter,
+		'supplier_id' => $sale_sum_data->supplier_id,
+		'supplier_name' => $sale_sum_data->supplier_name,
+		'name' => $sale_sum_data->name,
+		'item_unit_price' => $unit_price,
+		'item_cost_price' => $cost_price,
+		'qty_order' => $qty_order,
+		'qty_return' => $qty_return,
+		'qty_sales' => $qty_sales,
+		'total_cost_price' => isset($sale_sum_data->total_payment) ? to_currency($sale_sum_data->total_payment) : 0,
+		'total_unit_price' => isset($sale_sum_data->total_sales) ? to_currency($sale_sum_data->total_sales) : 0,
+	);
+	return $row;
+}
+
+function get_summary_sale_data_last_row($sales_sum_data){
+	$CI =& get_instance();
+	$total_sales = 0;
+	$total_payment = 0;
+	foreach($sales_sum_data as $key => $sum_data)
+	{
+		foreach($sum_data as $id_item => $sale_data){
+			if (isset($sale_data->total_sales)) {
+				$total_sales += $sale_data->total_sales;
+			}
+			if (isset($sale_data->total_payment)) {
+				$total_payment += $sale_data->total_payment;
+			}
+		}
+	}
+
+	return array(
+		'qty_sales' => strtoupper($CI->lang->line('sales_total')),
+		'total_cost_price' => to_currency($total_payment),
+		'total_unit_price' => to_currency($total_sales),
+	);
+}
 ?>

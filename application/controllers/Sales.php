@@ -8,6 +8,7 @@ class Sales extends Secure_Controller
 	{
 		parent::__construct('sales');
 		$this->load->model('Inventoryoutlet');
+		$this->load->model('Salesorder');
 		$this->load->helper('file');
 		$this->load->library('sale_lib');
 		$this->load->library('email_lib');
@@ -1614,6 +1615,70 @@ class Sales extends Secure_Controller
 		}
 
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
+
+	public function search_summary_sales()
+	{
+		$search = $this->input->get('search');
+		$limit = $this->input->get('limit');
+		$offset = $this->input->get('offset');
+		$sort = $this->input->get('sort');
+		$order = $this->input->get('order');
+
+		$filters = array(
+			'start_date' => $this->input->get('start_date'),
+			'end_date' => $this->input->get('end_date'),
+		);
+		// check if any filter is set in the multiselect dropdown
+		$supplier_id = $this->input->get('supplier_id');
+		if (!empty($supplier_id)){
+			$sales = $this->Sale->get_sales_return_order_summary($search, $filters, $limit, $offset, $sort, $order, FALSE, $supplier_id);
+			$sales_order = $this->Salesorder->search_summary_by_item_supplier($search, $filters, $limit, $offset, $sort, $order, FALSE, $supplier_id);
+		}else{
+			$sales = $this->Sale->get_sales_return_order_summary($search, $filters, $limit, $offset, $sort, $order, FALSE, null);
+			$sales_order = $this->Salesorder->search_summary_by_item_supplier($search, $filters, $limit, $offset, $sort, $order, FALSE, null);
+		}
+		$total_rows = $this->Sale->get_found_sales_summary_rows($search, $filters);
+		$data_rows = array();
+		$sale_sum_data = create_sale_sum_data($sales->result(), $sales_order->result());
+		$counter = 1;
+		foreach($sale_sum_data as $idx => $sales_item)
+		{
+			$subtotal_payment = 0;
+			$subtotal_sales = 0;
+			foreach($sales_item as $id_item => $sale_data){
+				$data_rows[] = $this->xss_clean(get_summary_sale_data_row($sale_data, $counter));
+				if (isset($sale_data->total_payment)) {
+					$subtotal_payment += $sale_data->total_payment;
+				}
+				if (isset($sale_data->total_sales)) {
+					$subtotal_sales += $sale_data->total_sales;
+				}
+				$counter++;
+			}
+			$sale_sub_sum = new stdClass();
+			$sale_sub_sum->supplier_id = ' ';
+			$sale_sub_sum->supplier_name = ' ';
+			$sale_sub_sum->name = ' ';
+			$sale_sub_sum->item_unit_price = null;
+			$sale_sub_sum->item_cost_price = null;
+			$sale_sub_sum->qty_order = null;
+			$sale_sub_sum->qty_return = null;
+			$sale_sub_sum->qty_sales = 'SUB TOTAL';
+			$sale_sub_sum->total_payment = $subtotal_payment;
+			$sale_sub_sum->total_sales = $subtotal_sales;
+			$data_rows[] = $this->xss_clean(get_summary_sale_data_row($sale_sub_sum, ' '));
+		}
+		if($total_rows > 0)
+		{
+			$data_rows[] = $this->xss_clean(get_summary_sale_data_last_row($sale_sum_data));
+		}
+		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
+	public function sales_summary(){
+		$data['table_headers'] = get_sales_summary_table_headers();
+		$data['page_title'] = 'LAPORAN PENJUALAN';
+		$this->load->view('sales/sales_summary', $data);
 	}
 }
 ?>
