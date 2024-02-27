@@ -1395,7 +1395,7 @@ function get_sales_summary_table_headers(){
 		array('qty_return' => 'Return','sortable' => false),
 		array('qty_sales' => 'Terjual','sortable' => false),
 		array('total_cost_price' => 'P Supplier','sortable' => false),
-		array('total_unit_price' => 'P IMESRA','sortable' => false),
+		array('total_margin' => 'P IMESRA','sortable' => false),
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
@@ -1417,7 +1417,7 @@ function create_sale_sum_data($sales = null, $sales_order = null){
 					$sale_info->qty_sales = 0;
 					if ($sale_data->sale_type == SALE_TYPE_INVOICE){
 						$sale_info->qty_sales = $sale_data->total_qty;
-						$sale_info->total_sales = $sale_data->total_sales;
+						$sale_info->total_margin = $sale_data->total_margin;
 						$sale_info->total_payment = $sale_data->total_payment;
 					}else if($sale_data->sale_type == SALE_TYPE_RETURN){
 						$sale_info->qty_return = $sale_data->total_qty;
@@ -1436,7 +1436,7 @@ function create_sale_sum_data($sales = null, $sales_order = null){
 						$sale_info->qty_sales = 0;
 						if ($sale_data->sale_type == SALE_TYPE_INVOICE){
 							$sale_info->qty_sales = $sale_data->total_qty;
-							$sale_info->total_sales = $sale_data->total_sales;
+							$sale_info->total_margin = $sale_data->total_margin;
 							$sale_info->total_payment = $sale_data->total_payment;
 						}else if($sale_data->sale_type == SALE_TYPE_RETURN){
 							$sale_info->qty_return = $sale_data->total_qty;
@@ -1446,7 +1446,7 @@ function create_sale_sum_data($sales = null, $sales_order = null){
 						$sale_info = $sales_summary_data[$sale_data->supplier_id][$sale_data->item_id];
 						if ($sale_data->sale_type == SALE_TYPE_INVOICE){
 							$sale_info->qty_sales = $sale_data->total_qty;
-							$sale_info->total_sales = $sale_data->total_sales;
+							$sale_info->total_margin = $sale_data->total_margin;
 							$sale_info->total_payment = $sale_data->total_payment;
 						}else if($sale_data->sale_type == SALE_TYPE_RETURN){
 							$sale_info->qty_return = $sale_data->total_qty;
@@ -1511,20 +1511,20 @@ function get_summary_sale_data_row($sale_sum_data, $counter){
 		'qty_return' => $qty_return,
 		'qty_sales' => $qty_sales,
 		'total_cost_price' => isset($sale_sum_data->total_payment) ? to_currency($sale_sum_data->total_payment) : 0,
-		'total_unit_price' => isset($sale_sum_data->total_sales) ? to_currency($sale_sum_data->total_sales) : 0,
+		'total_margin' => isset($sale_sum_data->total_margin) ? to_currency($sale_sum_data->total_margin) : 0,
 	);
 	return $row;
 }
 
 function get_summary_sale_data_last_row($sales_sum_data){
 	$CI =& get_instance();
-	$total_sales = 0;
+	$total_margin = 0;
 	$total_payment = 0;
 	foreach($sales_sum_data as $key => $sum_data)
 	{
 		foreach($sum_data as $id_item => $sale_data){
 			if (isset($sale_data->total_sales)) {
-				$total_sales += $sale_data->total_sales;
+				$total_margin += $sale_data->total_margin;
 			}
 			if (isset($sale_data->total_payment)) {
 				$total_payment += $sale_data->total_payment;
@@ -1535,7 +1535,7 @@ function get_summary_sale_data_last_row($sales_sum_data){
 	return array(
 		'qty_sales' => strtoupper($CI->lang->line('sales_total')),
 		'total_cost_price' => to_currency($total_payment),
-		'total_unit_price' => to_currency($total_sales),
+		'total_margin' => to_currency($total_margin),
 	);
 }
 ?>

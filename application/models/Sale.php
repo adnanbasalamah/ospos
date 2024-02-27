@@ -1486,6 +1486,7 @@ class Sale extends CI_Model
 		$str_field .= 'MIN(item_cost_price) AS min_cost_price, MAX(item_cost_price) AS max_cost_price, ';
 		$str_field .= 'MIN(item_unit_price) AS min_unit_price, MAX(item_unit_price) AS max_unit_price, ';
 		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
+		$str_field .= 'SUM(quantity_purchased*(item_unit_price-item_cost_price)) AS total_margin, ';
 		$str_field .= 'SUM(quantity_purchased*item_unit_price) AS total_sales, ';
 		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) AS supplier_name,';
 		$this->db->select($str_field)->from('sales_items AS sales_items');
