@@ -1645,14 +1645,14 @@ class Sales extends Secure_Controller
 		foreach($sale_sum_data as $idx => $sales_item)
 		{
 			$subtotal_payment = 0;
-			$subtotal_sales = 0;
+			$subtotal_margin = 0;
 			foreach($sales_item as $id_item => $sale_data){
 				$data_rows[] = $this->xss_clean(get_summary_sale_data_row($sale_data, $counter));
 				if (isset($sale_data->total_payment)) {
 					$subtotal_payment += $sale_data->total_payment;
 				}
-				if (isset($sale_data->total_sales)) {
-					$subtotal_sales += $sale_data->total_sales;
+				if (isset($sale_data->total_margin)) {
+					$subtotal_margin += $sale_data->total_margin;
 				}
 				$counter++;
 			}
@@ -1666,7 +1666,7 @@ class Sales extends Secure_Controller
 			$sale_sub_sum->qty_return = null;
 			$sale_sub_sum->qty_sales = 'SUB TOTAL';
 			$sale_sub_sum->total_payment = $subtotal_payment;
-			$sale_sub_sum->total_sales = $subtotal_sales;
+			$sale_sub_sum->total_margin = $subtotal_margin;
 			$data_rows[] = $this->xss_clean(get_summary_sale_data_row($sale_sub_sum, ' '));
 		}
 		if($total_rows > 0)

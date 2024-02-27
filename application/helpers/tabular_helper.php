@@ -1523,7 +1523,7 @@ function get_summary_sale_data_last_row($sales_sum_data){
 	foreach($sales_sum_data as $key => $sum_data)
 	{
 		foreach($sum_data as $id_item => $sale_data){
-			if (isset($sale_data->total_sales)) {
+			if (isset($sale_data->total_margin)) {
 				$total_margin += $sale_data->total_margin;
 			}
 			if (isset($sale_data->total_payment)) {
