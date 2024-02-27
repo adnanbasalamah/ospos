@@ -1386,16 +1386,16 @@ function get_sales_summary_table_headers(){
 	$CI =& get_instance();
 	$headers = array(
 		array('no' => $CI->lang->line('common_export_csv_no'),'sortable' => false),
-		array('supplier_id' => 'SUPP ID'),
-		array('supplier_name' => $CI->lang->line('suppliers_supplier')),
-		array('name' => $CI->lang->line('items_item')),
-		array('item_unit_price' => $CI->lang->line('items_unit_price')),
-		array('item_cost_price' => $CI->lang->line('items_cost_price2')),
-		array('qty_order' => 'Hantar'),
-		array('qty_return' => 'Return'),
-		array('qty_sales' => 'Terjual'),
-		array('total_cost_price' => 'P Supplier'),
-		array('total_unit_price' => 'P IMESRA'),
+		array('supplier_id' => 'SUPP ID', 'sortable' => false),
+		array('supplier_name' => $CI->lang->line('suppliers_supplier'), 'sortable' => false),
+		array('name' => $CI->lang->line('items_item'), 'sortable' => false),
+		array('item_unit_price' => $CI->lang->line('items_unit_price'),'sortable' => false),
+		array('item_cost_price' => $CI->lang->line('items_cost_price2'),'sortable' => false),
+		array('qty_order' => 'Hantar' ,'sortable' => false),
+		array('qty_return' => 'Return','sortable' => false),
+		array('qty_sales' => 'Terjual','sortable' => false),
+		array('total_cost_price' => 'P Supplier','sortable' => false),
+		array('total_unit_price' => 'P IMESRA','sortable' => false),
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
