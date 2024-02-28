@@ -1295,15 +1295,14 @@ function get_payment_paid_items_table_headers(){
 	$CI =& get_instance();
 
 	$headers = array(
-		array('item_id' => $CI->lang->line('common_id')),
-		array('item_number' => $CI->lang->line('items_item_number')),
-		array('name' => $CI->lang->line('items_item')),
-		array('total_qty' => $CI->lang->line('items_quantity')),
-		array('min_price' => $CI->lang->line('items_min_cost_price')),
-		array('max_price' => $CI->lang->line('items_max_cost_price')),
-		array('total_payment' => $CI->lang->line('sales_payments_total')),
-		array('supplier_name' => $CI->lang->line('suppliers_supplier')),
-		array('related_invoices' => 'Related '.$CI->lang->line('sales_invoice'), 'escape' => FALSE),
+		array('supplier_name' => $CI->lang->line('suppliers_supplier'),'sortable' => false),
+		array('item_number' => $CI->lang->line('items_item_number'),'sortable' => false),
+		array('name' => $CI->lang->line('items_item'),'sortable' => false),
+		array('total_qty' => $CI->lang->line('items_quantity'),'sortable' => false),
+		array('unit_price' => $CI->lang->line('items_unit_price'),'sortable' => false),
+		array('cost_price' => $CI->lang->line('items_cost_price2'),'sortable' => false),
+		array('total_payment' => 'P SUPP(RM)','sortable' => false),
+		array('total_margin' => 'P IMESRA(RM)','sortable' => false),
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
@@ -1312,30 +1311,40 @@ function get_paid_sale_item_data_row($paid_items){
 	$CI =& get_instance();
 	$controller_name = $CI->uri->segment(1);
 	$row = array (
-		'item_id' => $paid_items->item_id,
+		'supplier_name' => $paid_items->supplier_name,
 		'item_number' => $paid_items->item_number,
 		'name' => $paid_items->name,
 		'total_qty' => to_quantity_decimals($paid_items->total_qty),
-		'min_price' => to_currency($paid_items->min_price),
-		'max_price' => to_currency($paid_items->max_price),
-		'total_payment' => to_currency($paid_items->total_payment),
-		'supplier_name' => $paid_items->supplier_name,
-		'related_invoices' => $paid_items->related_invoices
+		'unit_price' => to_currency_no_money($paid_items->max_unit_price),
+		'cost_price' => to_currency_no_money($paid_items->max_price),
+		'total_payment' => to_currency_no_money($paid_items->total_payment),
+		'total_margin' => to_currency_no_money($paid_items->total_margin)
+	);
+	return $row;
+}
+function get_paid_sale_item_subtotal_row($paid_items){
+	$CI =& get_instance();
+	$row = array (
+		'cost_price' => 'SUBTOTAL',
+		'total_payment' => to_currency_no_money($paid_items->total_payment),
+		'total_margin' => to_currency_no_money($paid_items->total_margin)
 	);
 	return $row;
 }
 function get_paid_sale_item_data_last_row($paid_items){
 	$CI =& get_instance();
 	$total_payment = 0;
+	$total_margin = 0;
 	foreach($paid_items->result() as $key => $paid_item)
 	{
 		$total_payment += $paid_item->total_payment;
+		$total_margin += $paid_item->total_margin;
 	}
 
 	return array(
-		'item_id' => '-',
-		'max_price' => $CI->lang->line('sales_total'),
+		'cost_price' => 'GRAND '.$CI->lang->line('sales_total'),
 		'total_payment' => to_currency($total_payment),
+		'total_margin' => to_currency($total_margin),
 	);
 }
 
@@ -1394,8 +1403,8 @@ function get_sales_summary_table_headers(){
 		array('qty_order' => 'Hantar' ,'sortable' => false),
 		array('qty_return' => 'Return','sortable' => false),
 		array('qty_sales' => 'Terjual','sortable' => false),
-		array('total_cost_price' => 'P Supplier','sortable' => false),
-		array('total_margin' => 'P IMESRA','sortable' => false),
+		array('total_cost_price' => 'P Supp(RM)','sortable' => false),
+		array('total_margin' => 'P IMESRA(RM)','sortable' => false),
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
@@ -1495,8 +1504,8 @@ function create_sale_sum_data($sales = null, $sales_order = null){
 
 function get_summary_sale_data_row($sale_sum_data, $counter){
 	$CI =& get_instance();
-	$unit_price = !empty($sale_sum_data->item_unit_price) ? to_currency($sale_sum_data->item_unit_price) : ' ';
-	$cost_price = !empty($sale_sum_data->item_cost_price) ? to_currency($sale_sum_data->item_cost_price) : ' ';
+	$unit_price = !empty($sale_sum_data->item_unit_price) ? to_currency_no_money($sale_sum_data->item_unit_price) : ' ';
+	$cost_price = !empty($sale_sum_data->item_cost_price) ? to_currency_no_money($sale_sum_data->item_cost_price) : ' ';
 	$qty_order = !empty($sale_sum_data->qty_order) ? to_quantity_decimals($sale_sum_data->qty_order) : ' ';
 	$qty_return = !empty($sale_sum_data->qty_return) ? to_quantity_decimals($sale_sum_data->qty_return) : ' ';
 	$qty_sales = $sale_sum_data->qty_sales != 'SUB TOTAL' ? to_quantity_decimals($sale_sum_data->qty_sales) : $sale_sum_data->qty_sales;
@@ -1510,8 +1519,8 @@ function get_summary_sale_data_row($sale_sum_data, $counter){
 		'qty_order' => $qty_order,
 		'qty_return' => $qty_return,
 		'qty_sales' => $qty_sales,
-		'total_cost_price' => isset($sale_sum_data->total_payment) ? to_currency($sale_sum_data->total_payment) : 0,
-		'total_margin' => isset($sale_sum_data->total_margin) ? to_currency($sale_sum_data->total_margin) : 0,
+		'total_cost_price' => isset($sale_sum_data->total_payment) ? to_currency_no_money($sale_sum_data->total_payment) : 0,
+		'total_margin' => isset($sale_sum_data->total_margin) ? to_currency_no_money($sale_sum_data->total_margin) : 0,
 	);
 	return $row;
 }
@@ -1533,7 +1542,7 @@ function get_summary_sale_data_last_row($sales_sum_data){
 	}
 
 	return array(
-		'qty_sales' => strtoupper($CI->lang->line('sales_total')),
+		'qty_sales' => 'GRAND '.strtoupper($CI->lang->line('sales_total')),
 		'total_cost_price' => to_currency($total_payment),
 		'total_margin' => to_currency($total_margin),
 	);

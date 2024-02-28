@@ -1416,31 +1416,36 @@ class Sale extends CI_Model
 
 		if(empty($this->config->item('date_or_time_format')))
 		{
-			$where .= 'AND DATE(sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+			$where .= 'AND DATE(sales_payments.payment_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
 		}
 		else
 		{
-			$where .= 'AND sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+			$where .= 'AND sales_payments.payment_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
 		}
 
 		if (!empty($search)){
 			$where .= ' AND (items.item_number LIKE "%'.$search.'%" OR items.name LIKE "%'.$search.'%")';
 		}
 		$arr_status_payment = arr_sale_payment_status();
-		$str_field = 'items.item_id, items.item_number, items.name, SUM(quantity_purchased) AS total_qty, MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
+		$str_field = 'items.item_id, items.item_number, items.name, SUM(quantity_purchased) AS total_qty, sales_items.supplier_id, ';
+		$str_field .= 'MIN(item_cost_price) AS min_price, MAX(item_cost_price) AS max_price, ';
+		$str_field .= 'MIN(item_unit_price) AS min_unit_price, MAX(item_unit_price) AS max_unit_price, ';
 		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
-		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) AS supplier_name,';
-		$str_field .= 'CASE 
+		$str_field .= 'SUM(quantity_purchased*(item_unit_price-item_cost_price)) AS total_margin, ';
+		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) ';
+		$str_field .= 'AS supplier_name';
+		/*$str_field .= 'CASE
 		WHEN sales_items.payment_to_supplier_status = 0 THEN GROUP_CONCAT(
 		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<a class=\"btn btn-xs btn-warning\">UNPAID</a>"))
         ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
 		WHEN sales_items.payment_to_supplier_status = 1 THEN GROUP_CONCAT(
 		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<button class=\"btn btn-xs btn-success\">PAID</button>"))
         ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
-        END AS related_invoices';
+        END AS related_invoices';*/
 		$this->db->select($str_field)->from('sales_items AS sales_items');
 		$this->db->join('sales AS sales','sales_items.sale_id = sales.sale_id','LEFT');
 		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
+		$this->db->join('sales_payments AS sales_payments','sales_payments.sale_id = sales.sale_id', 'LEFT');
 		$this->db->where($where);
 		$this->db->group_by('sales_items.item_id');
 		$this->db->group_by('sales_items.supplier_id');

@@ -169,6 +169,7 @@ class Suppliers extends Persons
 
 	public function payment(){
 		$data = [];
+		$data['page_title'] = 'TABEL PEMBAYARAN';
 		$data['table_headers'] = get_payment_paid_items_table_headers();
 		$this->load->view("suppliers/payment_supplier", $data);
 	}
@@ -190,9 +191,35 @@ class Suppliers extends Persons
 		$total_rows = $this->Sale->get_paid_sales_by_items_found_rows($search, $filters);
 
 		$data_rows = array();
+		$supplier_id_grup = 0;
+		$counter = 0;
 		foreach($items_paid->result() as $item_paid)
 		{
+			if ($counter == 0){
+				$supplier_id_grup = $item_paid->supplier_id;
+				$subtotal = 0;
+				$subtotal_margin = 0;
+			}else{
+				if ($item_paid->supplier_id != $supplier_id_grup){
+					$subtotal_data = new stdClass();
+					$subtotal_data->total_payment = $subtotal;
+					$subtotal_data->total_margin = $subtotal_margin;
+					$data_rows[] = $this->xss_clean(get_paid_sale_item_subtotal_row($subtotal_data));
+					$supplier_id_grup = $item_paid->supplier_id;
+					$subtotal = 0;
+					$subtotal_margin = 0;
+				}
+			}
 			$data_rows[] = $this->xss_clean(get_paid_sale_item_data_row($item_paid));
+			$subtotal += $item_paid->total_payment;
+			$subtotal_margin += $item_paid->total_margin;
+			$counter++;
+			if ($counter >= $total_rows){
+				$subtotal_data = new stdClass();
+				$subtotal_data->total_payment = $subtotal;
+				$subtotal_data->total_margin = $subtotal_margin;
+				$data_rows[] = $this->xss_clean(get_paid_sale_item_subtotal_row($subtotal_data));
+			}
 		}
 		if($total_rows > 0)
 		{

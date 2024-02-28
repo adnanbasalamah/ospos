@@ -6,6 +6,13 @@
 
         $("#daterangepicker").on('apply.daterangepicker', function(ev, picker) {
             table_support.refresh();
+            var DateVal = $("#daterangepicker").val();
+            var SplitDate = DateVal.split('-');
+            if (SplitDate.length > 0 && SplitDate[0].trim() == SplitDate[1].trim()){
+                $('#report-date').html(SplitDate[0].trim());
+            }else{
+                $('#report-date').html($("#daterangepicker").val());
+            }
         });
 
         // when any filter is clicked and the dropdown window is closed
@@ -63,6 +70,8 @@
         });
     });
 </script>
+<div id="page_title"><?php echo $page_title; ?> <span id="report-date" class="report-date-title"><?php print date('d/m/Y'); ?></span></div>
+<div class="row">&nbsp;</div>
 <div id="toolbar">
     <div class="pull-left form-inline" role="toolbar">
         <?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm', 'id'=>'daterangepicker')); ?>
@@ -71,7 +80,7 @@
     </div>
 </div>
 <div id="table_holder">
-    <table id="table"></table>
+    <table id="table" class="payment-supplier-table"></table>
 </div>
 
 <?php $this->load->view("partial/footer"); ?>
