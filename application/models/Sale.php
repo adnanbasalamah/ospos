@@ -1409,7 +1409,7 @@ class Sale extends CI_Model
 	}
 
 	public function get_paid_sales_by_items($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_items.supplier_id', $order = 'asc', $count_only = FALSE, $supplier_id = null){
-		$where = 'sales.payment_status = 2 AND sales_items.payment_to_supplier_status = 0 ';
+		$where = 'sales.payment_status = 2 AND sales_items.payment_to_supplier_status = 0 AND sales.sale_status = 0 ';
 		if (!empty($supplier_id)){
 			$where .= 'AND sales_items.supplier_id = '.$supplier_id.' ';
 		}
@@ -1433,15 +1433,8 @@ class Sale extends CI_Model
 		$str_field .= 'SUM(quantity_purchased*item_cost_price) AS total_payment, ';
 		$str_field .= 'SUM(quantity_purchased*(item_unit_price-item_cost_price)) AS total_margin, ';
 		$str_field .= '(SELECT company_name FROM ospos_suppliers WHERE ospos_suppliers.person_id = sales_items.supplier_id) ';
-		$str_field .= 'AS supplier_name';
-		/*$str_field .= 'CASE
-		WHEN sales_items.payment_to_supplier_status = 0 THEN GROUP_CONCAT(
-		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<a class=\"btn btn-xs btn-warning\">UNPAID</a>"))
-        ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
-		WHEN sales_items.payment_to_supplier_status = 1 THEN GROUP_CONCAT(
-		DISTINCT(CONCAT(sales.invoice_number,"&nbsp;<button class=\"btn btn-xs btn-success\">PAID</button>"))
-        ORDER BY sales.sale_id ASC SEPARATOR "<br><br>")
-        END AS related_invoices';*/
+		$str_field .= 'AS supplier_name,';
+		$str_field .= 'GROUP_CONCAT(DISTINCT sales.invoice_number ORDER BY sales.sale_id ASC SEPARATOR "<br><br>") AS related_invoices';
 		$this->db->select($str_field)->from('sales_items AS sales_items');
 		$this->db->join('sales AS sales','sales_items.sale_id = sales.sale_id','LEFT');
 		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
@@ -1469,7 +1462,7 @@ class Sale extends CI_Model
 
 	function get_sales_return_order_summary($search, $filters, $rows = 0, $limit_from = 0, $sort = 'sales_items.supplier_id', $order = 'asc', $count_only = FALSE, $supplier_id = null){
 		$where = '((sales.payment_status = 2 AND sales.sale_type = '.SALE_TYPE_INVOICE.') OR sales.sale_type = '.SALE_TYPE_RETURN.') ';
-		$where .= 'AND sales_items.payment_to_supplier_status = 0 ';
+		$where .= 'AND sales_items.payment_to_supplier_status = 0 AND sales.sale_status = 0 ';
 		if (!empty($supplier_id)){
 			$where .= 'AND sales_items.supplier_id = '.$supplier_id.' ';
 		}

@@ -1,2 +1,2 @@
-UPDATE ospos_sales_items SET supplier_id = (SELECT supplier_id FROM ospos_items as items WHERE items.item_id = ospos_sales_items.item_id)
-UPDATE ospos_sales_order_items SET supplier_id = (SELECT supplier_id FROM ospos_items as items WHERE items.item_id = ospos_sales_order_items.item_id)
+UPDATE ospos_sales_items SET supplier_id = (SELECT supplier_id FROM ospos_items as items WHERE items.item_id = ospos_sales_items.item_id);
+UPDATE ospos_sales_order_items SET supplier_id = (SELECT supplier_id FROM ospos_items as items WHERE items.item_id = ospos_sales_order_items.item_id);
