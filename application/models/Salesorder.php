@@ -362,7 +362,7 @@ class Salesorder extends CI_Model
         }
         // order by sale time by default
         $this->db->order_by($sort, $order);
-        if($rows > 0)
+        if($rows > 0 && $limit_from != -1)
         {
             $this->db->limit($rows, $limit_from);
         }
@@ -411,7 +411,7 @@ class Salesorder extends CI_Model
         }
         // order by sale time by default
         $this->db->order_by($sort, $order);
-        if($rows > 0)
+        if($rows > 0 && $limit_from != -1)
         {
             $this->db->limit($rows, $limit_from);
         }

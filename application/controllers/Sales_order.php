@@ -75,6 +75,11 @@ class Sales_order extends Secure_Controller
         $data['filters3'] = $EmpOption;
         $this->load->view('sales_order/sales_order_summary', $data);
     }
+    public function summary_wa(){
+        $data['data_summary_so'] = $this->get_summary_so_wa();
+        $data['detail_product_so'] = $this->get_matrix_so_wa();
+        $this->load->view('sales_order/sales_order_summary_wa', $data);
+    }
     public function get_detail_so($sale_order_id){
         $search = $this->input->get('search');
         $limit = $this->input->get('limit');
@@ -129,6 +134,33 @@ class Sales_order extends Secure_Controller
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
 
+    public function get_matrix_so_wa(){
+        $search = '';
+        $limit = -1;
+        $offset = 0;
+        $sort = 'so_item.item_id';
+        $order = 'asc';
+        $sales_order_status_select = [];
+        $sales_order_status_select[] = 4;
+        $filters = array(
+            'start_date' => date('Y-m-d'),
+            'end_date' => date('Y-m-d'),
+        );
+        $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
+        $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters, $sales_order_status_select);
+        $data_rows = array();
+        foreach($sales_order_items->result() as $so_item)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_matrix_data_row($so_item));
+        }
+
+        if($total_rows > 0)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_matrix_data_last_row($sales_order_items));
+        }
+        $payment_summary = '';
+        return array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary);
+    }
     public function get_row($row_id)
     {
         $sale_info = $this->Salesorder->get_info($row_id)->row();
@@ -550,5 +582,32 @@ class Sales_order extends Secure_Controller
         }
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
+    }
+    public function get_summary_so_wa(){
+        $search = '';
+        $limit = -1;
+        $offset = 0;
+        $sort = 'people.city,people.last_name';
+        $order = 'asc';
+        $sales_order_status_select = [];
+        $sales_order_status_select[] = 4;
+        $filters = array(
+            'start_date' => date('Y-m-d'),
+            'end_date' => date('Y-m-d'),
+        );
+        $sales_order_summary = $this->Salesorder->search_summary_so($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
+        $total_rows = $this->Salesorder->get_summary_found_rows($search, $filters, $sales_order_status_select);
+        $data_rows = array();
+        foreach($sales_order_summary->result() as $so_sums)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_summary_data_row($so_sums));
+        }
+
+        if($total_rows > 0)
+        {
+            $data_rows[] = $this->xss_clean(get_sale_order_summary_data_last_row($sales_order_summary));
+        }
+        $payment_summary = '';
+        return array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary);
     }
 }
