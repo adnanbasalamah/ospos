@@ -5,7 +5,7 @@ print 'Mohon izin pada Ydh DTC ALP DAN seluruh tim kepemimpinan <br />';
 print 'menyampaikan laporan penghantaran <br />';
 print 'produk ikhwan untuk mesra petronas : ';
 print '<br /><br />';
-print 'Tarikh '.date('d M Y');
+print 'Tarikh '.date('d M Y',strtotime($date_check));
 print '<br /><br />';
 print 'Total Outlet Mesra : '.$data_summary_so['total'].'<br />';
 print '*LIST OUTLET MESRA*<br />';

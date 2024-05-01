@@ -80,7 +80,7 @@ class Sales_order extends Secure_Controller
         if (empty($DateCheck)){
             $DateCheck = date('Y-m-d');
         }
-        print $DateCheck;
+        $data['date_check'] = $DateCheck;
         $data['data_summary_so'] = $this->get_summary_so_wa($DateCheck);
         $data['detail_product_so'] = $this->get_matrix_so_wa($DateCheck);
         $this->load->view('sales_order/sales_order_summary_wa', $data);
@@ -151,8 +151,8 @@ class Sales_order extends Secure_Controller
             $DateCheck = date('Y-m-d');
         }
         $filters = array(
-            'start_date' => $DateCheck,
-            'end_date' => $DateCheck,
+            'start_date' => date('Y-m-d',strtotime($DateCheck)),
+            'end_date' => date('Y-m-d',strtotime($DateCheck)),
         );
         $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
         $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters, $sales_order_status_select);
@@ -603,8 +603,8 @@ class Sales_order extends Secure_Controller
             $DateCheck = date('Y-m-d');
         }
         $filters = array(
-            'start_date' => $DateCheck,
-            'end_date' => $DateCheck,
+            'start_date' => date('Y-m-d',strtotime($DateCheck)),
+            'end_date' => date('Y-m-d',strtotime($DateCheck)),
         );
         $sales_order_summary = $this->Salesorder->search_summary_so($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
         $total_rows = $this->Salesorder->get_summary_found_rows($search, $filters, $sales_order_status_select);
