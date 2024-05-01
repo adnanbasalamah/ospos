@@ -76,12 +76,13 @@ class Sales_order extends Secure_Controller
         $this->load->view('sales_order/sales_order_summary', $data);
     }
     public function summary_wa(){
-        $Date = $this->input->get('so_date');
-        if (empty($Date)){
-            $Date = date('Y-m-d');
+        $DateCheck = $this->input->get('so_date');
+        if (empty($DateCheck)){
+            $DateCheck = date('Y-m-d');
         }
-        $data['data_summary_so'] = $this->get_summary_so_wa($Date);
-        $data['detail_product_so'] = $this->get_matrix_so_wa($Date);
+        print $DateCheck;
+        $data['data_summary_so'] = $this->get_summary_so_wa($DateCheck);
+        $data['detail_product_so'] = $this->get_matrix_so_wa($DateCheck);
         $this->load->view('sales_order/sales_order_summary_wa', $data);
     }
     public function get_detail_so($sale_order_id){
@@ -138,7 +139,7 @@ class Sales_order extends Secure_Controller
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
 
-    public function get_matrix_so_wa($Date = null){
+    public function get_matrix_so_wa($DateCheck = null){
         $search = '';
         $limit = -1;
         $offset = 0;
@@ -146,12 +147,12 @@ class Sales_order extends Secure_Controller
         $order = 'asc';
         $sales_order_status_select = [];
         $sales_order_status_select[] = 4;
-        if (is_null($Date)){
-            $Date = date('Y-m-d');
+        if (is_null($DateCheck)){
+            $DateCheck = date('Y-m-d');
         }
         $filters = array(
-            'start_date' => $Date,
-            'end_date' => $Date,
+            'start_date' => $DateCheck,
+            'end_date' => $DateCheck,
         );
         $sales_order_items = $this->Salesorder->search_detail_matrix($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
         $total_rows = $this->Salesorder->get_detail_found_rows_matrix($search, $filters, $sales_order_status_select);
@@ -590,7 +591,7 @@ class Sales_order extends Secure_Controller
         $payment_summary = '';
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows, 'payment_summary' => $payment_summary));
     }
-    public function get_summary_so_wa($Date = null){
+    public function get_summary_so_wa($DateCheck = null){
         $search = '';
         $limit = -1;
         $offset = 0;
@@ -598,12 +599,12 @@ class Sales_order extends Secure_Controller
         $order = 'asc';
         $sales_order_status_select = [];
         $sales_order_status_select[] = 4;
-        if (is_null($Date)){
-            $Date = date('Y-m-d');
+        if (is_null($DateCheck)){
+            $DateCheck = date('Y-m-d');
         }
         $filters = array(
-            'start_date' => $Date,
-            'end_date' => $Date,
+            'start_date' => $DateCheck,
+            'end_date' => $DateCheck,
         );
         $sales_order_summary = $this->Salesorder->search_summary_so($search, $filters, $limit, $offset, $sort, $order,FALSE, $sales_order_status_select);
         $total_rows = $this->Salesorder->get_summary_found_rows($search, $filters, $sales_order_status_select);
