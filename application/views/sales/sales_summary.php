@@ -53,7 +53,7 @@
         table_support.init({
             resource: '<?php echo site_url($controller_name).'/search_summary_sales';?>',
             headers: <?php echo $table_headers; ?>,
-            pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
+            pageSize: 2000,
             uniqueId: 'items.item_id',
             onLoadSuccess: function(response) {
                 if($("#table tbody tr").length > 1) {

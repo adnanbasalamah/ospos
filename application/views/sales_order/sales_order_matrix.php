@@ -25,7 +25,7 @@
         table_support.init({
             resource: '<?php echo site_url($controller_name) . '/get_matrix_so/'; ?>',
             headers: <?php echo $table_headers; ?>,
-            pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
+            pageSize: 2000,
             onLoadSuccess: function (response) {
                 if ($("#table tbody tr").length > 1) {
                     $("#table tbody tr:last td:first").html("");
