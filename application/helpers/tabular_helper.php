@@ -39,13 +39,14 @@ function transform_headers($array, $readonly = FALSE, $editable = TRUE)
 	foreach($array as $element)
 	{
 		reset($element);
+		$columnClass = !empty($element ['class'])? $element ['class'] : '';
 		$result[] = array('field' => key($element),
 			'title' => current($element),
 			'switchable' => isset($element['switchable']) ? $element['switchable'] : !preg_match('(^$|&nbsp)', current($element)),
 			'escape' => !preg_match("/(edit|phone_number|email|messages|item_pic)/", key($element)) && !(isset($element['escape']) && !$element['escape']),
 			'sortable' => isset($element['sortable']) ? $element['sortable'] : current($element) != '',
 			'checkbox' => isset($element['checkbox']) ? $element['checkbox'] : FALSE,
-			'class' => isset($element['checkbox']) || preg_match('(^$|&nbsp)', current($element)) ? 'print_hide' : '',
+			'class' => isset($element['checkbox']) || preg_match('(^$|&nbsp)', current($element)) ? 'print_hide' : $columnClass,
 			'sorter' => isset($element['sorter']) ? $element ['sorter'] : '');
 	}
 
@@ -1298,11 +1299,11 @@ function get_payment_paid_items_table_headers(){
 		array('supplier_name' => $CI->lang->line('suppliers_supplier'),'sortable' => false),
 		array('item_number' => $CI->lang->line('items_item_number'),'sortable' => false),
 		array('name' => $CI->lang->line('items_item'),'sortable' => false),
-		array('total_qty' => $CI->lang->line('items_quantity'),'sortable' => false),
-		array('unit_price' => $CI->lang->line('items_unit_price'),'sortable' => false),
-		array('cost_price' => $CI->lang->line('items_cost_price2'),'sortable' => false),
-		array('total_payment' => 'P SUPP(RM)','sortable' => false),
-		array('total_margin' => 'P IMESRA(RM)','sortable' => false),
+		array('total_qty' => $CI->lang->line('items_quantity'),'sortable' => false,'class' => 'number-col'),
+		array('unit_price' => $CI->lang->line('items_unit_price'),'sortable' => false,'class' => 'number-col'),
+		array('cost_price' => $CI->lang->line('items_cost_price2'),'sortable' => false,'class' => 'number-col'),
+		array('total_payment' => 'P SUPP(RM)','sortable' => false,'class' => 'number-col', 'escape' => false),
+		array('total_margin' => 'P IMESRA(RM)','sortable' => false,'class' => 'number-col')
 		//array('related_invoices' => 'INVOICE','sortable' => false, 'escape' => false),
 	);
 	return transform_headers($headers, TRUE, FALSE);
@@ -1319,7 +1320,7 @@ function get_paid_sale_item_data_row($paid_items){
 		'unit_price' => to_currency_no_money($paid_items->max_unit_price),
 		'cost_price' => to_currency_no_money($paid_items->max_price),
 		'total_payment' => to_currency_no_money($paid_items->total_payment),
-		'total_margin' => to_currency_no_money($paid_items->total_margin),
+		'total_margin' => to_currency_no_money($paid_items->total_margin)
 		//'related_invoices' => $paid_items->related_invoices
 	);
 	return $row;
@@ -1345,7 +1346,7 @@ function get_paid_sale_item_data_last_row($paid_items){
 
 	return array(
 		'cost_price' => 'GRAND '.$CI->lang->line('sales_total'),
-		'total_payment' => to_currency($total_payment),
+		'total_payment' => '<span id="total-supp-payment">'.to_currency($total_payment).'</span>',
 		'total_margin' => to_currency($total_margin),
 	);
 }
@@ -1547,6 +1548,93 @@ function get_summary_sale_data_last_row($sales_sum_data){
 		'qty_sales' => 'GRAND '.strtoupper($CI->lang->line('sales_total')),
 		'total_cost_price' => to_currency($total_payment),
 		'total_margin' => to_currency($total_margin),
+	);
+}
+
+function get_payment_voucher_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('voucher_number' => $CI->lang->line('payment_voucher_number'),'sortable' => true),
+		array('supplier_name' => $CI->lang->line('suppliers_supplier'),'sortable' => true),
+		array('name' => $CI->lang->line('suppliers_up_to'),'sortable' => false),
+		array('payment_date' => $CI->lang->line('payment_voucher_date'),'sortable' => true),
+		array('payment_notes' => $CI->lang->line('payment_voucher_notes'),'sortable' => false),
+		array('payment_value' => $CI->lang->line('items_cost_price2'),'sortable' => false,'class' => 'number-col'),
+		array('print_pv' => 'Print', 'escape' => FALSE)
+	);
+	return transform_headers($headers, TRUE, FALSE);
+}
+
+function get_payment_voucher_detail_table_headers(){
+	$CI =& get_instance();
+
+	$headers = array(
+		array('no' => 'No.','sortable' => false),
+		array('item' => $CI->lang->line('items_item'),'sortable' => false),
+		array('voucher_number' => $CI->lang->line('sales_invoice'),'sortable' => false),
+		array('subtotal' => $CI->lang->line('sales_sub_total'),'sortable' => false),
+	);
+	return transform_headers($headers, TRUE, FALSE);
+}
+function get_payment_voucher_data_row($payment_data){
+	$CI =& get_instance();
+	$controller_name = $CI->uri->segment(1);
+	$UptoContact = $payment_data->upto_contact;
+	if (empty($payment_data->upto_contact)){
+		$UptoContact = $payment_data->first_name .' '. $payment_data->last_name;
+	}
+	$row = array (
+		'voucher_number' => $payment_data->voucher_number,
+		'supplier_name' => $payment_data->company_name,
+		'name' => $UptoContact,
+		'payment_date' => to_datetime(strtotime($payment_data->payment_date)),
+		'payment_notes' => $payment_data->payment_notes,
+		'payment_value' => $payment_data->payment_value,
+	);
+	$row['print_pv'] = anchor(
+		$controller_name."/print_pv/$payment_data->voucher_id",
+		'<span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;PRINT',
+		array('title'=>$CI->lang->line('payment_voucher_print'), 'class' => 'btn btn-xs btn-block btn-info')
+	);
+	return $row;
+}
+
+function get_payment_voucher_data_last_row($payment_datas){
+	$CI =& get_instance();
+	$total_payment = 0;
+	foreach($payment_datas->result() as $key => $payment_data)
+	{
+		$total_payment += $payment_data->payment_value;
+	}
+
+	return array(
+		'payment_notes' => $CI->lang->line('sales_total'),
+		'payment_value' => to_currency($total_payment)
+	);
+}
+
+function get_pv_items_data_row($payment_detail, $voucher_number, $counter){
+	$CI =& get_instance();
+	$row = array (
+		'no' => $counter,
+		'item' => $payment_detail->voucher_item,
+		'voucher_number' => $voucher_number,
+		'subtotal' => to_currency($payment_detail->voucher_value),
+	);
+	return $row;
+}
+function get_pv_items_data_row_last_row($payment_details){
+	$CI =& get_instance();
+	$total_payment = 0;
+	foreach($payment_details->result() as $key => $payment_detail)
+	{
+		$total_payment += $payment_detail->voucher_value;
+	}
+
+	return array(
+		'voucher_number' => $CI->lang->line('sales_total'),
+		'subtotal' => to_currency($total_payment)
 	);
 }
 ?>

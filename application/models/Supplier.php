@@ -303,5 +303,145 @@ class Supplier extends Person
 			return $this->lang->line('suppliers_cost');
 		}
 	}
+
+	public function save_voucher($payment_voucher, $payment_voucher_detail, $payment_voucher_id = null){
+		$this->db->trans_start();
+		if (is_null($payment_voucher_id)){
+			$this->db->insert('payment_voucher', $payment_voucher);
+			$payment_voucher['voucher_id'] = $this->db->insert_id();
+			if (!empty($payment_voucher['voucher_id'])){
+				$payment_voucher_detail['voucher_id'] = $payment_voucher['voucher_id'];
+				$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+			}
+		}else{
+			$this->db->where('voucher_id', $payment_voucher_id);
+			$this->db->update('payment_voucher', $payment_voucher);
+			if (!empty($payment_voucher_id)){
+				$this->db->where('voucher_id', $payment_voucher_id);
+				$success = $this->db->delete('payment_voucher_detail');
+				if ($success){
+					$payment_voucher_detail['voucher_id'] = $payment_voucher_id;
+					$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+				}
+			}
+		}
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			return -1;
+		}
+		return $payment_voucher['voucher_id'];
+	}
+	public function search_payment_voucher($search, $filters, $rows = 0, $limit_from = 0, $sort = 'last_name', $order = 'asc', $count_only = FALSE, $supplier_id = null)
+	{
+		$where = ' 1 = 1 ';
+		//check if supplier selected
+		if (!empty($supplier_id)){
+			$where .= 'AND pv.supplier_id = '.$supplier_id.' ';
+		}
+		//check if date range selected
+		if(empty($this->config->item('date_or_time_format')))
+		{
+			$where .= 'AND DATE(pv.payment_date) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
+		}
+		else
+		{
+			$where .= 'AND pv.payment_date BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
+		}
+		// get_found_rows case
+		if($count_only == TRUE)
+		{
+			$this->db->select('COUNT(pv.voucher_id) as count');
+		}else{
+			$this->db->select('*, (SELECT SUM(voucher_value) FROM ospos_payment_voucher_detail WHERE voucher_id = pv.voucher_id) AS payment_value');
+		}
+		$this->db->from('payment_voucher AS pv');
+		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id');
+		$this->db->join('people', 'suppliers.person_id = people.person_id');
+		$this->db->group_start();
+		$this->db->or_like('voucher_number', $search);
+		$this->db->or_like('payment_notes', $search);
+		$this->db->or_like('first_name', $search);
+		$this->db->or_like('last_name', $search);
+		$this->db->or_like('company_name', $search);
+		$this->db->or_like('agency_name', $search);
+		$this->db->or_like('email', $search);
+		$this->db->or_like('phone_number', $search);
+		$this->db->or_like('pv.account_number', $search);
+		$this->db->or_like('CONCAT(first_name, " ", last_name)', $search);
+		$this->db->group_end();
+		$this->db->where($where);
+		// get_found_rows case
+		if($count_only == TRUE)
+		{
+			return $this->db->get()->row()->count;
+		}
+
+		$this->db->order_by($sort, $order);
+
+		if($rows > 0)
+		{
+			$this->db->limit($rows, $limit_from);
+		}
+
+		return $this->db->get();
+	}
+	public function search_payment_voucher_found_row($search, $filters){
+		return $this->search_payment_voucher($search, $filters, 0, 0, 'last_name', 'asc', TRUE);
+	}
+
+	public function get_payment_voucher_info($voucher_id){
+		$where = 'voucher_id = '.$voucher_id;
+		$this->db->from('payment_voucher AS pv');
+		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id');
+		$this->db->join('people', 'suppliers.person_id = people.person_id');
+		$this->db->where($where);
+		$row = $this->db->get()->row();
+
+		if($row != NULL)
+		{
+			return $row;
+		}
+
+		return NULL;
+	}
+
+	public function get_payment_voucher_detail_info($voucher_id){
+		$where = 'voucher_id = '.$voucher_id;
+		$this->db->from('payment_voucher_detail');
+		$this->db->where($where);
+		$this->db->order_by('voucher_detail_id', 'asc');
+		$row = $this->db->get()->row();
+
+		if($row != NULL)
+		{
+			return $row;
+		}
+
+		return NULL;
+	}
+	public function search_pv_detail($voucher_id, $search, $filters, $rows = 0, $limit_from = 0, $sort = 'payment_voucher_detail.voucher_id', $order = 'asc', $count_only = FALSE){
+		$this->db->from('payment_voucher_detail');
+		$this->db->where('voucher_id', $voucher_id);
+		if(!empty($search))
+		{
+			$this->db->like('voucher_item', $search);
+		}
+		// get_found_rows case
+		if($count_only == TRUE)
+		{
+			return $this->db->get()->num_rows();
+		}
+		// order by sale time by default
+		$this->db->order_by($sort, $order);
+		if($rows > 0)
+		{
+			$this->db->limit($rows, $limit_from);
+		}
+		return $this->db->get();
+	}
+	public function get_detail_pv_found_rows($voucher_id, $search, $filters){
+		return $this->search_pv_detail($voucher_id, $search, $filters, 0, 0, 'payment_voucher_detail.voucher_id', 'asc', TRUE);
+	}
 }
 ?>

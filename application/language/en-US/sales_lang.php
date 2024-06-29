@@ -248,3 +248,5 @@ $lang["sales_order_confirm_delete"] = "Are you sure you want to delete the selec
 $lang["sales_order_summary"] = "Sales Order Summary";
 $lang["payment_transfer"] = "Transfer";
 $lang["sales_summary"] = "Sales Summary";
+$lang["payment_voucher_online"] = "Payment Voucher Online";
+$lang["payment_date"] = "Payment Date";

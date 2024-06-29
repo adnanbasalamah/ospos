@@ -83,3 +83,6 @@ table.payment-supplier-table td{
     font-weight: bold;
     line-height: 18px !important;
 }
+.number-col{
+    text-align: right !important;
+}

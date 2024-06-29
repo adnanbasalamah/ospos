@@ -1440,8 +1440,8 @@ class Sale extends CI_Model
 		$this->db->join('items AS items','sales_items.item_id = items.item_id', 'LEFT');
 		$this->db->join('sales_payments AS sales_payments','sales_payments.sale_id = sales.sale_id', 'LEFT');
 		$this->db->where($where);
-		$this->db->group_by('sales_items.item_id');
 		$this->db->group_by('sales_items.supplier_id');
+		$this->db->group_by('sales_items.item_id');
 		if($count_only == TRUE) {
 			return $this->db->get()->num_rows();
 		}

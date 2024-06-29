@@ -15,6 +15,7 @@
                     $("#table tbody tr:last td:first").html("");
                     $("#table tbody tr:last").css('font-weight', 'bold');
                 }
+                $('.fixed-table-toolbar,.fixed-table-pagination').attr('class','print_hide');
             },
             columns: {
                 'invoice': {
@@ -54,6 +55,7 @@
     </div>
 </div>
 <?php } ?>
+<div class="row">&nbsp;</div>
 <div id="table_holder">
     <table id="table"></table>
 </div>

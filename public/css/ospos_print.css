@@ -74,4 +74,12 @@
 	{
 		padding-right: 10px;
 	}
+
+	.width-small{
+		width : 100px !important;
+	}
+	.width-medium{
+		width : 800px !important;
+	}
+
 }

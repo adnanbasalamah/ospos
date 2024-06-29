@@ -174,7 +174,121 @@ class Suppliers extends Persons
 		$this->load->view("suppliers/payment_supplier", $data);
 	}
 
-	function search_paid_items_supp(){
+	public function payment_voucher_table(){
+		$data = [];
+		$data['page_title'] = 'PAYMENT VOUCHER';
+		$data['table_headers'] = get_payment_voucher_table_headers();
+		$this->load->view("suppliers/payment_voucher_table", $data);
+	}
+
+	public function print_pv($voucher_id){
+		$data['table_headers'] = get_payment_voucher_detail_table_headers();
+		$data['voucher_id'] = $voucher_id;
+		$voucher_info = $this->Supplier->get_payment_voucher_info($voucher_id);
+		$data['voucher_number'] = $voucher_info->voucher_number;
+		$data['page_title'] = 'PAYMENT VOUCHER';
+		$data['pv_info_supplier'] = $voucher_info->company_name;
+		$PaymentContact = $voucher_info->upto_contact;
+		if (empty($voucher_info->upto_contact)){
+			$PaymentContact = $voucher_info->first_name .' '.$voucher_info->last_name;
+		}
+		$data['pv_contact'] = $PaymentContact;
+		$data['pv_info_notes'] = $voucher_info->payment_notes;
+		$data['pv_info_account_number'] = $voucher_info->account_number;
+		$data['pv_info_date'] = substr($voucher_info->payment_date,0,10);
+		$this->load->view('suppliers/print_pv', $data);
+	}
+
+	public function get_detail_pv($voucher_id){
+		$voucher_info = $this->Supplier->get_payment_voucher_info($voucher_id);
+		$search = $this->input->get('search');
+		$limit = $this->input->get('limit');
+		$offset = $this->input->get('offset');
+		$sort = $this->input->get('sort');
+		$order = $this->input->get('order');
+		$filters = [];
+		$pv_items = $this->Supplier->search_pv_detail($voucher_id,$search, $filters, $limit, $offset, $sort, $order);
+		$total_rows = $this->Supplier->get_detail_pv_found_rows($voucher_id, $search, $filters);
+		$data_rows = array();
+		$counter = 1;
+		foreach($pv_items->result() as $pv_item)
+		{
+			$data_rows[] = $this->xss_clean(get_pv_items_data_row($pv_item, $voucher_info->voucher_number, $counter));
+			$counter++;
+		}
+
+		if($total_rows > 0)
+		{
+			$data_rows[] = $this->xss_clean(get_pv_items_data_row_last_row($pv_items));
+		}
+		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
+	public function payment_voucher()
+	{
+		$Month = ['JAN','FEB','MAC','APR','MEI','JUN','JUL','OGOS','SEPT','OCT','NOV','DIS'];
+		$SupplierId = $_GET['supplier_id'];
+		$StartDate = $_GET['start_date'];
+		$StartMonth = date('n', strtotime($StartDate));
+		$EndDate = $_GET['end_date'];
+		$EndMonth = date('n', strtotime($EndDate));
+		if ($StartMonth == $EndMonth){
+			$PVNotes = 'JUALAN TUNAI '.date('j', strtotime($StartDate)).' - '.date('j', strtotime($EndDate)).'HB '.$Month[$EndMonth];
+		}else{
+			$PVNotes = 'JUALAN TUNAI '.date('j', strtotime($StartDate)).'HB '.$Month[$StartMonth].' - '.date('j', strtotime($EndDate)).'HB '.$Month[$EndMonth];
+		}
+		$PaymentValue = $_GET['payment'];
+		$SupplierData = $this->Supplier->get_info($SupplierId);
+		$PvArr = ['online', 'cash'];
+		$data = [];
+		$data['page_title'] = 'PAYMENT VOUCHER';
+		$data['payment_date'] = date('Y-m-d H:i:s');
+		$data['selected_supplier_id'] = $SupplierId;
+		$data['selected_supplier_name'] = $SupplierData->company_name;
+		$data['supplier_contact'] = $SupplierData->first_name . ' ' . $SupplierData->last_name;
+		$data['voucher_number'] = 'PV0081';
+		$data['voucher_notes'] = $PVNotes;
+		$data['voucher_value'] = $PaymentValue;
+		$data['pv_type_option'] = $PvArr;
+		$data['account_number'] = $SupplierData->account_number;
+		$this->load->view("suppliers/voucher_form", $data);
+	}
+
+	public function voucher_save($payment_voucher_id = null){
+		$supplier_id = $this->xss_clean($this->input->post('supplier_id'));
+		$voucher_number = $this->xss_clean($this->input->post('voucher_number'));
+		$payment_notes = $this->xss_clean($this->input->post('voucher_notes'));
+		$voucher_type = $this->xss_clean($this->input->post('voucher_type'));
+		$voucher_value = $this->xss_clean($this->input->post('voucher_value'));
+		$account_number = $this->xss_clean($this->input->post('account_number'));
+		$upto_contact = $this->xss_clean($this->input->post('voucher_up_to'));
+		$newdate = $this->input->post('date');
+		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
+		$payment_date = $date_formatter->format('Y-m-d H:i:s');
+		$login_user = $this->Employee->get_logged_in_employee_info();
+		$user_id = $login_user->person_id;
+		$PaymentVoucher = [
+			'voucher_number' => $voucher_number,
+			'supplier_id' => $supplier_id,
+			'upto_contact' => $upto_contact,
+			'payment_date' => $payment_date,
+			'payment_notes' => $payment_notes,
+			'created' => time(),
+			'user_id' => $user_id,
+			'voucher_type' => $voucher_type,
+			'account_number' => $account_number
+		];
+		$PaymentVoucherDetail = [
+			'voucher_item' => $payment_notes,
+			'voucher_value' => $voucher_value
+		];
+		$VoucherId = $this->Supplier->save_voucher($PaymentVoucher, $PaymentVoucherDetail, $payment_voucher_id);
+		if ($VoucherId != -1) {
+			echo json_encode(array('success' => TRUE,'message' => $this->lang->line('payment_voucher_successful_updating')));
+		}else{
+			echo json_encode(array('success' => FALSE,'message' => $this->lang->line('payment_voucher_error_adding_updating')));
+		}
+	}
+	public function search_paid_items_supp(){
 		$search  = $this->input->get('search');
 		$limit   = $this->input->get('limit');
 		$offset  = $this->input->get('offset');
@@ -227,6 +341,29 @@ class Suppliers extends Persons
 		}
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
 	}
-
+	public function search_voucher(){
+		$search  = $this->input->get('search');
+		$limit   = $this->input->get('limit');
+		$offset  = $this->input->get('offset');
+		$sort    = $this->input->get('sort');
+		$order   = $this->input->get('order');
+		$supplier_id = $this->input->get('supplier_id');
+		$filters = array(
+			'start_date' => $this->input->get('start_date'),
+			'end_date' => $this->input->get('end_date'),
+		);
+		$payment_data = $this->Supplier->search_payment_voucher($search, $filters, $limit, $offset, $sort, $order, FALSE, $supplier_id);
+		$total_rows = $this->Supplier->search_payment_voucher_found_row($search, $filters);
+		$data_rows = array();
+		foreach($payment_data->result() as $payment)
+		{
+			$data_rows[] = $this->xss_clean(get_payment_voucher_data_row($payment));
+		}
+		if($total_rows > 0)
+		{
+			$data_rows[] = $this->xss_clean(get_payment_voucher_data_last_row($payment_data));
+		}
+		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
 }
 ?>

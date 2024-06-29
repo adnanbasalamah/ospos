@@ -75,6 +75,7 @@
     </div>
     <?php
     $detail_table = '';
+    //print_r($details_order);
     if (count($details_order)){
         $detail_table = '<table id="detail-table-so" class="table-striped table-bordered table table-hover">';
         $detail_table .= '<thead><tr>';

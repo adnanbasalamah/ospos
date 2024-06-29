@@ -48,6 +48,7 @@ $(document).ready(function()
     if ($controller_name == 'suppliers')
     {
         echo anchor("suppliers/payment", '<span class="glyphicon glyphicon-th">&nbsp</span>' . $this->lang->line('supplier_payment'), array('class'=>'btn btn-warning btn-sm pull-right', 'id'=>'supplier_payment'));
+        echo anchor("suppliers/payment_voucher_table", '<span class="glyphicon glyphicon-credit-card">&nbsp</span>' . $this->lang->line('payment_voucher_table'), array('class'=>'btn btn-danger btn-sm pull-right', 'id'=>'supplier_payment'));
     }
     ?>
 </div>
