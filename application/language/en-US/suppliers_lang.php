@@ -34,3 +34,4 @@ $lang["payment_voucher_error_adding_updating"] = "Payment voucher update or add 
 $lang["payment_voucher_table"] = "Payment Voucher Table";
 $lang["payment_voucher_date"] = "Payment Date";
 $lang["payment_voucher_print"] = "Print Payment Voucher";
+$lang["payment_voucher"] = "Payment Voucher";

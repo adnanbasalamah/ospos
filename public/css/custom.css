@@ -15,6 +15,10 @@
     width: 80px !important;
     height : 28px !important
 }
+.large-input{
+    width: 200px !important;
+    height : 28px !important
+}
 .align-right{
     text-align : right !important;
 }

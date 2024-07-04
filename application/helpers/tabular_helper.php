@@ -28,7 +28,7 @@ function transform_headers($array, $readonly = FALSE, $editable = TRUE)
 
 	if(!$readonly)
 	{
-		$array = array_merge(array(array('checkbox' => 'select', 'sortable' => FALSE)), $array);
+		$array = array_merge(array(array('checkbox' => 'select','class' => 'select-item', 'sortable' => FALSE)), $array);
 	}
 
 	if($editable)

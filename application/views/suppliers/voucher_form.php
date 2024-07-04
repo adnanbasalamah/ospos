@@ -17,6 +17,9 @@
             ?>
         </div>
     </div>
+    <?php
+    if (!$payment_type_selected){
+    ?>
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('suppliers_supplier'), 'supplier', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
@@ -26,7 +29,6 @@
             ?>
         </div>
     </div>
-
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('suppliers_up_to'), 'voucher_up_to', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
@@ -35,7 +37,26 @@
             ?>
         </div>
     </div>
-
+    <?php
+    }else{
+    ?>
+        <div class="form-group form-group-sm">
+            <?php echo form_label($this->lang->line('supplier_name'), 'custom_supplier', array('class'=>'control-label col-xs-3')); ?>
+            <div class='col-xs-8'>
+                <?php
+                echo form_input(array('name'=>'custom_supplier', 'value'=> '', 'id'=>'custom_supplier', 'class'=>'form-control input-sm'));
+                ?>
+            </div>
+            <?php echo form_label($this->lang->line('suppliers_up_to'), 'voucher_up_to', array('class'=>'control-label col-xs-3')); ?>
+            <div class='col-xs-8'>
+                <?php
+                echo form_input(array('name'=>'voucher_up_to', 'value'=> $employee_contact, 'id'=>'employee_contact', 'class'=>'form-control input-sm'));
+                ?>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('payment_voucher_number'), 'voucher_number', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
@@ -73,7 +94,7 @@
                     'id'=>'payment_voucher_type'
                 ),
                 $pv_type_option,
-                0,
+                $payment_type_selected,
                 array('class' => 'form-control input-sm')
             );
             ?>
@@ -88,6 +109,44 @@
             ?>
         </div>
     </div>
+    <?php
+    if (!empty($expense_data)){
+        $detail_table = '<table id="detail-pv" class="table-striped table-bordered table table-hover">';
+        $detail_table .= '<thead><tr>';
+        $detail_table .= '<th>'.$this->lang->line('common_no').'</th>';
+        $detail_table .= '<th>'.$this->lang->line('items_item').'</th>';
+        $detail_table .= '<th id="label-current">'.$this->lang->line('sales_invoice').'</th>';
+        $detail_table .= '<th id="label-next">'.$this->lang->line('sales_sub_total').'</th>';
+        $detail_table .= '</tr></thead>';
+        $detail_table .= '<tbody>';
+        $Counter = 1;
+        for ($i = 0;$i < count($expense_data);$i++){
+            $detail_table .= '<tr>';
+            $detail_table .= '<td class="fix-align">'.$Counter.'</td>';
+            $PvItem = '['.substr($expense_data[$i]->date,0,10).'] : '.$expense_data[$i]->description;
+            $input_pv_item = form_input(
+                array(
+                    'name'=>'pv_item[]',
+                    'id' => 'pv_item-'.$expense_data[$i]->expense_id,
+                    'value'=> $PvItem,
+                    'class'=>'form-control input-sm large-input'
+                )
+            );
+            $detail_table .= '<td class="fix-align">'.$input_pv_item.'</td>';
+            $detail_table .= '<td class="fix-align"><div class="align-right">'.$voucher_number.'</div></td>';
+            $hidden_item_value = form_hidden('pv_value[]', $expense_data[$i]->amount);
+            $detail_table .= '<td>'.$expense_data[$i]->amount.$hidden_item_value.'</td>';
+            $detail_table .= '</tr>';
+            $Counter++;
+        }
+        $detail_table .= '</tbody></table>';
+        ?>
+        <div id="table_wrapper" class="wrapper">
+            <?php echo $detail_table; ?>
+        </div>
+    <?php
+    }
+    ?>
 </fieldset>
 
 <?php echo form_close(); ?>

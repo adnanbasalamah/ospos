@@ -305,13 +305,24 @@ class Supplier extends Person
 	}
 
 	public function save_voucher($payment_voucher, $payment_voucher_detail, $payment_voucher_id = null){
+		$this->db->query('SET FOREIGN_KEY_CHECKS=0');
 		$this->db->trans_start();
 		if (is_null($payment_voucher_id)){
 			$this->db->insert('payment_voucher', $payment_voucher);
 			$payment_voucher['voucher_id'] = $this->db->insert_id();
 			if (!empty($payment_voucher['voucher_id'])){
-				$payment_voucher_detail['voucher_id'] = $payment_voucher['voucher_id'];
-				$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+				if (isset($payment_voucher_detail[0])){
+					for ($i = 0;$i < count($payment_voucher_detail);$i++){
+						$pv_detail = [];
+						$pv_detail['voucher_item'] = $payment_voucher_detail[$i]['voucher_item'];
+						$pv_detail['voucher_value'] = $payment_voucher_detail[$i]['voucher_value'];
+						$pv_detail['voucher_id'] = $payment_voucher['voucher_id'];
+						$this->db->insert('payment_voucher_detail', $pv_detail);
+					}
+				}else {
+					$payment_voucher_detail['voucher_id'] = $payment_voucher['voucher_id'];
+					$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+				}
 			}
 		}else{
 			$this->db->where('voucher_id', $payment_voucher_id);
@@ -320,13 +331,23 @@ class Supplier extends Person
 				$this->db->where('voucher_id', $payment_voucher_id);
 				$success = $this->db->delete('payment_voucher_detail');
 				if ($success){
-					$payment_voucher_detail['voucher_id'] = $payment_voucher_id;
-					$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+					if (isset($payment_voucher_detail[0])){
+						for ($i = 0;$i < count($payment_voucher_detail);$i++){
+							$pv_detail = [];
+							$pv_detail['voucher_item'] = $payment_voucher_detail[$i]['voucher_item'];
+							$pv_detail['voucher_value'] = $payment_voucher_detail[$i]['voucher_value'];
+							$pv_detail['voucher_id'] = $payment_voucher['voucher_id'];
+							$this->db->insert('payment_voucher_detail', $pv_detail);
+						}
+					}else {
+						$payment_voucher_detail['voucher_id'] = $payment_voucher_id;
+						$this->db->insert('payment_voucher_detail', $payment_voucher_detail);
+					}
 				}
 			}
 		}
 		$this->db->trans_complete();
-
+		$this->db->query('SET FOREIGN_KEY_CHECKS=1');
 		if ($this->db->trans_status() === FALSE) {
 			return -1;
 		}
@@ -356,8 +377,8 @@ class Supplier extends Person
 			$this->db->select('*, (SELECT SUM(voucher_value) FROM ospos_payment_voucher_detail WHERE voucher_id = pv.voucher_id) AS payment_value');
 		}
 		$this->db->from('payment_voucher AS pv');
-		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id');
-		$this->db->join('people', 'suppliers.person_id = people.person_id');
+		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id','LEFT');
+		$this->db->join('people', 'suppliers.person_id = people.person_id','LEFT');
 		$this->db->group_start();
 		$this->db->or_like('voucher_number', $search);
 		$this->db->or_like('payment_notes', $search);
@@ -383,7 +404,8 @@ class Supplier extends Person
 		{
 			$this->db->limit($rows, $limit_from);
 		}
-
+		/*$this->db->get();
+		print $this->db->last_query();*/
 		return $this->db->get();
 	}
 	public function search_payment_voucher_found_row($search, $filters){
@@ -393,8 +415,8 @@ class Supplier extends Person
 	public function get_payment_voucher_info($voucher_id){
 		$where = 'voucher_id = '.$voucher_id;
 		$this->db->from('payment_voucher AS pv');
-		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id');
-		$this->db->join('people', 'suppliers.person_id = people.person_id');
+		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id','LEFT');
+		$this->db->join('people', 'suppliers.person_id = people.person_id','LEFT');
 		$this->db->where($where);
 		$row = $this->db->get()->row();
 

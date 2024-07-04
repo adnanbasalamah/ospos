@@ -42,7 +42,18 @@
 <div class="row">&nbsp;</div>
 <div class="row">&nbsp;</div>
 <div class="row">
+    <?php
+    if (!empty($pv_info_supplier)){
+    ?>
     <div class="col-md-2 so-info">Supplier</div><div class="col-md-4 so-info so-info-value"><?php echo $pv_info_supplier; ?></div>
+    <?php
+    }
+    if (!empty($pv_custom_supplier)){
+        ?>
+        <div class="col-md-2 so-info">Supplier</div><div class="col-md-4 so-info so-info-value"><?php echo $pv_custom_supplier; ?></div>
+        <?php
+    }
+    ?>
     <div class="col-md-12 so-info width-small">U/P : <?php echo $pv_contact; ?></div>
     <div class="row">&nbsp;</div>
     <div class="col-md-2 so-info">Payment Date</div><div class="col-md-4 so-info so-info-value"><?php echo $pv_info_date; ?></div>

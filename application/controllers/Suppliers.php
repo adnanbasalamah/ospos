@@ -188,6 +188,7 @@ class Suppliers extends Persons
 		$data['voucher_number'] = $voucher_info->voucher_number;
 		$data['page_title'] = 'PAYMENT VOUCHER';
 		$data['pv_info_supplier'] = $voucher_info->company_name;
+		$data['pv_custom_supplier'] = $voucher_info->custom_supplier;
 		$PaymentContact = $voucher_info->upto_contact;
 		if (empty($voucher_info->upto_contact)){
 			$PaymentContact = $voucher_info->first_name .' '.$voucher_info->last_name;
@@ -226,41 +227,85 @@ class Suppliers extends Persons
 	public function payment_voucher()
 	{
 		$Month = ['JAN','FEB','MAC','APR','MEI','JUN','JUL','OGOS','SEPT','OCT','NOV','DIS'];
-		$SupplierId = $_GET['supplier_id'];
+		$PaymentCash = 0;
+		$ExpenseData = [];
+		if (!empty($_GET['supplier_id'])){
+			$SupplierId = $_GET['supplier_id'];
+			$SupplierData = $this->Supplier->get_info($SupplierId);
+		}else if(!empty($_GET['expense_id'])){
+			$PaymentCash = 1;
+			$ExpenseId = $_GET['expense_id'];
+			$EmployeeContact = '';
+			$ExpenseData = $this->Expense->get_multiple_info($ExpenseId);
+			if (is_array($ExpenseId)){
+				$ArrEmployee = [];
+				foreach ($ExpenseId as $Idexpense){
+					$DataEmployee = $this->Expense->get_employee($Idexpense);
+					if (!in_array($DataEmployee->person_id, $ArrEmployee)){
+						$ArrEmployee[] = $DataEmployee->person_id;
+						if ($EmployeeContact != '') {
+							$EmployeeContact .= ', '.$DataEmployee->first_name . ' ' . $DataEmployee->last_name;
+						}else{
+							$EmployeeContact .= $DataEmployee->first_name . ' ' . $DataEmployee->last_name;
+						}
+					}
+				}
+			}else{
+				$ExpenseData = $this->Expense->get_multiple_info($ExpenseId);
+				$DataEmployee = $this->Expense->get_employee($ExpenseId);
+				$EmployeeContact .= $DataEmployee->first_name . ' ' . $DataEmployee->last_name;
+			}
+		}
 		$StartDate = $_GET['start_date'];
 		$StartMonth = date('n', strtotime($StartDate));
 		$EndDate = $_GET['end_date'];
 		$EndMonth = date('n', strtotime($EndDate));
-		if ($StartMonth == $EndMonth){
-			$PVNotes = 'JUALAN TUNAI '.date('j', strtotime($StartDate)).' - '.date('j', strtotime($EndDate)).'HB '.$Month[$EndMonth];
+		if (!$PaymentCash) {
+			if ($StartMonth == $EndMonth) {
+				$PVNotes = 'JUALAN TUNAI ' . date('j', strtotime($StartDate)) . ' - ' . date('j', strtotime($EndDate)) . 'HB ' . $Month[$EndMonth];
+			} else {
+				$PVNotes = 'JUALAN TUNAI ' . date('j', strtotime($StartDate)) . 'HB ' . $Month[$StartMonth] . ' - ' . date('j', strtotime($EndDate)) . 'HB ' . $Month[$EndMonth];
+			}
 		}else{
-			$PVNotes = 'JUALAN TUNAI '.date('j', strtotime($StartDate)).'HB '.$Month[$StartMonth].' - '.date('j', strtotime($EndDate)).'HB '.$Month[$EndMonth];
+			$PVNotes = '';
 		}
 		$PaymentValue = $_GET['payment'];
-		$SupplierData = $this->Supplier->get_info($SupplierId);
 		$PvArr = ['online', 'cash'];
 		$data = [];
 		$data['page_title'] = 'PAYMENT VOUCHER';
 		$data['payment_date'] = date('Y-m-d H:i:s');
-		$data['selected_supplier_id'] = $SupplierId;
-		$data['selected_supplier_name'] = $SupplierData->company_name;
-		$data['supplier_contact'] = $SupplierData->first_name . ' ' . $SupplierData->last_name;
+		$data['payment_type_selected'] = $PaymentCash;
+		if (!$PaymentCash) {
+			$data['selected_supplier_id'] = $SupplierId;
+			$data['selected_supplier_name'] = $SupplierData->company_name;
+			$data['supplier_contact'] = $SupplierData->first_name . ' ' . $SupplierData->last_name;
+			$data['account_number'] = $SupplierData->account_number;
+		}else{
+			$data['selected_employee_id'] = $ArrEmployee[0];
+			$data['employee_contact'] = $EmployeeContact;
+			$data['account_number'] = 'CASH';
+			$data['expense_data'] = $ExpenseData->result();
+		}
 		$data['voucher_number'] = 'PV0081';
 		$data['voucher_notes'] = $PVNotes;
 		$data['voucher_value'] = $PaymentValue;
 		$data['pv_type_option'] = $PvArr;
-		$data['account_number'] = $SupplierData->account_number;
 		$this->load->view("suppliers/voucher_form", $data);
 	}
 
 	public function voucher_save($payment_voucher_id = null){
-		$supplier_id = $this->xss_clean($this->input->post('supplier_id'));
+		$voucher_type = $this->xss_clean($this->input->post('voucher_type'));
+		if (!$voucher_type){
+			$supplier_id = $this->xss_clean($this->input->post('supplier_id'));
+		}
+		$custom_supplier = $this->xss_clean($this->input->post('custom_supplier'));
 		$voucher_number = $this->xss_clean($this->input->post('voucher_number'));
 		$payment_notes = $this->xss_clean($this->input->post('voucher_notes'));
-		$voucher_type = $this->xss_clean($this->input->post('voucher_type'));
 		$voucher_value = $this->xss_clean($this->input->post('voucher_value'));
 		$account_number = $this->xss_clean($this->input->post('account_number'));
 		$upto_contact = $this->xss_clean($this->input->post('voucher_up_to'));
+		$pv_item = $this->xss_clean($this->input->post('pv_item'));
+		$pv_value = $this->xss_clean($this->input->post('pv_value'));
 		$newdate = $this->input->post('date');
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);
 		$payment_date = $date_formatter->format('Y-m-d H:i:s');
@@ -269,6 +314,7 @@ class Suppliers extends Persons
 		$PaymentVoucher = [
 			'voucher_number' => $voucher_number,
 			'supplier_id' => $supplier_id,
+			'custom_supplier' => $custom_supplier,
 			'upto_contact' => $upto_contact,
 			'payment_date' => $payment_date,
 			'payment_notes' => $payment_notes,
@@ -277,10 +323,21 @@ class Suppliers extends Persons
 			'voucher_type' => $voucher_type,
 			'account_number' => $account_number
 		];
-		$PaymentVoucherDetail = [
-			'voucher_item' => $payment_notes,
-			'voucher_value' => $voucher_value
-		];
+		if (!empty($pv_item)){
+			$PaymentVoucherDetail = [];
+			for ($i = 0;$i < count($pv_item);$i++){
+				$DetailData = [
+					'voucher_item' => $pv_item[$i],
+					'voucher_value' => !empty($pv_value[$i]) ? $pv_value[$i] : 0
+				];
+				$PaymentVoucherDetail[] = $DetailData;
+			}
+		}else {
+			$PaymentVoucherDetail = [
+				'voucher_item' => $payment_notes,
+				'voucher_value' => $voucher_value
+			];
+		}
 		$VoucherId = $this->Supplier->save_voucher($PaymentVoucher, $PaymentVoucherDetail, $payment_voucher_id);
 		if ($VoucherId != -1) {
 			echo json_encode(array('success' => TRUE,'message' => $this->lang->line('payment_voucher_successful_updating')));

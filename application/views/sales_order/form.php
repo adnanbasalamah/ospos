@@ -101,7 +101,6 @@
             $hidden_item_id = form_hidden('item_id[]', $row_detail[0]);
             $detail_table .= '<td>'.$input_qty_shipped.$hidden_item_id.'</td>';
             $detail_table .= '</tr>';
-
         }
         $detail_table .= '</tbody></table>';
     }
