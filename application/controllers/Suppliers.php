@@ -299,9 +299,9 @@ class Suppliers extends Persons
 		}
 		$pv_last_number = $this->Supplier->get_pv_last_id();
 		if (empty($pv_last_number)){
-			$pv_last_number = 86;
+			$pv_last_number = 93;
 		}else{
-			$pv_last_number = $pv_last_number + 86;
+			$pv_last_number = $pv_last_number + 93;
 		}
 		$data['voucher_number'] = 'PV'.str_pad($pv_last_number,4,'0',STR_PAD_LEFT);
 		$data['voucher_notes'] = $PVNotes;
