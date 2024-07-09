@@ -465,5 +465,29 @@ class Supplier extends Person
 	public function get_detail_pv_found_rows($voucher_id, $search, $filters){
 		return $this->search_pv_detail($voucher_id, $search, $filters, 0, 0, 'payment_voucher_detail.voucher_id', 'asc', TRUE);
 	}
+	public function get_pv_last_id(){
+		$this->db->from('payment_voucher AS pv');
+		$this->db->order_by('voucher_id', 'desc');
+		$this->db->limit(1);
+		$row = $this->db->get()->row();
+		if($row != NULL)
+		{
+			return $row->voucher_id;
+		}
+
+		return 0;
+	}
+	public function update_status_pv($voucher_id, $updated_status = 1){
+		$pv_current_data = $this->get_payment_voucher_info($voucher_id);
+		if (empty($pv_current_data->voucher_status) || $pv_current_data->voucher_status < $updated_status){
+			$pv_data['voucher_status'] = $updated_status;
+			$this->db->where('voucher_id', $voucher_id);
+			$success = $this->db->update('payment_voucher', $pv_data);
+			if ($success){
+				return true;
+			}
+		}
+		return false;
+	}
 }
 ?>

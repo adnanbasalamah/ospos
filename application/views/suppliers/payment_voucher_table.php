@@ -37,6 +37,11 @@
             }
         });
         <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
+
+        var selected_rows = function () {
+            return $("#table td input:checkbox:checked").parents("tr");
+        };
+
         table_support.query_params = function()
         {
             return {
@@ -55,10 +60,60 @@
                 if($("#table tbody tr").length > 1) {
                     $("#table tbody tr:last td:first").html("");
                     $("#table tbody tr:last").css('font-weight', 'bold');
-                    $("#table tbody tr td").each(function(){
+                    /*$("#table tbody tr td").each(function(){
                         $(this).css('line-height', '2px');
-                    })
+                    })*/
                 }
+                $('.btn-status').off('click');
+                $('.btn-status').on('click', function(e){
+                    var IdButton = $(this).attr('id');
+                    var SplitId = IdButton.split('-');
+                    if (SplitId[1] == 1){
+                        var konfirmasi = confirm('Yakin untuk mengubah status menjadi paid...??!');
+                        if (konfirmasi){
+                            var AjaxAddress = 'suppliers/update_status_paid/'+ parseInt(SplitId[0]);
+                            $.ajax({
+                                url: AjaxAddress,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    var return_data = eval(data);
+                                    alert(data.status);
+                                    table_support.refresh();
+                                }
+                            });
+                        }
+                    }
+                });
+                $('#delete-button').off('click');
+                $('#delete-button').on('click', function(){
+                    var selected_row = selected_rows();
+                    var Ids = [];
+                    for (var i = 0; i < selected_row.length;i++){
+                        var selected_cells = selected_row[i]['cells'][1];
+                        var row_id = selected_cells.innerHTML;
+                        Ids.push(row_id);
+                    }
+                    if (Ids.length > 0){
+                        var konfirmasi = confirm('Yakin untuk menghapus payment voucher yang di pilih...??!');
+                        if (konfirmasi){
+                            var request = new Object;
+                            request.pv_id = Ids;
+                            var AjaxAddress = 'suppliers/delete_voucher';
+                            $.ajax({
+                                url: AjaxAddress,
+                                type: 'POST',
+                                data: request,
+                                dataType: 'json',
+                                success: function (data) {
+                                    var return_data = eval(data);
+                                    alert(data.status);
+                                    table_support.refresh();
+                                }
+                            });
+                        }
+                    }
+                });
             },
             queryParams: function() {
                 return $.extend(arguments[0], table_support.query_params());
@@ -76,6 +131,9 @@
 </div>
 <div id="toolbar">
     <div class="pull-left form-inline" role="toolbar">
+        <button id="delete-button" class="btn btn-default btn-sm print_hide">
+            <span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
+        </button>
         <?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm print_hide', 'id'=>'daterangepicker')); ?>
         <?php echo form_input(array('name'=>'filters', 'class'=>'form-control input-sm print_hide', 'id'=>'filters')); ?>
         <?php echo form_hidden('supplier_id', ''); ?>

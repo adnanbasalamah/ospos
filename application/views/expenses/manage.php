@@ -30,7 +30,8 @@ $(document).ready(function()
 				$("#payment_summary").html(response.payment_summary);
 				$("#table tbody tr:last td:first").html("");
 				$("#table tbody tr:last").css('font-weight', 'bold');
-			}
+            }
+            $('#payment-voucher').off('click');
             $('#payment-voucher').click(function(e){
                 var selected_row = selected_rows();
                 var Ids = [];
@@ -75,6 +76,7 @@ $(document).ready(function()
 			title='<?php echo $this->lang->line($controller_name.'_new'); ?>'>
 		<span class="glyphicon glyphicon-tags">&nbsp</span><?php echo $this->lang->line($controller_name . '_new'); ?>
 	</button>
+    <?php echo anchor("suppliers/payment_voucher_table", '<span class="glyphicon glyphicon-credit-card">&nbsp</span>' . $this->lang->line('payment_voucher_table'), array('class'=>'btn btn-danger btn-sm pull-right')); ?>
 </div>
 
 <div id="toolbar">

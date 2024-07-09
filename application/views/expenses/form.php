@@ -157,7 +157,12 @@
 $(document).ready(function()
 {
 	<?php $this->load->view('partial/datepicker_locale'); ?>
-
+    $('#description').on('keyup', function(e){
+        if (e.keyCode == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
 	var amount_validator = function(field) {
 		return {
 			url: "<?php echo site_url($controller_name . '/ajax_check_amount')?>",

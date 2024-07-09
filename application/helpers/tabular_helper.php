@@ -1555,15 +1555,17 @@ function get_payment_voucher_table_headers(){
 	$CI =& get_instance();
 
 	$headers = array(
+		array('voucher_id' => $CI->lang->line('expenses_expense_id'),'sortable' => true),
 		array('voucher_number' => $CI->lang->line('payment_voucher_number'),'sortable' => true),
 		array('supplier_name' => $CI->lang->line('suppliers_supplier'),'sortable' => true),
 		array('name' => $CI->lang->line('suppliers_up_to'),'sortable' => false),
 		array('payment_date' => $CI->lang->line('payment_voucher_date'),'sortable' => true),
-		array('payment_notes' => $CI->lang->line('payment_voucher_notes'),'sortable' => false),
+		array('payment_notes' => $CI->lang->line('payment_voucher_notes'),'sortable' => false, 'escape' => FALSE),
 		array('payment_value' => $CI->lang->line('items_cost_price2'),'sortable' => false,'class' => 'number-col'),
+		array('pv_status' => 'Status', 'escape' => FALSE),
 		array('print_pv' => 'Print', 'escape' => FALSE)
 	);
-	return transform_headers($headers, TRUE, FALSE);
+	return transform_headers($headers, FALSE, FALSE);
 }
 
 function get_payment_voucher_detail_table_headers(){
@@ -1577,20 +1579,39 @@ function get_payment_voucher_detail_table_headers(){
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
+
+function pv_status_array(){
+	return ['NEW', 'PRINTED', 'PAID', 'DELETED'];
+}
+function pv_status_colour_array(){
+	return ['btn-danger', 'btn-info', 'btn-success', 'btn-disabled'];
+}
+function pv_status_title_array(){
+	return ['-', 'click to change status to paid', '-', '-'];
+}
 function get_payment_voucher_data_row($payment_data){
 	$CI =& get_instance();
+	$pv_status_array = pv_status_array();
+	$pv_status_color_array = pv_status_colour_array();
+	$pv_status_title_array = pv_status_title_array();
 	$controller_name = $CI->uri->segment(1);
 	$UptoContact = $payment_data->upto_contact;
 	if (empty($payment_data->upto_contact)){
 		$UptoContact = $payment_data->first_name .' '. $payment_data->last_name;
 	}
+	if (empty($payment_data->voucher_status)){
+		$payment_data->voucher_status = 0;
+	}
+	$pv_status_button = '<a id="'.$payment_data->voucher_id.'-'.$payment_data->voucher_status.'" title="'.$pv_status_title_array[$payment_data->voucher_status].'" class="btn-status btn '.$pv_status_color_array[$payment_data->voucher_status].' btn-xs btn-block">'.$pv_status_array[$payment_data->voucher_status].'</a>';
 	$row = array (
+		'voucher_id' => $payment_data->voucher_id,
 		'voucher_number' => $payment_data->voucher_number,
 		'supplier_name' => $payment_data->company_name,
 		'name' => $UptoContact,
 		'payment_date' => to_datetime(strtotime($payment_data->payment_date)),
 		'payment_notes' => $payment_data->payment_notes,
 		'payment_value' => $payment_data->payment_value,
+		'pv_status' => $pv_status_button
 	);
 	$row['print_pv'] = anchor(
 		$controller_name."/print_pv/$payment_data->voucher_id",

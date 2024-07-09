@@ -18,7 +18,7 @@
         </div>
     </div>
     <?php
-    if (!$payment_type_selected){
+        if (!empty($selected_supplier_id)){
     ?>
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('suppliers_supplier'), 'supplier', array('class'=>'control-label col-xs-3')); ?>
@@ -33,29 +33,31 @@
         <?php echo form_label($this->lang->line('suppliers_up_to'), 'voucher_up_to', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
             <?php
-            echo form_input(array('name'=>'voucher_up_to', 'value'=> $supplier_contact, 'id'=>'supplier_contact', 'class'=>'form-control input-sm', 'readonly' => 'readonly'));
+                echo form_input(array('name'=>'voucher_up_to', 'value'=> $supplier_contact, 'id'=>'supplier_contact', 'class'=>'form-control input-sm', 'readonly' => 'readonly'));
             ?>
         </div>
     </div>
     <?php
-    }else{
+        }else{
     ?>
-        <div class="form-group form-group-sm">
-            <?php echo form_label($this->lang->line('supplier_name'), 'custom_supplier', array('class'=>'control-label col-xs-3')); ?>
-            <div class='col-xs-8'>
-                <?php
+    <div class="form-group form-group-sm">
+        <?php echo form_label($this->lang->line('supplier_name'), 'custom_supplier', array('class'=>'control-label col-xs-3')); ?>
+        <div class='col-xs-8'>
+            <?php
                 echo form_input(array('name'=>'custom_supplier', 'value'=> '', 'id'=>'custom_supplier', 'class'=>'form-control input-sm'));
-                ?>
-            </div>
-            <?php echo form_label($this->lang->line('suppliers_up_to'), 'voucher_up_to', array('class'=>'control-label col-xs-3')); ?>
-            <div class='col-xs-8'>
-                <?php
-                echo form_input(array('name'=>'voucher_up_to', 'value'=> $employee_contact, 'id'=>'employee_contact', 'class'=>'form-control input-sm'));
-                ?>
-            </div>
+            ?>
         </div>
+    </div>
+    <div class="form-group form-group-sm">
+        <?php echo form_label($this->lang->line('suppliers_up_to'), 'voucher_up_to', array('class'=>'control-label col-xs-3')); ?>
+        <div class='col-xs-8'>
+            <?php
+            echo form_input(array('name'=>'voucher_up_to', 'value'=> $supplier_contact, 'id'=>'supplier_contact', 'class'=>'form-control input-sm'));
+            ?>
+        </div>
+    </div>
     <?php
-    }
+        }
     ?>
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('payment_voucher_number'), 'voucher_number', array('class'=>'control-label col-xs-3')); ?>
@@ -70,7 +72,12 @@
         <?php echo form_label($this->lang->line('payment_voucher_notes'), 'voucher_notes', array('class'=>'control-label col-xs-3')); ?>
         <div class='col-xs-8'>
             <?php
-            echo form_input(array('name'=>'voucher_notes', 'value'=> $voucher_notes, 'id'=>'voucher_notes', 'class'=>'form-control input-sm'));
+            echo form_textarea(array(
+                    'name' => 'voucher_notes',
+                    'id' => 'voucher_notes',
+                    'class' => 'form-control input-sm',
+                    'value' => $voucher_notes)
+            );
             ?>
         </div>
     </div>
@@ -154,6 +161,12 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <?php $this->load->view('partial/datepicker_locale'); ?>
+        $('#voucher_notes').on('keyup', function(e){
+            if (e.keyCode == 13){
+                e.preventDefault();
+                return false;
+            }
+        });
         $('#voucher_form').validate($.extend( {
             submitHandler: function(form) {
                 $(form).ajaxSubmit({

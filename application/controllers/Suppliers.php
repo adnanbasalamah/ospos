@@ -185,6 +185,7 @@ class Suppliers extends Persons
 		$data['table_headers'] = get_payment_voucher_detail_table_headers();
 		$data['voucher_id'] = $voucher_id;
 		$voucher_info = $this->Supplier->get_payment_voucher_info($voucher_id);
+		$this->Supplier->update_status_pv($voucher_id);
 		$data['voucher_number'] = $voucher_info->voucher_number;
 		$data['page_title'] = 'PAYMENT VOUCHER';
 		$data['pv_info_supplier'] = $voucher_info->company_name;
@@ -236,8 +237,8 @@ class Suppliers extends Persons
 			$PaymentCash = 1;
 			$ExpenseId = $_GET['expense_id'];
 			$EmployeeContact = '';
-			$ExpenseData = $this->Expense->get_multiple_info($ExpenseId);
 			if (is_array($ExpenseId)){
+				$ExpenseData = $this->Expense->get_multiple_info($ExpenseId)->result();
 				$ArrEmployee = [];
 				foreach ($ExpenseId as $Idexpense){
 					$DataEmployee = $this->Expense->get_employee($Idexpense);
@@ -250,10 +251,14 @@ class Suppliers extends Persons
 						}
 					}
 				}
+				$SupplierId = $ExpenseData[0]->supplier_id;
+				$SupplierData = $this->Supplier->get_info($SupplierId);
 			}else{
-				$ExpenseData = $this->Expense->get_multiple_info($ExpenseId);
+				$ExpenseData = $this->Expense->get_info($ExpenseId)->result();
 				$DataEmployee = $this->Expense->get_employee($ExpenseId);
 				$EmployeeContact .= $DataEmployee->first_name . ' ' . $DataEmployee->last_name;
+				$SupplierId = $ExpenseData->supplier_id;
+				$SupplierData = $this->Supplier->get_info($SupplierId);
 			}
 		}
 		$StartDate = $_GET['start_date'];
@@ -281,12 +286,24 @@ class Suppliers extends Persons
 			$data['supplier_contact'] = $SupplierData->first_name . ' ' . $SupplierData->last_name;
 			$data['account_number'] = $SupplierData->account_number;
 		}else{
+			$data['account_number'] = 'CASH';
+			if (!empty($SupplierId)) {
+				$data['selected_supplier_id'] = $SupplierId;
+				$data['selected_supplier_name'] = $SupplierData->company_name;
+				$data['supplier_contact'] = $SupplierData->first_name . ' ' . $SupplierData->last_name;
+				$data['account_number'] = $SupplierData->account_number;
+			}
 			$data['selected_employee_id'] = $ArrEmployee[0];
 			$data['employee_contact'] = $EmployeeContact;
-			$data['account_number'] = 'CASH';
-			$data['expense_data'] = $ExpenseData->result();
+			$data['expense_data'] = $ExpenseData;
 		}
-		$data['voucher_number'] = 'PV0081';
+		$pv_last_number = $this->Supplier->get_pv_last_id();
+		if (empty($pv_last_number)){
+			$pv_last_number = 86;
+		}else{
+			$pv_last_number = $pv_last_number + 86;
+		}
+		$data['voucher_number'] = 'PV'.str_pad($pv_last_number,4,'0',STR_PAD_LEFT);
 		$data['voucher_notes'] = $PVNotes;
 		$data['voucher_value'] = $PaymentValue;
 		$data['pv_type_option'] = $PvArr;
@@ -300,7 +317,7 @@ class Suppliers extends Persons
 		}
 		$custom_supplier = $this->xss_clean($this->input->post('custom_supplier'));
 		$voucher_number = $this->xss_clean($this->input->post('voucher_number'));
-		$payment_notes = $this->xss_clean($this->input->post('voucher_notes'));
+		$payment_notes = $this->xss_clean(nl2br($this->input->post('voucher_notes')));
 		$voucher_value = $this->xss_clean($this->input->post('voucher_value'));
 		$account_number = $this->xss_clean($this->input->post('account_number'));
 		$upto_contact = $this->xss_clean($this->input->post('voucher_up_to'));
@@ -421,6 +438,37 @@ class Suppliers extends Persons
 			$data_rows[] = $this->xss_clean(get_payment_voucher_data_last_row($payment_data));
 		}
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+	}
+	public function update_status_paid($voucher_id){
+		if (!empty($voucher_id)){
+			$return_data = $this->Supplier->update_status_pv($voucher_id,2);
+			if ($return_data){
+				echo json_encode(array('status' => 'Update Status BERHASIL'));
+			}else{
+				echo json_encode(array('status' => 'Update Status GAGAL'));
+			}
+		}else{
+			echo json_encode(array('status' => 'Update Status GAGAL'));
+		}
+	}
+	public function delete_voucher(){
+		$selected_pv = $this->xss_clean($this->input->post('pv_id'));
+		if (!empty($selected_pv)){
+			$UpdatedStatus = [];
+			for ($i = 0;$i < count($selected_pv);$i++){
+				$ReturnUpdate = $this->Supplier->update_status_pv($selected_pv[$i], 3);
+				if ($ReturnUpdate){
+					$UpdatedStatus[] = $ReturnUpdate;
+				}
+			}
+			if (count($UpdatedStatus)){
+				echo json_encode(array('status' => 'Update Status BERHASIL'));
+			}else{
+				echo json_encode(array('status' => 'Update Status GAGAL'));
+			}
+		}else{
+			echo json_encode(array('status' => 'Update Status GAGAL, Tidak ada PV yang dipilih..!!!'));
+		}
 	}
 }
 ?>
