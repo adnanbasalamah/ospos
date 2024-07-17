@@ -185,6 +185,7 @@ class Suppliers extends Persons
 		$data['table_headers'] = get_payment_voucher_detail_table_headers();
 		$data['voucher_id'] = $voucher_id;
 		$voucher_info = $this->Supplier->get_payment_voucher_info($voucher_id);
+		print_r($voucher_info);
 		$this->Supplier->update_status_pv($voucher_id);
 		$data['voucher_number'] = $voucher_info->voucher_number;
 		$data['page_title'] = 'PAYMENT VOUCHER';
