@@ -3,6 +3,11 @@
     font-size: 32px;
     font-weight: 600;
 }
+.so-number-small{
+    font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+}
 .so-info{
     font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 16px;

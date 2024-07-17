@@ -198,6 +198,8 @@ class Suppliers extends Persons
 		$data['pv_info_notes'] = $voucher_info->payment_notes;
 		$data['pv_info_account_number'] = !empty($voucher_info->pv_account_number) ? $voucher_info->pv_account_number : $voucher_info->account_number;
 		$data['pv_info_date'] = substr($voucher_info->payment_date,0,10);
+		$PvArr = ['online', 'cash'];
+		$data['pv_type'] = $PvArr[$voucher_info->voucher_type];
 		$this->load->view('suppliers/print_pv', $data);
 	}
 

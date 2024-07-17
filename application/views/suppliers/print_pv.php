@@ -39,7 +39,7 @@
 </div>
 <div id="page_title"><?php echo $page_title; ?></div>
 <div class="so-number"><?php echo $voucher_number; ?></div>
-<div class="row">&nbsp;</div>
+<div class="so-number-small">[<?php echo strtoupper($pv_type); ?>]</div>
 <div class="row">&nbsp;</div>
 <div class="row">
     <?php
