@@ -414,6 +414,7 @@ class Supplier extends Person
 
 	public function get_payment_voucher_info($voucher_id){
 		$where = 'voucher_id = '.$voucher_id;
+		$this->db->select('*, pv.account_number AS pv_account_number');
 		$this->db->from('payment_voucher AS pv');
 		$this->db->join('suppliers', 'suppliers.person_id = pv.supplier_id','LEFT');
 		$this->db->join('people', 'suppliers.person_id = people.person_id','LEFT');

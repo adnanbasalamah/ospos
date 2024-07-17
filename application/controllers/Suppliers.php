@@ -185,7 +185,6 @@ class Suppliers extends Persons
 		$data['table_headers'] = get_payment_voucher_detail_table_headers();
 		$data['voucher_id'] = $voucher_id;
 		$voucher_info = $this->Supplier->get_payment_voucher_info($voucher_id);
-		print_r($voucher_info);
 		$this->Supplier->update_status_pv($voucher_id);
 		$data['voucher_number'] = $voucher_info->voucher_number;
 		$data['page_title'] = 'PAYMENT VOUCHER';
@@ -197,7 +196,7 @@ class Suppliers extends Persons
 		}
 		$data['pv_contact'] = $PaymentContact;
 		$data['pv_info_notes'] = $voucher_info->payment_notes;
-		$data['pv_info_account_number'] = $voucher_info->account_number;
+		$data['pv_info_account_number'] = !empty($voucher_info->pv_account_number) ? $voucher_info->pv_account_number : $voucher_info->account_number;
 		$data['pv_info_date'] = substr($voucher_info->payment_date,0,10);
 		$this->load->view('suppliers/print_pv', $data);
 	}
