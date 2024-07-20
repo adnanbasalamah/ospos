@@ -190,6 +190,11 @@ class Suppliers extends Persons
 		$data['page_title'] = 'PAYMENT VOUCHER';
 		$data['pv_info_supplier'] = $voucher_info->company_name;
 		$data['pv_custom_supplier'] = $voucher_info->custom_supplier;
+		if (!empty($voucher_info->custom_supplier)){
+			$data['pv_account_name'] = $voucher_info->custom_supplier;
+		}else{
+			$data['pv_account_name'] = $voucher_info->company_name;
+		}
 		$PaymentContact = $voucher_info->upto_contact;
 		if (empty($voucher_info->upto_contact)){
 			$PaymentContact = $voucher_info->first_name .' '.$voucher_info->last_name;

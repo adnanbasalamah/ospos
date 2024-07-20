@@ -67,7 +67,7 @@
 <div class="row">&nbsp;</div>
 <div class="row">&nbsp;</div>
 <div class="row so-info">
-    <div class="col-md-12">AKAUN : <?php echo $pv_contact; ?></div>
+    <div class="col-md-12">AKAUN : <?php echo $pv_account_name; ?></div>
     <div class="col-md-12"><?php echo $pv_info_account_number; ?></div>
 </div>
 <div class="row">&nbsp;</div>
