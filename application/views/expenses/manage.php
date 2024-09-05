@@ -42,7 +42,7 @@ $(document).ready(function()
                     var payment_row = selected_row[i]['cells'][5];
                     var payment_str = payment_row.innerHTML;
                     var payment_arr = payment_str.split('&nbsp;');
-                    total_payment += parseFloat(payment_arr[1]);
+                    total_payment += parseFloat(payment_arr[1].replace(/,/g, ""));
                     var row_id = selected_cells.innerHTML;
                     Ids.push(row_id);
                     added_query += '&expense_id[]='+ row_id
