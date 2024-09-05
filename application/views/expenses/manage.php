@@ -42,7 +42,12 @@ $(document).ready(function()
                     var payment_row = selected_row[i]['cells'][5];
                     var payment_str = payment_row.innerHTML;
                     var payment_arr = payment_str.split('&nbsp;');
-                    total_payment += parseFloat(payment_arr[1].replace(/,/g, ""));
+                    var payment_symbol_split = payment_arr[0].split('RM');
+                    var symbol_value = '';
+                    if (payment_symbol_split.length > 0){
+                        symbol_value = payment_symbol_split[0];
+                    }
+                    total_payment += (symbol_value + parseFloat(payment_arr[1].replace(/,/g, "")))*1;
                     var row_id = selected_cells.innerHTML;
                     Ids.push(row_id);
                     added_query += '&expense_id[]='+ row_id

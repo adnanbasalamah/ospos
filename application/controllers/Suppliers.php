@@ -201,7 +201,11 @@ class Suppliers extends Persons
 		}
 		$data['pv_contact'] = $PaymentContact;
 		$data['pv_info_notes'] = $voucher_info->payment_notes;
-		$data['pv_info_account_number'] = !empty($voucher_info->pv_account_number) ? $voucher_info->pv_account_number : $voucher_info->account_number;
+		if ($voucher_info->voucher_type == 1){
+			$data['pv_info_account_number'] = $voucher_info->pv_account_number;
+		}else{
+			$data['pv_info_account_number'] = !empty($voucher_info->pv_account_number) ? $voucher_info->pv_account_number : $voucher_info->account_number;
+		}
 		$data['pv_info_date'] = substr($voucher_info->payment_date,0,10);
 		$PvArr = ['online', 'cash'];
 		$data['pv_type'] = $PvArr[$voucher_info->voucher_type];
@@ -318,10 +322,8 @@ class Suppliers extends Persons
 	}
 
 	public function voucher_save($payment_voucher_id = null){
-		$voucher_type = $this->xss_clean($this->input->post('voucher_type'));
-		if (!$voucher_type){
-			$supplier_id = $this->xss_clean($this->input->post('supplier_id'));
-		}
+		$voucher_type = $this->xss_clean($this->input->post('payment_voucher_type'));
+		$supplier_id = $this->xss_clean($this->input->post('supplier_id'));
 		$custom_supplier = $this->xss_clean($this->input->post('custom_supplier'));
 		$voucher_number = $this->xss_clean($this->input->post('voucher_number'));
 		$payment_notes = $this->xss_clean(nl2br($this->input->post('voucher_notes')));
