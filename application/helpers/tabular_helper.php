@@ -1303,8 +1303,8 @@ function get_payment_paid_items_table_headers(){
 		array('unit_price' => $CI->lang->line('items_unit_price'),'sortable' => false,'class' => 'number-col'),
 		array('cost_price' => $CI->lang->line('items_cost_price2'),'sortable' => false,'class' => 'number-col'),
 		array('total_payment' => 'P SUPP(RM)','sortable' => false,'class' => 'number-col', 'escape' => false),
-		array('total_margin' => 'P IMESRA(RM)','sortable' => false,'class' => 'number-col')
-		//array('related_invoices' => 'INVOICE','sortable' => false, 'escape' => false),
+		array('total_margin' => 'P IMESRA(RM)','sortable' => false,'class' => 'number-col'),
+		array('related_invoices' => 'INVOICE','sortable' => false, 'escape' => false)
 	);
 	return transform_headers($headers, TRUE, FALSE);
 }
@@ -1320,8 +1320,8 @@ function get_paid_sale_item_data_row($paid_items){
 		'unit_price' => to_currency_no_money($paid_items->max_unit_price),
 		'cost_price' => to_currency_no_money($paid_items->max_price),
 		'total_payment' => to_currency_no_money($paid_items->total_payment),
-		'total_margin' => to_currency_no_money($paid_items->total_margin)
-		//'related_invoices' => $paid_items->related_invoices
+		'total_margin' => to_currency_no_money($paid_items->total_margin),
+		'related_invoices' => $paid_items->related_invoices
 	);
 	return $row;
 }
@@ -1610,7 +1610,7 @@ function get_payment_voucher_data_row($payment_data){
 		'name' => $UptoContact,
 		'payment_date' => to_datetime(strtotime($payment_data->payment_date)),
 		'payment_notes' => $payment_data->payment_notes,
-		'payment_value' => $payment_data->payment_value,
+		'payment_value' => round($payment_data->payment_value,1),
 		'pv_status' => $pv_status_button
 	);
 	$row['print_pv'] = anchor(
