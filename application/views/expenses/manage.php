@@ -53,6 +53,7 @@ $(document).ready(function()
                     added_query += '&expense_id[]='+ row_id
                 }
                 console.log(added_query);
+                total_payment = Math.round(total_payment*10)/10;
                 added_query += '&payment='+ total_payment +'&payment_type=1';
                 var hrefVal = 'suppliers/payment_voucher?start_date='+ start_date +'&end_date='+ end_date + added_query;
                 $('#show_pv_button').attr('href',hrefVal);
