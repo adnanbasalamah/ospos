@@ -62,7 +62,7 @@
 </div>
 <div class="row">&nbsp;</div>
 <div id="table_holder">
-    <table id="table"></table>
+    <table id="table" style="font-size: 14px;"></table>
 </div>
 <div class="row">&nbsp;</div>
 <div class="row">&nbsp;</div>
